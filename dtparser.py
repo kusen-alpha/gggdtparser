@@ -89,14 +89,17 @@ class StringDateTimeRegexParser(object):
             match_obj = None
             try:
                 match_obj = re.search(regex, s, flags=re.M | re.I | re.S)
-            except (ValueError, re.error):
-                print(regex, s)
+            except (ValueError, re.error) as e:
+                # print(regex, s, e)
+                continue
             if not match_obj:
                 continue
             group_dict = match_obj.groupdict()
             if group_dict:
                 try:
-                    return cls._parse_group_dict(group_dict, accurately)
+                    result = cls._parse_group_dict(group_dict, accurately)
+                    # print(regex)
+                    return result
                 except ValueError as e:
                     continue
 
@@ -106,6 +109,8 @@ class StringDateTimeRegexParser(object):
         now = datetime.datetime.now()
         timestamp = int(group_dict.get('ts') or 0)
         if timestamp:
+            if len(str(timestamp)) == 13:
+                timestamp = int(timestamp) // 1000
             return datetime.datetime.fromtimestamp(timestamp)
         year = group_dict.get('Y') or now.year
         if isinstance(year, str) and len(year) == 2:
@@ -118,6 +123,7 @@ class StringDateTimeRegexParser(object):
         hour = int(group_dict.get('H') or 0)
         minute = int(group_dict.get('M') or 0)
         second = int(group_dict.get('S') or 0)
+        # 常见异常组合
         use_now_config = dict()
         use_now_config['year'] = use_now_config['month'] = False
         use_now_config['day'] = use_now_config['hour'] = False
@@ -235,7 +241,7 @@ class StringDateTimeRegexParser(object):
                     second=un_accurately)
         if special_other:
             if special_other == '刚刚':
-                change_second += 10
+                change_second += 5
                 cls._update_use_now_config(
                     use_now_config, year=True, month=True,
                     day=True, hour=True, minute=True, second=True)
@@ -260,8 +266,6 @@ class StringDateTimeRegexParser(object):
             accurately, use_now_config['minute'], now.minute, minute)
         second = cls._get_default_or_now(
             accurately, use_now_config['second'], now.second, second)
-        if year and not month:
-            raise ValueError
         month = 1 if not month else month
         day = 1 if not day else day
         parse_date_time = now.replace(
