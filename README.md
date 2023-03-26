@@ -1,5 +1,5 @@
 # gggdtparser
-  (General General General DateTime Parser) ,通用的字符串时间解析Python库。
+通用时间解析器(General General General DateTime Parser) ，是基于Python编写的字符串时间抽取解析工具。
 
 ## 项目背景
 1. 在日常开发中，特别是爬虫采集时，来自各种语言、各种格式、语义化话的字符串时间，对其解析非常复杂繁琐。
@@ -13,7 +13,7 @@
     pip install gggdtparser
 ### 使用
     import gggdtparser
-    dt = gggdtparser.parse("2022/02/02 02:02:02")
+    dt = gggdtparser.parse("发布：2022/02/02 02:02:02，来源：xxx网")
     print(dt)
 ## 使用案例
 参考test.py中的测试案例
