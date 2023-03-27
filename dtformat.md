@@ -1,4 +1,3 @@
-
 # 测试时间格式样例
 
 ## 一、标准时间/中文时间
@@ -81,31 +80,30 @@
 
 ### the special day
 
-2. 前天02:02:02
+1. 前天02:02:02
 2. 前天02:02
-2. 前天02
-1. 前天
-3. 昨天02:02:02
-3. 昨天02:02
-3. 昨天02
-3. 昨天
-4. 今天02:02:02
-4. 今天02:02
-4. 今天02
-4. 今天
+3. 前天02
+4. 前天
+5. 昨天02:02:02
+6. 昨天02:02
+7. 昨天02
+8. 昨天
+9. 今天02:02:02
+10. 今天02:02
+11. 今天02
+12. 今天
 13. 刚刚
 
 ### before days
 
-1. 2年前 
+1. 2年前
 2. 2月前
-4. 2星期前
-6. 2周前
-7. 2天前
-9. 2小时前
-11. 2分钟前
-12. 2秒前
-
+3. 2星期前
+4. 2周前
+5. 2天前
+6. 2小时前
+7. 2分钟前
+8. 2秒前
 
 ### in days
 
@@ -130,57 +128,119 @@
 
 1. 民國112年02月07日
 2. 民国112年02月07日
-10. 2小時前
+3. 2小時前
 
 ## 三、英文时间
+
 ### year month day hour minute second
+
 1. Thu Mar 23 02:28:00 2022 UTC
+
 ### year month day hour minute
+
 1. Feb 02, 2022 08:35 pm
 2. Mon, Feb 06, 2022 - 10:31 AM
 3. 18:33, 5 Feb 2022
+
 ### year month day hour
+
 ### year month day
+
 1. February 9, 2022
-2. 7 March 2022
+2. Feb. 23, 2022
+3. 7 March 2022
+
 ### year month
+
 ### year
+
 ### month day hour minute second
+
 ### month day hour minute
+
 ### month day hour
+
 ### month day
+
 ### month
+
 ### day hour minute second
+
 ### day hour minute
+
 ### day hour
+
 ### day
+
 ### hour minute second
+
 ### hour minute
+
 ### hour
+
 ### minute second
+
 ### minute
-21 years ago
-3. 1 month ago
-5. 2 weeks ago
-8. 6 days ago
+
+### the special day
+
+### before days
+
+1. years ago
+2. 2 month ago
+3. 2 weeks ago
+4. 6 days ago
+
+### in days
+
+### other
+
 ## 其他语言时间
+
 ### year month day hour minute second
+
 ### year month day hour minute
+
 ### year month day hour
+
 ### year month day
+
 ### year month
+
 ### year
+
 ### month day hour minute second
+
 ### month day hour minute
+
 ### month day hour
+
 ### month day
+
 ### month
+
 ### day hour minute second
+
 ### day hour minute
+
 ### day hour
+
 ### day
+
 ### hour minute second
+
 ### hour minute
+
 ### hour
+
 ### minute second
+
 ### minute
+
+### the special day
+
+### before days
+
+### in days
+
+### other

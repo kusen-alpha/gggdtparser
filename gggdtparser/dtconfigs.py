@@ -81,30 +81,6 @@ ZH_TW_STRING_DATE_TIME_REGEX_LIST = [
     r"民国(?P<mgY>\d+)[年]?",
 ]
 
-DEFAULT_META_XPATH_LIST = [  # 部分特别规范的新闻网站，可以直接从 HTML 的 meta 数据中获得发布时间
-    '//meta[starts-with(@property, "rnews:datePublished")]/@content',
-    '//meta[starts-with(@property, "article:published_time")]/@content',
-    '//meta[starts-with(@property, "og:article:published_time")]/@content',
-    '//meta[starts-with(@property, "og:published_time")]/@content',
-    '//meta[starts-with(@property, "og:release_date")]/@content',
-    '//meta[starts-with(@itemprop, "datePublished")]/@content',
-    '//meta[starts-with(@itemprop, "dateUpdate")]/@content',
-    '//meta[starts-with(@name, "OriginalPublicationDate")]/@content',
-    '//meta[starts-with(@name, "article_date_original")]/@content',
-    '//meta[starts-with(@name, "og:time")]/@content',
-    '//meta[starts-with(@name, "apub:time")]/@content',
-    '//meta[starts-with(@name, "publication_date")]/@content',
-    '//meta[starts-with(@name, "sailthru.date")]/@content',
-    '//meta[starts-with(@name, "PublishDate")]/@content',
-    '//meta[starts-with(@name, "publishdate")]/@content',
-    '//meta[starts-with(@name, "PubDate")]/@content',
-    '//meta[starts-with(@name, "pubtime")]/@content',
-    '//meta[starts-with(@name, "_pubtime")]/@content',
-    '//meta[starts-with(@name, "weibo: article:create_at")]/@content',
-    '//meta[starts-with(@pubdate, "pubdate")]/@content',
-    '//meta[@property="article:published_time"]/@content',
-]
-
 # 英文转阿拉伯
 EN2ARAB = [
     (r"January|Jan\.|Jan", "1月"),
