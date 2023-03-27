@@ -7,7 +7,7 @@
 import re
 import random
 import datetime
-import dtconfigs
+from . import dtconfigs
 
 
 class StringDateTimeLanguageHandler(object):
@@ -338,7 +338,21 @@ def parse_string_datetime(s, format_list=None, regex_list=None,
         return result
 
 
+def check(dst_dt, check_dt):
+    """
+    检测解析结果
+    :param dst_dt: 解析结果datetime.datetime
+    :param check_dt: 验证结果datetime.datetime或两datetime.datetime元组
+    :return: bool
+    """
+    if isinstance(check_dt, datetime.datetime):
+        return dst_dt == check_dt
+    start_dt, end_dt = check_dt
+    return start_dt <= dst_dt <= end_dt
+
+
 parse = parse_string_datetime
 
 if __name__ == '__main__':
-    parse_string_datetime_by_format('2022年', fs=['%Y年'])
+    result = parse_string_datetime_by_format('2022年', fs=['%Y年'])
+    print(result)
