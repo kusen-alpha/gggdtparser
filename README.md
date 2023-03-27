@@ -14,8 +14,14 @@
     pip install gggdtparser
 ### 使用
     import gggdtparser
-    dt = gggdtparser.parse("发布：2022/02/02 02:02:02，来源：xxx网")
-    print(dt)
+    parse_dt = gggdtparser.parse("发布：2022/02/02 02:02:02，来源：xxx网")
+    print(parse_dt)
+### 测试
+    import datetime
+    import gggdtparser
+    parse_dt = gggdtparser.parse("发布：2022/02/02 02:02:02，来源：xxx网")
+    is_right = gggdtparser.check(parse_dt, datetime.datetime(year=2022, month=2, day=2, hour=2, minute=2, second=2))
+    print(is_right)
 ## 使用案例
 1. 参考dtformat.md中支持的格式。
 2. 参考test.py中的测试案例。
