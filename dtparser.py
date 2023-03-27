@@ -319,12 +319,12 @@ def parse_string_datetime(s, format_list=None, regex_list=None,
                           langs=None, accurately=True):
     """
     解析文本时间
-    :param s:
-    :param format_list:
-    :param regex_list:
-    :param langs:
-    :param accurately:
-    :return:
+    :param s: 字符串时间文本
+    :param format_list: 时间解析模板列表，如%Y-%m-%d
+    :param regex_list: 正则解析规则列表，统一为有名分组格式，参考dtconfigs.py
+    :param langs: 语言列表，优先设置的语言进行翻译替换和解析
+    :param accurately: 是否为严格模式
+    :return: datetime.datetime
     """
     # format
     # regex
