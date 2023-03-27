@@ -330,7 +330,7 @@ def parse_string_datetime(s, format_list=None, regex_list=None,
     # format
     # regex
     # fanyi
-    result = parse_string_datetime_by_format(s, format_list, accurately)
+    result = parse_string_datetime_by_format(s, format_list)
     if result:
         return result
     result = parse_string_datetime_by_regex(s, regex_list, langs, accurately)
