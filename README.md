@@ -17,7 +17,8 @@
     dt = gggdtparser.parse("发布：2022/02/02 02:02:02，来源：xxx网")
     print(dt)
 ## 使用案例
-参考test.py中的测试案例
+1. 参考dtformat.md中支持的格式。
+2. 参考test.py中的测试案例。
 ## 关于作者
 1. 邮箱：1194542196@qq.com
 2. 微信：hu1194542196
