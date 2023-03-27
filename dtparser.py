@@ -294,11 +294,12 @@ class StringDateTimeRegexParser(object):
 parse_string_datetime_by_regex = StringDateTimeRegexParser.parse
 
 
-def parse_string_datetime_by_format(s, fs=None):
+def parse_string_datetime_by_format(s, fs=None, accurately=True):
     """
     通过format进行时间解析
     :param s:
     :param fs:
+    :param accurately:
     :return:
     """
     if not fs:
@@ -323,13 +324,13 @@ def parse_string_datetime(s, format_list=None, regex_list=None,
     :param format_list: 时间解析模板列表，如%Y-%m-%d
     :param regex_list: 正则解析规则列表，统一为有名分组格式，参考dtconfigs.py
     :param langs: 语言列表，优先设置的语言进行翻译替换和解析
-    :param accurately: 是否为严格模式
+    :param accurately: 是否为严格模式,format不支持非严格模式
     :return: datetime.datetime
     """
     # format
     # regex
     # fanyi
-    result = parse_string_datetime_by_format(s, format_list)
+    result = parse_string_datetime_by_format(s, format_list, accurately)
     if result:
         return result
     result = parse_string_datetime_by_regex(s, regex_list, langs, accurately)
@@ -338,3 +339,6 @@ def parse_string_datetime(s, format_list=None, regex_list=None,
 
 
 parse = parse_string_datetime
+
+if __name__ == '__main__':
+    parse_string_datetime_by_format('2022年', fs=['%Y年'])
