@@ -294,7 +294,7 @@ class StringDateTimeRegexParser(object):
 parse_string_datetime_by_regex = StringDateTimeRegexParser.parse
 
 
-def parse_string_datetime_by_format(s, fs=None, accurately=True):
+def parse_string_datetime_by_format(s, fs=None):
     """
     通过format进行时间解析
     :param s:
