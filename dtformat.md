@@ -10,12 +10,15 @@
 ### year month day hour minute second
 
 1. 2022-02-02T02:02:02+00:00
-2. 2022年02月02日 02:02:02
+2. 2022-02-02 02:02:02
+3. 2022年02月02日 02:02:02
+4. 2022/02/02 02:02:02
 
 ### year month day hour minute
 
 1. 2022年02月02日 02:02
 2. 2022-02-02 02:02
+3. 2022/02/02 02:02
 
 ### year month day hour
 
@@ -27,7 +30,9 @@
 2. 2022/02/02
 3. 20220202
 4. 2022.02.02
-5. 二零二二年二月二日
+5. 二零二二年二月二日 
+6. 2022-02-02
+7. 2022/0202
 
 ### year month
 
@@ -46,6 +51,7 @@
 ### month day hour minute
 
 1. 02月02日 02:02
+2. 03/18 11:08
 
 ### month day hour
 
@@ -55,6 +61,7 @@
 
 1. 02月02日
 2. 02-02
+3. 3/28
 
 ### month
 
@@ -78,7 +85,7 @@
 
 ### hour
 
-### the special day
+### the special
 
 1. 前天02:02:02
 2. 前天02:02
@@ -94,7 +101,7 @@
 12. 今天
 13. 刚刚
 
-### before days
+### before
 
 1. 2年前
 2. 2月前
@@ -105,7 +112,7 @@
 7. 2分钟前
 8. 2秒前
 
-### in days
+### in
 
 1. 2年内
 2. 2月内
@@ -135,12 +142,15 @@
 ### year month day hour minute second
 
 1. Thu Mar 23 02:28:00 2022 UTC
+2. Sat Mar 18 11:07:47 2023
 
 ### year month day hour minute
 
 1. Feb 02, 2022 08:35 pm
 2. Mon, Feb 06, 2022 - 10:31 AM
-3. 18:33, 5 Feb 2022
+3. 14  March  2023 |  10:57 AM
+4. 18:33, 5 Feb 2022
+5. Wed 29 Mar 2023 at 3:04pm
 
 ### year month day hour
 
@@ -149,6 +159,7 @@
 1. February 9, 2022
 2. Feb. 23, 2022
 3. 7 March 2022
+4. MONDAY, MARCH 20, 2023
 
 ### year month
 
@@ -161,6 +172,8 @@
 ### month day hour
 
 ### month day
+
+1. Feb 5
 
 ### month
 
@@ -182,16 +195,20 @@
 
 ### minute
 
-### the special day
+### the special
 
-### before days
+### before
 
-1. years ago
+1. 2 years ago
 2. 2 month ago
 3. 2 weeks ago
-4. 6 days ago
+4. 2 days ago
+5. 2h ago
+6. 2 hours ago
+7. 2 minutes ago
+8. 2m ago
 
-### in days
+### in
 
 ### other
 
@@ -237,10 +254,10 @@
 
 ### minute
 
-### the special day
+### the special
 
-### before days
+### before
 
-### in days
+### in
 
 ### other

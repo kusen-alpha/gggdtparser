@@ -110,6 +110,14 @@ if __name__ == '__main__':
                 year=2022, month=2, day=2,
                 hour=now.hour, minute=now.minute, second=now.second),
         },
+        '2022/0202': {
+            'accurately': datetime.datetime(
+                year=2022, month=2, day=2, hour=0,
+                minute=0, second=0),
+            'un_accurately': datetime.datetime(
+                year=2022, month=2, day=2, hour=now.hour,
+                minute=now.minute, second=now.second)
+        },
         '2022年02月': {
             'accurately': datetime.datetime(
                 year=2022, month=2, day=1),
@@ -154,6 +162,14 @@ if __name__ == '__main__':
                 year=now.year, month=2, day=2, hour=2,
                 minute=2, second=now.second),
         },
+        '02/02 02:02': {
+            'accurately': datetime.datetime(
+                year=now.year, month=2, day=2, hour=2,
+                minute=2, second=0),
+            'un_accurately': datetime.datetime(
+                year=now.year, month=2, day=2, hour=2,
+                minute=2, second=now.second)
+        },
         '02月02日 02': {
             'accurately': datetime.datetime(
                 year=now.year, month=2, day=2, hour=2,
@@ -177,6 +193,14 @@ if __name__ == '__main__':
             'un_accurately': datetime.datetime(
                 year=now.year, month=2, day=2, hour=now.hour,
                 minute=now.minute, second=now.second),
+        },
+        '2/2': {
+            'accurately': datetime.datetime(
+                year=now.year, month=2, day=2, hour=0,
+                minute=0, second=0),
+            'un_accurately': datetime.datetime(
+                year=now.year, month=2, day=2, hour=now.hour,
+                minute=now.minute, second=now.second)
         },
         '02月': {
             'accurately': datetime.datetime(
@@ -509,7 +533,7 @@ if __name__ == '__main__':
 
     }
     test_string_datetime = {
-        '10秒内': {
+        '03/18 11:08': {
             'accurately': datetime.datetime(
                 year=now.year, month=now.month, day=now.day, hour=now.hour,
                 minute=now.minute, second=now.second) - datetime.timedelta(

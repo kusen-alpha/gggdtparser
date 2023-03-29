@@ -6,3 +6,5 @@
 
 from .dtparser import parse
 from .dtparser import check
+from .dtparser import parse_string_datetime_by_format
+from .dtparser import parse_string_datetime_by_regex

@@ -98,7 +98,7 @@ class StringDateTimeRegexParser(object):
             if group_dict:
                 try:
                     result = cls._parse_group_dict(group_dict, accurately)
-                    # print(regex)
+                    print(regex)
                     return result
                 except ValueError as e:
                     continue
@@ -116,8 +116,8 @@ class StringDateTimeRegexParser(object):
         if isinstance(year, str) and len(year) == 2:
             year = '20' + year
         year = int(year)
-        if year < 1970:
-            raise ValueError
+        # if year < 1970:
+        #     raise ValueError
         month = int(group_dict.get('m') or 0)
         day = int(group_dict.get('d') or 0)
         hour = int(group_dict.get('H') or 0)
