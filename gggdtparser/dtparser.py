@@ -22,19 +22,15 @@ class StringDateTimeLanguageHandler(object):
         if not langs:
             langs = []
         if not langs:
-            for di in dir(dtconfigs):
-                if not re.search(r'.+2.+', di):
+            for key in dir(dtconfigs):
+                if 'SUB_TRANSLATE' not in key:
                     continue
-                for conf in getattr(dtconfigs, di):
+                for conf in getattr(dtconfigs, key):
                     s = re.sub(conf[0], conf[1], s)
         for lang in langs:
-            to_arab = '%s2ARAB' % lang.upper()
-            to_zh_cn = '%s2ZH_CN' % lang.upper()
-            if hasattr(dtconfigs, to_arab):
-                for conf in getattr(dtconfigs, to_arab):
-                    s = re.sub(conf[0], conf[1], s)
-            if hasattr(dtconfigs, to_zh_cn):
-                for conf in getattr(dtconfigs, to_zh_cn):
+            sub_translate = '%s_SUB_TRANSLATE' % lang.upper()
+            if hasattr(dtconfigs, sub_translate):
+                for conf in getattr(dtconfigs, sub_translate):
                     s = re.sub(conf[0], conf[1], s)
         return s
 
@@ -245,6 +241,10 @@ class StringDateTimeRegexParser(object):
                 cls._update_use_now_config(
                     use_now_config, year=True, month=True,
                     day=True, hour=True, minute=True, second=True)
+        # 上下午
+        ap = group_dict.get('ap')
+        if ap == 'pm':
+            hour += 12 if hour and hour < 12 else hour
         # 民国时间
         mg_year = group_dict.get('mgY')
         if mg_year:

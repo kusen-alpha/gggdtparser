@@ -71,6 +71,8 @@ EN_STRING_DATE_TIME_REGEX_LIST = [
     r"(?P<H>\d{1,2})[:](?P<M>\d{1,2})\s*[,]?\s*(?P<d>\d{1,2})\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})",  # 04:28, 13 Feb 2023
     r"(?P<m>\d{1,2})\s*[月]\s*(?P<d>\d{1,2})\s*(?P<H>\d{1,2})[:](?P<M>\d{1,2})[:](?P<S>\d{1,2})\s*(?P<Y>\d{4})",  # Mar 23 02:28:00 2023
     r"(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*,\s*(?P<Y>\d{4})",  # 10 25, 2021| Jan 01, 2000
+    r"(?P<d>\d{1,2})\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})\s*(?P<H>\d{1,2})[:](?P<M>\d{1,2})\s*(?P<ap>am|pm)",  # Wed 29 Mar 2023 at 3:04pm
+    r"(?P<d>\d{1,2})\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})\s*(?P<H>\d{1,2})[:](?P<M>\d{1,2})",  # Wed 29 Mar 2023 at 3:04
     r"(?P<d>\d{1,2})\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})",  # 25 10 2021
     r"(?P<d>\d{1,2})\s*(?P<m>\d{1,2})\s*(?P<Y>\d{4})",  # 25 10 2021
     r"(?P<m>\d{1,2})\s*(?P<Y>\d{4})",  # 10 2021
@@ -92,7 +94,7 @@ ZH_TW_STRING_DATE_TIME_REGEX_LIST = [
 ]
 
 # 英文转阿拉伯
-EN2ARAB = [
+EN_SUB_TRANSLATE = [
     (r"January|Jan\.|Jan", "1月"),
     (r"February|Feb\.|Feb", "2月"),
     (r"March|Mar\.|Mar", "3月"),
@@ -108,11 +110,14 @@ EN2ARAB = [
     (r'Spring', '2月'),
     (r'Summer', '5月'),
     (r'Autumn', '8月'),
-    (r'Winter', '11月')
+    (r'Winter', '11月'),
+    (r'at', ''),
+    (r'AM', 'am'),
+    (r'PM', 'pm'),
 ]
 
 # 中文转阿拉伯
-ZH_CN2ARAB = [
+ZH_CN_SUB_TRANSLATE = [
     (r"十一", "11"),
     (r"十二", "12"),
     (r"十三", "13"),
@@ -141,10 +146,11 @@ ZH_CN2ARAB = [
 ]
 
 # 繁体转简体
-ZH_TW2ZH_CN = {
+ZH_TW_SUB_TRANSLATE = {
     (r'時', '时'),
     (r'國', '国'),
 }
+
 
 DATE_TIME_FORMATS = [
     # '%Y/%m/%d'
