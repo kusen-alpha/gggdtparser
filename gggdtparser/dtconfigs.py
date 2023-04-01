@@ -62,6 +62,7 @@ STRING_DATE_TIME_REGEX_LIST_FUZZY = [  # 模糊时间
     r"(?P<H>\d{1,2})\s*[:时]\s*(?P<M>\d{1,2})\s*[:分]\s*(?P<S>\d{1,2})\s*[秒]?",  # 02:02:02
     r"(?P<H>\d{1,2})\s*[:时]\s*(?P<M>\d{1,2})\s*[:分]?",  # 02:02
     r"(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[\-\|/\.日]\s*(?P<Y>\d{2,4})",  # 06-02-20
+    r"(?P<d>\d{1,2})\s*[\-\|/\.日]\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<Y>\d{2,4})",  # 31.01.2019
     r"(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[日]?",  # 11月20日 01-01
     r"(?P<Y>\d{4})\s*(?P<m>\d{1,2})\s*(?P<d>\d{1,2})",  # 20000101
 ]
@@ -95,23 +96,23 @@ ZH_TW_STRING_DATE_TIME_REGEX_LIST = [
 
 # 英文转阿拉伯
 EN_SUB_TRANSLATE = [
-    (r"January|Jan\.|Jan", "1月"),
-    (r"February|Feb\.|Feb", "2月"),
-    (r"March|Mar\.|Mar", "3月"),
-    (r"April|Apr\.|Apr", "4月"),
-    (r"May\.|May", "5月"),
-    (r"June|Jun\.|Jun", "6月"),
-    (r"July|Jul\.|Jul", "7月"),
-    (r"August|Aug\.|Aug", "8月"),
-    (r"September|Sept\.|Sept|Sep\.|Sep", "9月"),
-    (r"October|Oct\.|Oct", "10月"),
-    (r"November|Nov\.|Nov", "11月"),
-    (r"December|Dec\.|Dec", "12月"),
-    (r'Spring', '2月'),
-    (r'Summer', '5月'),
-    (r'Autumn', '8月'),
-    (r'Winter', '11月'),
-    (r'at', ''),
+    (r"January|JANUARY|Jan\.|Jan", "1月"),
+    (r"February|FEBRUARY|Feb\.|Feb", "2月"),
+    (r"March|MARCH|Mar\.|Mar", "3月"),
+    (r"April|APRIL|Apr\.|Apr", "4月"),
+    (r"May\.|May|MAY", "5月"),
+    (r"June|JUNE|Jun\.|Jun", "6月"),
+    (r"July|JULY|Jul\.|Jul", "7月"),
+    (r"August|AUGUST|Aug\.|Aug", "8月"),
+    (r"September|SEPTEMBER|Sept\.|Sept|Sep\.|Sep", "9月"),
+    (r"October|OCTOBER|Oct\.|Oct", "10月"),
+    (r"November|NOVEMBER|Nov\.|Nov", "11月"),
+    (r"December|DECEMBER|Dec\.|Dec", "12月"),
+    (r'Spring|SPRING', '2月'),
+    (r'Summer|SUMMER', '5月'),
+    (r'Autumn|AUTUMN', '8月'),
+    (r'Winter|WINTER', '11月'),
+    (r'at|AT', ''),
     (r'AM', 'am'),
     (r'PM', 'pm'),
 ]
@@ -149,6 +150,7 @@ ZH_CN_SUB_TRANSLATE = [
 ZH_TW_SUB_TRANSLATE = {
     (r'時', '时'),
     (r'國', '国'),
+    (r'鐘', '钟'),
 }
 
 
