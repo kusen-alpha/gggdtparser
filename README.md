@@ -25,7 +25,7 @@
 
     import gggdtparser
     parse_dt = gggdtparser.parse("发布：2022/02/02 02:02:02，来源：xxx网")
-    print(parse_dt)
+    print(parse_dt)  # 2022-02-02 02:02:02
 
 ### 测试
 
@@ -33,15 +33,20 @@
     import gggdtparser
     parse_dt = gggdtparser.parse("发布：2022/02/02 02:02:02，来源：xxx网")
     is_right = gggdtparser.check(parse_dt, datetime.datetime(year=2022, month=2, day=2, hour=2, minute=2, second=2))
-    print(is_right)
+    print(is_right)  # True
 
 ## 使用案例
 
+### 详细案例
+
 1. 参考dtformat.md中支持的格式。
 2. 参考test.py中的测试案例。
+
+### 特色案例
 
 ## 关于作者
 
 1. 邮箱：1194542196@qq.com
 2. 微信：hu1194542196
-3. 目前对常见的时间格式解析支持比较全，但是一些特殊的时间格式和其他语言的支持不够完善，如果遇到解析bug或不能解析的时间格式，可以私信作者，你们的提供越多，本库才能更完善。
+3. 目前对常见的时间格式解析支持比较全，但是一些特殊的时间格式和其他语言的支持不够完善，如果遇到解析bug
+   或不能解析的时间格式，可以私信作者，你们的提供越多，本库才能更完善。
