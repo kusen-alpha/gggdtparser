@@ -30,7 +30,7 @@
 2. 2022/02/02
 3. 20220202
 4. 2022.02.02
-5. 二零二二年二月二日 
+5. 二零二二年二月二日
 6. 2022-02-02
 7. 2022/0202
 
@@ -133,10 +133,58 @@
 
 ## 二、繁体/中国台湾时间
 
-1. 民國112年02月07日
-2. 民国112年02月07日
-3. 2小時前
-4. 13分鐘前
+### year month day hour minute second
+
+### year month day hour minute
+
+### year month day hour
+
+1. 民国111年02月02日
+
+### year month day
+
+### year month
+
+### year
+
+### month day hour minute second
+
+### month day hour minute
+
+### month day hour
+
+### month day
+
+### month
+
+### day hour minute second
+
+### day hour minute
+
+### day hour
+
+### day
+
+### hour minute second
+
+### hour minute
+
+### hour
+
+### minute second
+
+### minute
+
+### the special
+
+### before
+
+1. 2小時前
+2. 2分鐘前
+
+### in
+
+### other
 
 ## 三、英文时间
 
@@ -147,20 +195,20 @@
 
 ### year month day hour minute
 
-1. Feb 02, 2022 08:35 pm
-2. Mon, Feb 06, 2022 - 10:31 AM
-3. 14  March  2023 |  10:57 AM
-4. 18:33, 5 Feb 2022
-5. Wed 29 Mar 2023 at 3:04pm
+1. Feb 02, 2022 02:02 pm
+2. Feb 02, 2022 02:02
+3. Feb 02, 2022 - 02:02 AM
+4. 02 Feb 2022 | 02:02 AM
+5. 18:33, 5 Feb 2022
+6. 02 Feb 2022 at 2:02pm
 
 ### year month day hour
 
 ### year month day
 
-1. February 9, 2022
-2. Feb. 23, 2022
-3. 7 March 2022
-4. MONDAY, MARCH 20, 2023
+1. February 2, 2022
+2. Feb. 02, 2022
+3. 7 February 2022
 
 ### year month
 
@@ -208,42 +256,193 @@
 6. 2 hours ago
 7. 2 minutes ago
 8. 2m ago
+9. 2 seconds ago
 
 ### in
 
 ### other
 
 ## 其他语言时间
+
 ### 法语
-1. aujourd’hui à 10h35
-2. à 10h35
-3. 1 heure
-4. il y a 1 # 之前
-5. à l’instant
-6. il y a 2 heures
-7. 31/03/23 à 12h03
-8. 20/02/06 à 00h00
-9. 31 mars 2023 à 11h37
+
+### year month day hour minute second
+
+### year month day hour minute
+
+1. 02/02/22 à 02h02
+2. 02/02/2022 à 02h02
+3. 31 mars 2023 à 11h37
+
+### year month day hour
+
+### year month day
+
+### year month
+
+### year
+
+### month day hour minute second
+
+### month day hour minute
+
+### month day hour
+
+### month day
+
+### month
+
+### day hour minute second
+
+### day hour minute
+
+### day hour
+
+### day
+
+### hour minute second
+
+### hour minute
+
+1. aujourd’hui à 02h02
+2. à 02h02
+
+### hour
+
+### minute second
+
+### minute
+
+### the special
+
+1. à l’instant
+
+### before
+
+1. 2 heure
+2. il y a 2 heures
+
+### in
+
+### other
 
 ### 德语
-1. 31.03.2023, 10.27 Uhr
-2. 31.03.2023
-3. am 31.01.2019
-4. 17. Dezember 2018
-5. 31. März 2023
 
-### 越南语
+### year month day hour minute second
+
+### year month day hour minute
+
+1. 02.02.2022, 02.02 Uhr
+
+### year month day hour
+
+### year month day
+
+1. 02.02.2022
+2. 02.Februar 2022
+
+### year month
+
+### year
+
+### month day hour minute second
+
+### month day hour minute
+
+### month day hour
+
+### month day
+
+### month
+
+### day hour minute second
+
+### day hour minute
+
+### day hour
+
+### day
+
+### hour minute second
+
+### hour minute
+
+### hour
+
+### minute second
+
+### minute
+
+### the special
+
+### before
+
+### in
+
+### other
+
+### 越南语(VIE)
+
+### year month day hour minute second
+
+### year month day hour minute
+
+### year month day hour
+
+### year month day
+
+### year month
+
+### year
+
+### month day hour minute second
+
+### month day hour minute
+
+### month day hour
+
+### month day
+
+### month
+
+### day hour minute second
+
+### day hour minute
+
+### day hour
+
+### day
+
+### hour minute second
+
+### hour minute
+
+### hour
+
+### minute second
+
+### minute
+
+### the special
+
+### before
+
 1. 16 phút trước
 
+### in
+
+### other
+
 # 波斯语
+
 1. 比较复杂，用翻译
 
-###卡拜尔语
+### 卡拜尔语
+
 1. 27 Fev 2023
+
 ### 其他
-1. 37 minutes
-2. 2 minute
-3. 29.10.2013
+
 ### year month day hour minute second
 
 ### year month day hour minute

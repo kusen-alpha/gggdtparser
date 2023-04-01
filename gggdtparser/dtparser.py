@@ -22,29 +22,32 @@ class StringDateTimeLanguageHandler(object):
         if not langs:
             langs = []
         if not langs:
-            for key in dir(dtconfigs):
-                if 'SUB_TRANSLATE' not in key:
-                    continue
-                for conf in getattr(dtconfigs, key):
+            for key, value in dtconfigs.SUB_TRANSLATE.items():
+                for conf in value:
                     s = re.sub(conf[0], conf[1], s)
         for lang in langs:
-            sub_translate = '%s_SUB_TRANSLATE' % lang.upper()
-            if hasattr(dtconfigs, sub_translate):
-                for conf in getattr(dtconfigs, sub_translate):
-                    s = re.sub(conf[0], conf[1], s)
+            sub_translate = dtconfigs.SUB_TRANSLATE.get(lang.upper())
+            if not sub_translate:
+                continue
+            for conf in sub_translate:
+                s = re.sub(conf[0], conf[1], s)
         return s
 
 
 class StringDateTimeRegexParser(object):
+    # 默认时间顺序
+    DEFAULT_DATETIME_SEQ = ['year', 'month', 'day', 'hour', 'minute', 'second']
 
     @classmethod
-    def parse(cls, s, regex_list=None, langs=None, accurately=True):
+    def parse(cls, s, regex_list=None, langs=None, accurately=True,
+              max_datetime=None):
         """
         通过正则对文本的时间进行抽取和解析
         :param s: 文本时间
         :param regex_list: 正则列表
         :param langs: 语言
         :param accurately: 是否遵循严格判断
+        :param max_datetime: 最大时间，超过解析失败，默认为now
         :return:
         """
         if not regex_list:
@@ -53,36 +56,38 @@ class StringDateTimeRegexParser(object):
             regex_list = [regex_list, ]
         s = StringDateTimeLanguageHandler.handle(s, langs)
         if regex_list:
-            result = cls.match_and_parse(s, regex_list, accurately)
+            result = cls.match_and_parse(s, regex_list, accurately,
+                                         max_datetime)
             if result:
-                return
+                return result
         if langs:
             for lang in langs:
-                lang_regex_list = '%s_STRING_DATE_TIME_REGEX_LIST' % lang.upper()
-                if hasattr(dtconfigs, lang_regex_list):
-                    result = cls.match_and_parse(
-                        s, getattr(dtconfigs, lang_regex_list),
-                        accurately)
-                    if result:
-                        return result
-        result = cls.match_and_parse(
-            s, dtconfigs.STRING_DATE_TIME_REGEX_LIST, accurately)
-        if result:
-            return result
-        for di in dir(dtconfigs):
-            if re.search(r'.+_STRING_DATE_TIME_REGEX_LIST', di):
+                regex_list = dtconfigs.OTHER_STRING_DATE_TIME_REGEX_LIST.get(
+                    lang.upper()
+                )
+                if not regex_list:
+                    continue
                 result = cls.match_and_parse(
-                    s, getattr(dtconfigs, di), accurately)
+                    s, getattr(dtconfigs, regex_list),
+                    accurately, max_datetime)
                 if result:
                     return result
+        result = cls.match_and_parse(
+            s, dtconfigs.STRING_DATE_TIME_REGEX_LIST, accurately, max_datetime)
+        if result:
+            return result
+        for lang, regex_list in dtconfigs.OTHER_STRING_DATE_TIME_REGEX_LIST.items():
+            result = cls.match_and_parse(
+                s, regex_list, accurately, max_datetime)
+            if result:
+                return result
         return cls.match_and_parse(
             s, dtconfigs.STRING_DATE_TIME_REGEX_LIST_FUZZY,
-            accurately)
+            accurately, max_datetime)
 
     @classmethod
-    def match_and_parse(cls, s, regex_list, accurately):
+    def match_and_parse(cls, s, regex_list, accurately, max_datetime):
         for regex in regex_list:
-            match_obj = None
             try:
                 match_obj = re.search(regex, s, flags=re.M | re.I | re.S)
             except (ValueError, re.error) as e:
@@ -93,14 +98,15 @@ class StringDateTimeRegexParser(object):
             group_dict = match_obj.groupdict()
             if group_dict:
                 try:
-                    result = cls._parse_group_dict(group_dict, accurately)
-                    print(regex)
+                    result = cls._parse_group_dict(
+                        group_dict, accurately, max_datetime)
+                    # print(regex)
                     return result
-                except ValueError as e:
+                except Exception:
                     continue
 
     @classmethod
-    def _parse_group_dict(cls, group_dict, accurately):
+    def _parse_group_dict(cls, group_dict, accurately, max_datetime):
         un_accurately = not accurately
         now = datetime.datetime.now()
         timestamp = int(group_dict.get('ts') or 0)
@@ -108,8 +114,8 @@ class StringDateTimeRegexParser(object):
             if len(str(timestamp)) == 13:
                 timestamp = int(timestamp) // 1000
             return datetime.datetime.fromtimestamp(timestamp)
-        year = group_dict.get('Y') or now.year
-        if isinstance(year, str) and len(year) == 2:
+        year = group_dict.get('Y') or 0  # or now.year
+        if year and isinstance(year, str) and len(year) == 2:
             year = '20' + year
         year = int(year)
         # if year < 1970:
@@ -124,6 +130,8 @@ class StringDateTimeRegexParser(object):
         use_now_config['year'] = use_now_config['month'] = False
         use_now_config['day'] = use_now_config['hour'] = False
         use_now_config['minute'] = use_now_config['second'] = False
+        cls._update_use_now_config_by_has_parse(
+            use_now_config, year, month, day, hour, minute, second)
         # 抽取到的具有变化含义的时间
         change_day = 0
         change_hour = 0
@@ -141,11 +149,12 @@ class StringDateTimeRegexParser(object):
         for key in change_before:
             if change_before[key] <= 0 or accurately:
                 continue
-            change_before[key] += round(random.random(), 1)
+            change_before[key] += round(random.random(), 2)
         if change_before['bY'] > 0:
             change_day += change_before['bY'] * 365
-            month = month if month else 1
-            cls._update_use_now_config(use_now_config, year=True)
+            cls._update_use_now_config(use_now_config, year=True,
+                                       month=not accurately,
+                                       day=not accurately)
         if change_before['bm'] > 0:
             change_day += change_before['bm'] * 30
             cls._update_use_now_config(use_now_config, year=True,
@@ -186,8 +195,9 @@ class StringDateTimeRegexParser(object):
             change_within[key] -= round(random.random(), 1)
         if change_within['wY'] > 0:
             change_day += change_within['wY'] * 365
-            month = month if month else 1
-            cls._update_use_now_config(use_now_config, year=True)
+            cls._update_use_now_config(use_now_config, year=True,
+                                       month=not accurately,
+                                       day=not accurately)
         if change_within['wm'] > 0:
             change_day += change_within['wm'] * 30
             cls._update_use_now_config(use_now_config, year=True,
@@ -251,7 +261,7 @@ class StringDateTimeRegexParser(object):
             year = 1911 + int(mg_year)
             month = month if month else 1
         # 计算时间
-        change_date_time = datetime.timedelta(
+        change_timedelta = datetime.timedelta(
             days=change_day, hours=change_hour,
             minutes=change_minute, seconds=change_second)
         year = cls._get_default_or_now(
@@ -268,10 +278,15 @@ class StringDateTimeRegexParser(object):
             accurately, use_now_config['second'], now.second, second)
         month = 1 if not month else month
         day = 1 if not day else day
-        parse_date_time = now.replace(
-            year=year, month=month, day=day, hour=hour,
-            minute=minute, second=second, microsecond=0)
-        return parse_date_time - change_date_time
+        parse_datetime = datetime.datetime(
+            year=year, month=month,
+            day=day, hour=hour,
+            minute=minute, second=second) - change_timedelta
+        if not max_datetime:
+            max_datetime = now
+        if parse_datetime > max_datetime:
+            raise Exception('解析时间超出最大时间')
+        return parse_datetime
 
     @classmethod
     def _update_use_now_config(cls, use_now_config, year=False, month=False,
@@ -289,6 +304,18 @@ class StringDateTimeRegexParser(object):
                             now_value, default_value):
         return now_value if not default_value and (
                 use_now_enabled or not accurately) else default_value
+
+    @classmethod
+    def _update_use_now_config_by_has_parse(
+            cls, use_now_config, year, month, day, hour, minute, second):
+        parse_flag = '%s%s%s%s%s%s' % (
+            int(bool(year)), int(bool(month)), int(bool(day)),
+            int(bool(hour)), int(bool(minute)), int(bool(second))
+        )
+        for index, flag in enumerate(parse_flag):
+            if flag == '1':
+                break
+            use_now_config[cls.DEFAULT_DATETIME_SEQ[index]] = True
 
 
 parse_string_datetime_by_regex = StringDateTimeRegexParser.parse
@@ -317,7 +344,8 @@ def parse_string_datetime_by_format(s, format_list=None):
 
 
 def parse_string_datetime(s, format_list=None, regex_list=None,
-                          langs=None, accurately=True):
+                          langs=None, accurately=True,
+                          max_datetime=None):
     """
     解析文本时间
     :param s: 字符串时间文本
@@ -325,6 +353,7 @@ def parse_string_datetime(s, format_list=None, regex_list=None,
     :param regex_list: 正则解析规则列表，统一为有名分组格式，参考dtconfigs.py
     :param langs: 语言列表，优先设置的语言进行翻译替换和解析
     :param accurately: 是否为严格模式,format不支持非严格模式
+    :param max_datetime: 最大时间
     :return: datetime.datetime
     """
     # format
@@ -333,7 +362,8 @@ def parse_string_datetime(s, format_list=None, regex_list=None,
     result = parse_string_datetime_by_format(s, format_list)
     if result:
         return result
-    result = parse_string_datetime_by_regex(s, regex_list, langs, accurately)
+    result = parse_string_datetime_by_regex(s, regex_list, langs, accurately,
+                                            max_datetime=max_datetime)
     if result:
         return result
 
@@ -354,5 +384,5 @@ def check(dst_dt, check_dt):
 parse = parse_string_datetime
 
 if __name__ == '__main__':
-    result = parse_string_datetime_by_format('2022年', fs=['%Y年'])
-    print(result)
+    result1 = parse_string_datetime_by_format('2022年', fs=['%Y年'])
+    print(result1)
