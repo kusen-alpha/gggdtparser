@@ -50,6 +50,8 @@ STRING_DATE_TIME_REGEX_LIST = [
 ]
 
 STRING_DATE_TIME_REGEX_LIST_FUZZY = [  # 模糊时间
+    # 2010 7月19日
+    r"(?P<Y>\d{4})\s*[\-\|/\.年]?\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[日]?",
     # 14 March 2023
     r"(?P<d>\d{1,2})[\.]?\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})",
     # 2023/0329
@@ -81,6 +83,7 @@ STRING_DATE_TIME_REGEX_LIST_FUZZY = [  # 模糊时间
     r"(?P<Y>\d{4})\s*年",
     # 02月
     r"(?P<m>\d{1,2})\s*[月]",
+
 
 ]
 

@@ -122,6 +122,13 @@ HAS_TEST_STRING_DATETIME = {
             year=2022, month=2, day=2, hour=now.hour,
             minute=now.minute, second=now.second)
     },
+    '2022 02月02日': {
+        'accurately': datetime.datetime(
+            year=2022, month=2, day=2, ),
+        'un_accurately': datetime.datetime(
+            year=2022, month=2, day=2,
+            hour=now.hour, minute=now.minute, second=now.second),
+    },
     '2022年02月': {
         'accurately': datetime.datetime(
             year=2022, month=2, day=1),
