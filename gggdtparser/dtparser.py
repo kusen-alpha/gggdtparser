@@ -100,7 +100,7 @@ class StringDateTimeRegexParser(object):
                 try:
                     result = cls._parse_group_dict(
                         group_dict, accurately, max_datetime)
-                    # print(regex)
+                    print(regex)
                     return result
                 except Exception:
                     continue
@@ -282,9 +282,7 @@ class StringDateTimeRegexParser(object):
             year=year, month=month,
             day=day, hour=hour,
             minute=minute, second=second) - change_timedelta
-        if not max_datetime:
-            max_datetime = now
-        if parse_datetime > max_datetime:
+        if max_datetime and parse_datetime > max_datetime:
             raise Exception('解析时间超出最大时间')
         return parse_datetime
 
