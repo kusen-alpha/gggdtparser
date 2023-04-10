@@ -167,8 +167,8 @@ SUB_TRANSLATE = {
     'EN': [
         (r"January|JANUARY|Jan\.|Jan", "1月"),
         (r"February|FEBRUARY|Feb\.", "2月"),
-        (r"March|MARCH|Mar\.|Mar", "3月"),
-        (r"April|APRIL|Apr\.|Apr", "4月"),
+        (r"March|MARCH|Mar\.|Mar|Mai", "3月"),
+        (r"April|APRIL|Apr\.|Apr|Abr", "4月"),
         (r"May\.|May|MAY", "5月"),
         (r"June|JUNE|Jun\.|Jun", "6月"),
         (r"July|JULY|Jul\.|Jul", "7月"),
