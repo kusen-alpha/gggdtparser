@@ -21,12 +21,13 @@ def test(test_string_datetime):
             else:
                 continue
             result = parse(string_datetime, accurately=accurately,
-                           max_datetime=datetime.datetime(year=2030,month=1,
+                           max_datetime=datetime.datetime(year=2030, month=1,
                                                           day=1))
             check_result = check(result, check_dt)
             if not check_result:
                 print('字符串时间：%s | 解析结果：%s | 严格模式：%s | 预期效果：%s | 验证结果：%s' % (
-                    string_datetime, result, accurately, check_dt, check_result))
+                    string_datetime, result, accurately, check_dt,
+                    check_result))
 
 
 now = datetime.datetime.now()
@@ -64,13 +65,13 @@ HAS_TEST_STRING_DATETIME = {
             hour=2, minute=2, second=now.second),
     },
     '2022年2月02日，上午02:02': {
-            'accurately': datetime.datetime(
-                year=2022, month=2, day=2, hour=2,
-                minute=2, second=0),
-            'un_accurately': datetime.datetime(
-                year=2022, month=2, day=2, hour=2,
-                minute=2, second=now.second)
-        },
+        'accurately': datetime.datetime(
+            year=2022, month=2, day=2, hour=2,
+            minute=2, second=0),
+        'un_accurately': datetime.datetime(
+            year=2022, month=2, day=2, hour=2,
+            minute=2, second=now.second)
+    },
     '2022-02-02 02:02': {
         'accurately': datetime.datetime(
             year=2022, month=2, day=2,
@@ -358,8 +359,8 @@ HAS_TEST_STRING_DATETIME = {
     '2年前': {
         'accurately': datetime.datetime(
             year=now.year - 2, month=1, day=1),
-        'un_accurately': (now-datetime.timedelta(days=365*3),
-                          now-datetime.timedelta(days=365*2)),
+        'un_accurately': (now - datetime.timedelta(days=365 * 3),
+                          now - datetime.timedelta(days=365 * 2)),
     },
     '2月前': {
         'accurately': datetime.datetime(
@@ -452,8 +453,8 @@ HAS_TEST_STRING_DATETIME = {
     '2年内': {
         'accurately': datetime.datetime(
             year=now.year - 2, month=1, day=1),
-        'un_accurately': (now-datetime.timedelta(days=365*2),
-                          now-datetime.timedelta(days=365*1)),
+        'un_accurately': (now - datetime.timedelta(days=365 * 2),
+                          now - datetime.timedelta(days=365 * 1)),
     },
     '2月内': {
         'accurately': datetime.datetime(
@@ -545,6 +546,14 @@ HAS_TEST_STRING_DATETIME = {
     },
     # 中国台湾繁体
     '民國111年02月02日': {
+        'accurately': datetime.datetime(
+            year=2022, month=2, day=2, hour=0,
+            minute=0, second=0),
+        'un_accurately': datetime.datetime(
+            year=2022, month=2, day=2, hour=now.hour,
+            minute=now.minute, second=now.second)
+    },
+    '111-02-02': {
         'accurately': datetime.datetime(
             year=2022, month=2, day=2, hour=0,
             minute=0, second=0),
@@ -663,8 +672,8 @@ HAS_TEST_STRING_DATETIME = {
     '2 years ago': {
         'accurately': datetime.datetime(
             year=now.year - 2, month=1, day=1),
-        'un_accurately': (now-datetime.timedelta(days=365*3),
-                          now-datetime.timedelta(days=365*2)),
+        'un_accurately': (now - datetime.timedelta(days=365 * 3),
+                          now - datetime.timedelta(days=365 * 2)),
     },
     '2 month ago': {
         'accurately': datetime.datetime(
@@ -869,7 +878,11 @@ HAS_TEST_STRING_DATETIME = {
             year=2022, month=2, day=2,
             hour=now.hour, minute=now.minute, second=now.second),
     },
-    # 越南语
+
+}
+
+# 越南语
+HAS_TEST_STRING_DATETIME_VIE = {
     '2 phút trước': {
         'accurately': datetime.datetime(
             year=now.year, month=now.month, day=now.day, hour=now.hour,
@@ -882,6 +895,14 @@ HAS_TEST_STRING_DATETIME = {
             year=now.year, month=now.month, day=now.day, hour=now.hour,
             minute=now.minute, second=now.second) -
                           datetime.timedelta(minutes=2)),
+    },
+    '02 tháng 2 năm 2022': {
+        'accurately': datetime.datetime(
+            year=2022, month=2, day=2, hour=0,
+            minute=0, second=0),
+        'un_accurately': datetime.datetime(
+            year=2022, month=2, day=2, hour=now.hour,
+            minute=now.minute, second=now.second)
     },
 }
 if __name__ == '__main__':

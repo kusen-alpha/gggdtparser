@@ -142,6 +142,7 @@
 ### year month day hour
 
 1. 民国111年02月02日
+2. 111-02-02
 
 ### year month day
 
@@ -253,8 +254,11 @@
 
 1. 2 years ago
 2. 2 month ago
+2. 2 m
 3. 2 weeks ago
+3. 2 w
 4. 2 days ago
+4. 2 d
 5. 2h ago
 6. 2 hours ago
 7. 2 minutes ago
@@ -393,6 +397,7 @@
 ### year month day hour
 
 ### year month day
+1. 29 tháng 3 năm 2023
 
 ### year month
 
@@ -494,6 +499,7 @@
 2. 泰米尔语
 3. 阿拉伯语
 4. 尼泊尔语
+5. 卢旺达语
 
 ### year month day hour minute second
 

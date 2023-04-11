@@ -100,7 +100,7 @@ class StringDateTimeRegexParser(object):
                 try:
                     result = cls._parse_group_dict(
                         group_dict, accurately, max_datetime)
-                    print(regex)
+                    # print(regex)
                     return result
                 except Exception:
                     continue
@@ -114,17 +114,14 @@ class StringDateTimeRegexParser(object):
             if len(str(timestamp)) == 13:
                 timestamp = int(timestamp) // 1000
             return datetime.datetime.fromtimestamp(timestamp)
-        year = group_dict.get('Y') or 0  # or now.year
+        year = group_dict.get('Y')  # or now.year
         if year and isinstance(year, str) and len(year) == 2:
             year = '20' + year
-        year = int(year)
-        # if year < 1970:
-        #     raise ValueError
-        month = int(group_dict.get('m') or 0)
-        day = int(group_dict.get('d') or 0)
-        hour = int(group_dict.get('H') or 0)
-        minute = int(group_dict.get('M') or 0)
-        second = int(group_dict.get('S') or 0)
+        month = group_dict.get('m')
+        day = group_dict.get('d')
+        hour = group_dict.get('H')
+        minute = group_dict.get('M')
+        second = group_dict.get('S')
         # 常见异常组合
         use_now_config = dict()
         use_now_config['year'] = use_now_config['month'] = False
@@ -251,10 +248,6 @@ class StringDateTimeRegexParser(object):
                 cls._update_use_now_config(
                     use_now_config, year=True, month=True,
                     day=True, hour=True, minute=True, second=True)
-        # 上下午
-        ap = group_dict.get('ap')
-        if ap == 'pm':
-            hour += 12 if hour and hour < 12 else hour
         # 民国时间
         mg_year = group_dict.get('mgY')
         if mg_year:
@@ -278,6 +271,10 @@ class StringDateTimeRegexParser(object):
             accurately, use_now_config['second'], now.second, second)
         month = 1 if not month else month
         day = 1 if not day else day
+        # 上下午
+        apm = group_dict.get('apm')
+        if apm == 'pm':
+            hour += 12 if hour and hour < 12 else hour
         parse_datetime = datetime.datetime(
             year=year, month=month,
             day=day, hour=hour,
@@ -300,8 +297,8 @@ class StringDateTimeRegexParser(object):
     @classmethod
     def _get_default_or_now(cls, accurately, use_now_enabled,
                             now_value, default_value):
-        return now_value if not default_value and (
-                use_now_enabled or not accurately) else default_value
+        return int((now_value if default_value is None and (
+                use_now_enabled or not accurately) else default_value) or 0)
 
     @classmethod
     def _update_use_now_config_by_has_parse(
