@@ -12,10 +12,10 @@ from . import dtconfigs
 
 class StringDateTimeLanguageHandler(object):
     @classmethod
-    def handle(cls, s, langs):
+    def handle(cls, string_datetime, langs):
         """
         根据语言进行一些特殊处理
-        :param s:
+        :param string_datetime:
         :param langs:
         :return:
         """
@@ -24,14 +24,14 @@ class StringDateTimeLanguageHandler(object):
         if not langs:
             for key, value in dtconfigs.SUB_TRANSLATE.items():
                 for conf in value:
-                    s = re.sub(conf[0], conf[1], s)
+                    string_datetime = re.sub(conf[0], conf[1], string_datetime)
         for lang in langs:
             sub_translate = dtconfigs.SUB_TRANSLATE.get(lang.upper())
             if not sub_translate:
                 continue
             for conf in sub_translate:
-                s = re.sub(conf[0], conf[1], s)
-        return s
+                string_datetime = re.sub(conf[0], conf[1], string_datetime)
+        return string_datetime
 
 
 class StringDateTimeRegexParser(object):
@@ -39,11 +39,11 @@ class StringDateTimeRegexParser(object):
     DEFAULT_DATETIME_SEQ = ['year', 'month', 'day', 'hour', 'minute', 'second']
 
     @classmethod
-    def parse(cls, s, regex_list=None, langs=None, accurately=True,
+    def parse(cls, string_datetime, regex_list=None, langs=None, accurately=True,
               max_datetime=None):
         """
         通过正则对文本的时间进行抽取和解析
-        :param s: 文本时间
+        :param string_datetime: 文本时间
         :param regex_list: 正则列表
         :param langs: 语言
         :param accurately: 是否遵循严格判断
@@ -54,10 +54,11 @@ class StringDateTimeRegexParser(object):
             regex_list = []
         if isinstance(regex_list, str):
             regex_list = [regex_list, ]
-        s = StringDateTimeLanguageHandler.handle(s, langs)
+        string_datetime = StringDateTimeLanguageHandler.handle(
+            string_datetime, langs)
         if regex_list:
-            result = cls.match_and_parse(s, regex_list, accurately,
-                                         max_datetime)
+            result = cls.match_and_parse(
+                string_datetime, regex_list, accurately, max_datetime)
             if result:
                 return result
         if langs:
@@ -68,30 +69,32 @@ class StringDateTimeRegexParser(object):
                 if not regex_list:
                     continue
                 result = cls.match_and_parse(
-                    s, getattr(dtconfigs, regex_list),
+                    string_datetime, getattr(dtconfigs, regex_list),
                     accurately, max_datetime)
                 if result:
                     return result
         result = cls.match_and_parse(
-            s, dtconfigs.STRING_DATE_TIME_REGEX_LIST, accurately, max_datetime)
+            string_datetime, dtconfigs.STRING_DATE_TIME_REGEX_LIST, accurately, max_datetime)
         if result:
             return result
         for lang, regex_list in dtconfigs.OTHER_STRING_DATE_TIME_REGEX_LIST.items():
             result = cls.match_and_parse(
-                s, regex_list, accurately, max_datetime)
+                string_datetime, regex_list, accurately, max_datetime)
             if result:
                 return result
         return cls.match_and_parse(
-            s, dtconfigs.STRING_DATE_TIME_REGEX_LIST_FUZZY,
+            string_datetime, dtconfigs.STRING_DATE_TIME_REGEX_LIST_FUZZY,
             accurately, max_datetime)
 
     @classmethod
-    def match_and_parse(cls, s, regex_list, accurately, max_datetime):
+    def match_and_parse(cls, string_datetime, regex_list,
+                        accurately, max_datetime):
         for regex in regex_list:
             try:
-                match_obj = re.search(regex, s, flags=re.M | re.I | re.S)
+                match_obj = re.search(
+                    regex, string_datetime, flags=re.M | re.I | re.S)
             except (ValueError, re.error) as e:
-                # print(regex, s, e)
+                # print(regex, string_datetime, e)
                 continue
             if not match_obj:
                 continue
@@ -338,27 +341,31 @@ def parse_string_datetime_by_format(s, format_list=None):
             continue
 
 
-def parse_string_datetime(s, format_list=None, regex_list=None,
+def parse_string_datetime(string_datetime, format_list=None, regex_list=None,
                           langs=None, accurately=True,
-                          max_datetime=None):
+                          max_datetime=None, translate_func=None):
     """
     解析文本时间
-    :param s: 字符串时间文本
+    :param string_datetime: 字符串时间文本
     :param format_list: 时间解析模板列表，如%Y-%m-%d
     :param regex_list: 正则解析规则列表，统一为有名分组格式，参考dtconfigs.py
     :param langs: 语言列表，优先设置的语言进行翻译替换和解析
     :param accurately: 是否为严格模式,format不支持非严格模式
     :param max_datetime: 最大时间
+    :param translate_func: 翻译函数
     :return: datetime.datetime
     """
     # format
     # regex
     # fanyi
-    result = parse_string_datetime_by_format(s, format_list)
+    if translate_func and callable(translate_func):
+        string_datetime = translate_func(string_datetime)
+    result = parse_string_datetime_by_format(string_datetime, format_list)
     if result:
         return result
-    result = parse_string_datetime_by_regex(s, regex_list, langs, accurately,
-                                            max_datetime=max_datetime)
+    result = parse_string_datetime_by_regex(
+        string_datetime, regex_list, langs, accurately,
+        max_datetime=max_datetime)
     if result:
         return result
 
