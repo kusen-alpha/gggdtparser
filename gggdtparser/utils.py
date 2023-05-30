@@ -3,6 +3,8 @@
 # email: 1194542196@qq.com
 # date: 2023/4/26
 
+import sys
+
 
 def get_sort_dict(d, sort_list=None):
     """
@@ -13,5 +15,9 @@ def get_sort_dict(d, sort_list=None):
     """
     if not sort_list:
         return d
-    return {k: d[k] for k in sort_list if k in d} | {k: d[
-        k] for k in d if k not in sort_list}
+    if sys.version_info >= (3, 9):
+        return {k: d[k] for k in sort_list if k in d} | {k: d[
+            k] for k in d if k not in sort_list}
+    else:
+        return {k: d[k] for k in sort_list if k in d}.update({k: d[
+            k] for k in d if k not in sort_list})
