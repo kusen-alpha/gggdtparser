@@ -3,330 +3,109 @@
 # author: kusen
 # email: 1194542196@qq.com
 # date: 2023/3/24
+import copy
+import os
+import glob
+import importlib
+from .utils import get_sort_dict
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-STRING_DATE_TIME_REGEX_LIST = [
-    # 精准策略
-    r"(?P<ts>\d{13})",
-    r"(?P<ts>\d{10})",
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{2})\s*[\-\|/\.月]\s*(?P<d>\d{2})\s*[日]?\s*[T，]?\s*(?P<apm>am|pm)?\s*(?P<H>\d{2})\s*[:时h]\s*(?P<M>\d{2})\s*[:分]\s*(?P<S>\d{2})\s*[秒]?",
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{2})\s*[\-\|/\.月]\s*(?P<d>\d{2})\s*[日]?\s*[T，]?\s*(?P<apm>am|pm)?\s*(?P<H>\d{2})\s*[:时h]\s*(?P<M>\d{2})\s*[分]?",
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{2})\s*[\-\|/\.月]\s*(?P<d>\d{2})\s*[日]?\s*[T，]?\s*(?P<apm>am|pm)?\s*(?P<H>\d{2})\s*[时]?",
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{2})\s*[\-\|/\.月]\s*(?P<d>\d{2})\s*[日]?",
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[日]?\s*[T，]?\s*(?P<apm>am|pm)?\s*(?P<H>\d{1,2})\s*[:时h]\s*(?P<M>\d{1,2})\s*[:分]\s*(?P<S>\d{1,2})\s*[秒]?",
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[日]?\s*[T，]?\s*(?P<apm>am|pm)?\s*(?P<H>\d{1,2})\s*[:时h]\s*(?P<M>\d{1,2})\s*[分]?",
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[日]?\s*[T，]?\s*(?P<apm>am|pm)?\s*(?P<H>\d{1,2})\s*[时]?",
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[日]?",
-
-
-    # before
-    r"(?P<bd>\d+)\s*天\s*(前|ago)",
-    r"(?P<bM>\d+)\s*分钟\s*(前|ago)",
-    r"(?P<bH>\d+)\s*小时\s*(前|ago)",
-    r"(?P<bm>\d+)\s*(个)?月\s*(前|ago)",
-    r"(?P<bY>\d+)\s*年\s*(前|ago)",
-    r"(?P<bS>\d+)\s*秒\s*(前|ago)",
-    r"(?P<ba>\d+)\s*周\s*(前|ago)",
-    r"(?P<ba>\d+)\s*星期\s*(前|ago)",
-    # in
-    r"(?P<wd>\d+)\s*天内",
-    r"(?P<wM>\d+)\s*分钟内",
-    r"(?P<wH>\d+)\s*小时内",
-    r"(?P<wm>\d+)\s*(个)?月内",
-    r"(?P<wY>\d+)\s*年内",
-    r"(?P<wS>\d+)\s*秒内",
-    r"(?P<wa>\d+)\s*周内",
-    r"(?P<wa>\d+)\s*星期内",
-    # 特殊语义
-    r"(?P<sd>今天)\s*(?P<H>\d+):(?P<M>\d+):(?P<S>\d+)",
-    r"(?P<sd>今天)\s*(?P<H>\d+):(?P<M>\d+)",
-    r"(?P<sd>今天)\s*(?P<H>\d+)",
-    r"(?P<sd>今天)",
-    r"(?P<sd>昨天)\s*(?P<H>\d+):(?P<M>\d+):(?P<S>\d+)",
-    r"(?P<sd>昨天)\s*(?P<H>\d+):(?P<M>\d+)",
-    r"(?P<sd>昨天)\s*(?P<H>\d+)",
-    r"(?P<sd>昨天)",
-    r"(?P<sd>前天)\s*(?P<H>\d+):(?P<M>\d+):(?P<S>\d+)",
-    r"(?P<sd>前天)\s*(?P<H>\d+):(?P<M>\d+)",
-    r"(?P<sd>前天)\s*(?P<H>\d+)",
-    r"(?P<sd>前天)",
-    r"(?P<so>刚刚)",
-]
-
-STRING_DATE_TIME_REGEX_LIST_FUZZY = [  # 模糊时间
-    # 2010 7月19日
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]?\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[日]?",
-    # 10 апреля 2023, 18:57
-    r"(?P<d>\d{1,2})[\.]?\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})\s*[,]?\s*(?P<H>\d{2})\s*[:时h]\s*(?P<M>\d{2})\s*[分]?",
-    # # 14 March 2023
-    r"(?P<d>\d{1,2})[\.]?\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})",
-    # 2023/0329
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{2})(?P<d>\d{2})",
-    # 2012.9
-    r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{1,2})",
-    r"(?P<m>\d{1,2})\s*[\-\|/\.月]?\s*(?P<d>\d{1,2})\s*[\-\|/\.日]?\s*?(?P<Y>\d{4})\s*[\-\|/\.年]?",
-    # 11/1/2018
-    r"(?P<m>\d{1,2})\s*[\-\|/\.月]?\s*(?P<d>\d{1,2})\s*[\-\|/\.日]?\s*(?P<H>\d{1,2})\s*[:时h]\s*(?P<M>\d{1,2})\s*[:分]\s*(?P<S>\d{1,2})\s*[秒]?",
-
-    # 02月02日 02:02:02
-    r"(?P<m>\d{1,2})\s*[\-\|/\.月]?\s*(?P<d>\d{1,2})\s*[\-\|/\.日]?\s*(?P<H>\d{1,2})\s*[:时h]\s*(?P<M>\d{1,2})\s*[:分]?",
-    # 02月02日 02:02
-    r"(?P<m>\d{2})\s*[\-\|/\.月]?\s*(?P<d>\d{2})\s*[\-\|/\.日]?\s*(?P<H>\d{2})\s*[:时h]?",
-    # 02月02日 02
-    # 02:02:02
-    r"(?P<H>\d{1,2})\s*[:时h]\s*(?P<M>\d{1,2})\s*[:分]\s*(?P<S>\d{1,2})\s*[秒]?",
-    # 02:02
-    r"(?P<H>\d{1,2})\s*[:时h]\s*(?P<M>\d{1,2})\s*[:分]?",
-    r"(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[\-\|/\.日]\s*(?P<Y>\d{2,4})",
-    # 06-02-20
-    r"(?P<d>\d{1,2})\s*[\-\|/\.日]\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<Y>\d{2,4})",
-    # 31.01.2019
-    r"(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[日]?",  # 11月20日 01-01
-    r"(?P<Y>\d{4})\s*(?P<m>\d{1,2})\s*(?P<d>\d{1,2})",  # 20000101
-    # Feb 5
-    r"(?P<m>\d{1,2})\s*[月]\s*(?P<d>\d{1,2})",
-    # 2022年
-    r"(?P<Y>\d{4})\s*年",
-    # 02月
-    r"(?P<m>\d{1,2})\s*[月]",
-
-    r"(?P<bH>\d+)\s*hr\s*",
-    r"(?P<bH>\d+)\s*h\s*",
-    r"(?P<bd>\d+)\s*d\s*",
-    r"(?P<ba>\d+)\s*w\s*",
-    r"(?P<bm>\d+)\s*m\s*",
-    r"(?P<bY>\d+)\s*y\s*",
-
-]
-
-OTHER_STRING_DATE_TIME_REGEX_LIST = {
-    'EN': [
-        # Thu February 02 02:02:02 2022
-        r"(?P<m>\d{1,2})\s*[\-\|/\.月]?\s*(?P<d>\d{1,2})\s*[\-\|/\.日]?\s*(?P<H>\d{1,2})\s*[:时h]\s*(?P<M>\d{1,2})\s*[:分]\s*(?P<S>\d{1,2})\s*[秒]?\s*(?P<Y>\d{4})\s*[\-\|/\.年]?",
-        # 04:28, 13 Feb 2023
-        r"(?P<H>\d{1,2})[:](?P<M>\d{1,2})\s*[,]?\s*(?P<d>\d{1,2})\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})",
-        # Mar 23 02:28:00 2023
-        r"(?P<m>\d{1,2})\s*[月]\s*(?P<d>\d{1,2})\s*(?P<H>\d{1,2})[:](?P<M>\d{1,2})[:](?P<S>\d{1,2})\s*(?P<Y>\d{4})",
-        # Feb 02, 2022 08:35 pm
-        r"(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*,\s*(?P<Y>\d{4})\s*[-]?\s*(?P<H>\d{1,2})[:](?P<M>\d{1,2})\s*(?P<apm>am|pm)",
-        # Feb 02, 2022 08:35
-        r"(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*,\s*(?P<Y>\d{4})\s*(?P<H>\d{1,2})[:](?P<M>\d{1,2})",
-        # Feb 02, 2022
-        r"(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*,\s*(?P<Y>\d{4})",
-        # 10 25, 2021| Jan 01, 2000
-        r"(?P<d>\d{1,2})[\.]?\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})\s*[|]?\s*(?P<H>\d{1,2})[:](?P<M>\d{1,2})\s*(?P<apm>am|pm)",
-        # Wed 29 Mar 2023 at 3:04pm
-        r"(?P<d>\d{1,2})[\.]?\s*(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})\s*(?P<H>\d{1,2})[:h](?P<M>\d{1,2})",
-        # Wed 29 Mar 2023 at 3:04
-
-        r"(?P<d>\d{1,2})\s*(?P<m>\d{1,2})\s*(?P<Y>\d{4})",  # 25 10 2021
-        r"(?P<m>\d{1,2})\s*(?P<Y>\d{4})",  # 10 2021
-        #
-        r"(?P<bS>\d+)\s*seconds?\s*(ago)?",
-        r"(?P<bM>\d+)\s*m\s*ago",
-        r"(?P<bM>\d+)\s*minutes?\s*(ago)?",
-        r"(?P<bH>\d+)\s*h\s*ago",
-        r"(?P<bH>\d+)\s*hours?\s*(ago)?",
-        r"(?P<bd>\d+)\s*days?\s*(ago)?",
-        r"(?P<bm>\d+)\s*months?\s*(ago)?",
-        r"(?P<ba>\d+)\s*weeks?\s*(ago)?",
-        r"(?P<bY>\d+)\s*years?\s*(ago)?",
-
-
-    ],
-    'ZH_TW': [
-        r"民国\s*(?P<mgY>\d+)[\-\|/\.年]\s*(?P<m>\d+)[\-\|/\.月]\s*(?P<d>\d+)[日]?",
-        r"民国\s*(?P<mgY>\d+)[\-\|/\.年]\s*(?P<m>\d+)[\-\|/\.月]?",
-        r"民国(?P<mgY>\d+)[年]?",
-        r"(?P<mgY>\d{3})\s*[\-\|/\.年]\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})\s*[日]?",
-        r"(?P<bH>\d+)\s*时间前",
-    ],
-    'FRA': [
-        # 31/03/23 à 12h03
-        r"(?P<d>\d{1,2})\s*[\-\|/\.日]\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<Y>\d{2,4})\s*[,]?\s*(?P<H>\d{1,2})\s*[:时h\.]\s*(?P<M>\d{1,2})\s*[:分]?",
-
-        # before
-        r"(il y a)?\s*(?P<bH>\d+)\s*heures?\s*(ago)?",
-    ],
-    "SWE": [
-        r"(?P<bS>\d+)\s*segundos?\s*",
-        r"(?P<bM>\d+)\s*minutos?\s*",
-        r"(?P<bH>\d+)\s*horas?\s*",
-        r"(?P<bd>\d+)\s*dias?\s*",
-        r"(?P<bm>\d+)\s*meses?\s*",
-        r"(?P<ba>\d+)\s*semanas?\s*",
-        r"(?P<bY>\d+)\s*anos?\s*",
-    ],
-    "SOM": [
-        r"(?P<bH>\d+)\s*Saacadood?\s*",
-    ],
-    "IR": [
-        r"(?P<bS>\d+)\s*секунда?\s*",
-        r"(?P<bM>\d+)\s*минута?\s*",
-        r"(?P<bH>\d+)\s*час?\s*",
-    ],
-    "MAR": [
-        r"(?P<bM>\d+)\s*तासांपूर्वी",
-    ],
-    "VIE": [
-        "(?P<d>\d{1,2})\s*[\-\|/\.月]\s*(?P<m>\d{1,2})\s*[\-\|/\.年]\s*(?P<Y>\d{2,4})"  # 29 tháng 3 năm 2023
-    ]
+LANG_MAPPING = {
+    # 英语
+    "en": "en",
+    # 中文
+    "zh": "zh",
+    "zh-CN": "zh",
+    "zh-CHS": "zh",
+    # 繁体/中国台湾
+    "cht": "cht",
+    "zh-TW": "cht",
+    "zh-CHT": "cht",
+    # 德语
+    "de": "de",
+    # 法语
+    "fra": "fra",
+    "fr": "fr",
+    # 瑞典语
+    "swe": 'swe',
+    "sv": 'sv',
+    # 越南语
+    "vie": 'vie',
+    "vi": 'vi',
+    # 阿塞拜疆语
+    'az': 'az',
+    # 俄语
+    "ru": "ru",
+    # 西班牙语
+    "spa": "es",
+    "es": "es",
+    # 索马里语
+    "so": "so",
+    # 马拉地语
+    "mr": "mr",
+    "mar": "mr",
+    # 乌克兰语
+    "uk": "uk",
+    # 斯瓦希里语
+    "sw": "sw",
+    # 土耳其语
+    "tr": "tr",
+    # 吉尔吉斯语
+    "ky": "ky",
+    # 乌尔都语
+    "ur": "ur",
+    # 印尼语
+    "id": "_id",
+    # 卢旺达语
+    "rw": "rw",
+    # 僧伽罗语
+    "si": "si",
+    # 塔吉克语
+    "tg": "tg",
+    # 印地语
+    "hi": "hi",
 }
 
-# 替换翻译
-SUB_TRANSLATE = {
-    'EN': [
-        (r"January|JANUARY|Jan\.|Jan", "1月"),
-        (r"February|FEBRUARY|Feb\.", "2月"),
-        (r"March|MARCH|Mar\.|Mar|Mai", "3月"),
-        (r"April|APRIL|Apr\.|Apr", "4月"),
-        (r"May\.|May|MAY", "5月"),
-        (r"June|JUNE|Jun\.|Jun", "6月"),
-        (r"July|JULY|Jul\.|Jul", "7月"),
-        (r"August|AUGUST|Aug\.|Aug", "8月"),
-        (r"September|SEPTEMBER|Sept\.|Sept|Sep\.|Sep", "9月"),
-        (r"October|OCTOBER|Oct\.|Oct", "10月"),
-        (r"November|NOVEMBER|Nov\.|Nov", "11月"),
-        (r"December|DECEMBER|Dec\.|Dec", "12月"),
-        (r'Spring|SPRING', '2月'),
-        (r'Summer|SUMMER', '5月'),
-        (r'Autumn|AUTUMN', '8月'),
-        (r'Winter|WINTER', '11月'),
-        (r'at|AT', ''),
-        (r'AM', 'am'),
-        (r'PM', 'pm'),
-    ],
-    'ZH_CN': [
-        (r"十一", "11"),
-        (r"十二", "12"),
-        (r"十三", "13"),
-        (r"十四", "14"),
-        (r"十五", "15"),
-        (r"十六", "16"),
-        (r"十七", "17"),
-        (r"十八", "18"),
-        (r"十九", "19"),
-        (r"二十一", "21"),
-        (r"二十二", "22"),
-        (r"二十三", "23"),
-        (r"二十四", "24"),
-        (r"二十", "20"),
-        (r"十", "10"),
-        (r"一", "1"),
-        (r"二", "2"),
-        (r"三", "3"),
-        (r"四", "4"),
-        (r"五", "5"),
-        (r"六", "6"),
-        (r"七", "7"),
-        (r"八", "8"),
-        (r"九", "9"),
-        (r"零", "0"),
-        (r"上午", "am"),
-        (r"下午", "pm"),
-    ],
-    'ZH_TW': [
-        (r'時', '时'),
-        (r'間', '间'),
-        (r'國', '国'),
-        (r'鐘', '钟'),
-    ],
-    'DE': [
-        (r"Januar|Jan", "1月"),
-        (r"Februar|Feb\.", "2月"),
-        (r"März|Mär", "3月"),
-        (r"April|Apr", "4月"),
-        (r"Abriil|Abr", "4月"),
-        (r"Mai|mai", "5月"),
-        (r"Juni|Jun", "6月"),
-        (r"Juli|Jnl", "7月"),
-        (r"August|Aug", "8月"),
-        (r"September|Sep\.", "9月"),
-        (r"Oktober|Okt", "10月"),
-        (r"November|Nov", "11月"),
-        (r"Dezember|Dez", "12月"),
-        (r"Uhr", "am"),
-        (r"une heure", "1 heure"),
-        (r"il y a heure", "il y a 1 heure"),
-    ],
-    'FRA': [
-        (r"janvier|jan\.", "1月"),
-        (r"février|fev\.", "2月"),
-        (r"mars\.|mars", "3月"),
-        (r"avril|avr\.", "4月"),
-        (r"mai\.|mai", "5月"),
-        (r"juin\.|juin", "6月"),
-        (r"juillet\.|juillet", "7月"),
-        (r"aout\.|août", "8月"),
-        (r"septembre|sept\.", "9月"),
-        (r"octobre|oct\.", "10月"),
-        (r"novembre|nov\.", "11月"),
-        (r"décembre|dec\.", "12月"),
-        (r"aujourd’hui à", ""),
-        (r"à l’instant", "刚刚"),
-        (r"hier à", "昨天"),
-        (r"à", ""),
-    ],
-    'VIE': [
-        (r"phút", "分钟"),
-        (r"trước", "前"),
-        (r"giờ", "小时"),
-        (r"tháng", "月"),
-        (r"năm", "年"),
-    ],
-    'KAB': [
-        (r"Fev", "2月"),
-    ],
-    'KOR': [
-        (r"(de)?\s*enero\s*(de)?", "1月"),
-        (r"(de)?\s*febrero\s*(de)?", "2月"),
-        (r"(de)?\s*marzo\s*(de)?", "3月"),
-        (r"(de)?\s*abril\s*(de)?", "4月"),
-        (r"(de)?\s*mayo\s*(de)?", "5月"),
-        (r"(de)?\s*junio\s*(de)?", "6月"),
-        (r"(de)?\s*julio\s*(de)?", "7月"),
-        (r"(de)?\s*agosto\s*(de)?", "8月"),
-        (r"(de)?\s*septiembre\s*(de)?", "9月"),
-        (r"(de)?\s*octubre\s*(de)?", "10月"),
-        (r"(de)?\s*noviembre\s*(de)?", "11月"),
-        (r"(de)?\s*diciembre\s*(de)?", "12月"),
-    ],
-    'IR': [
-        (r"январь", "1月"),
-        (r"февраль", "2月"),
-        (r"март", "3月"),
-        (r"апрель|апреля|апрел", "4月"),
-        (r"май", "5月"),
-        (r"июнь", "6月"),
-        (r"июль", "7月"),
-        (r"август", "8月"),
-        (r"сентябрь", "9月"),
-        (r"октябрь", "10月"),
-        (r"ноябрь", "11月"),
-        (r"декабрь", "12月"),
-        (r"сегодня  в|сегодня", "今天"),
-    ],
-    'SWE': [
-        (r"janeiro", "1月"),
-        (r"fevereiro", "2月"),
-        (r"março", "3月"),
-        (r"abril", "4月"),
-        (r"maio", "5月"),
-        (r"junho", "6月"),
-        (r"julho", "7月"),
-        (r"agosto", "8月"),
-        (r"setembro", "9月"),
-        (r"outubro", "10月"),
-        (r"novembro", "11月"),
-        (r"dezembro", "12月"),
-    ],
-    # 最后
-    'END': [
-        (r"Feb", "2月"),
-    ]
-
-}
-
-DATE_TIME_FORMATS = [
-    # '%Y/%m/%d'
+TRANSLATE_LANGS = [
+    # 阿拉伯语
+    'ara',
+    'ar'
 ]
+
+_LANG_LIST_SORT = ['default', 'en', 'zh', 'zht', 'de', 'fra', 'swe',
+                   'vie', 'ru', 'es', 'so', 'mr', 'az', "uk", 'sw',
+                   'tr', 'ky', 'ur', '_id', 'rw', 'si', 'tg', 'hi'
+                   ]
+
+_LANG_DIR = os.path.join(BASE_DIR, 'langs')
+_LANG_FILES = glob.glob(_LANG_DIR + '/*.py')
+_LANG_FILES = [filename for filename in _LANG_FILES if
+               '__init__' not in filename]
+LANG_SUB_TRANSLATE = {}
+LANG_ACCURATE_REGEX_LIST = {}
+LANG_FUZZY_REGEX_LIST = {}
+for lang_file in _LANG_FILES:
+    lang = os.path.basename(lang_file).replace('.py', '')
+    module_name = 'gggdtparser.langs.' + lang
+    module = importlib.import_module(module_name)
+    if hasattr(module, 'SUB_TRANSLATE'):
+        LANG_SUB_TRANSLATE[lang] = getattr(module, 'SUB_TRANSLATE')
+    if hasattr(module, 'ACCURATE_REGEX_LIST'):
+        LANG_ACCURATE_REGEX_LIST[lang] = getattr(
+            module, 'ACCURATE_REGEX_LIST')
+    if hasattr(module, 'FUZZY_REGEX_LIST'):
+        LANG_FUZZY_REGEX_LIST[lang] = getattr(
+            module, 'FUZZY_REGEX_LIST')
+
+LANG_ACCURATE_REGEX_LIST = get_sort_dict(
+    LANG_ACCURATE_REGEX_LIST, _LANG_LIST_SORT)
+LANG_FUZZY_REGEX_LIST = get_sort_dict(
+    LANG_FUZZY_REGEX_LIST, _LANG_LIST_SORT)
+
+_SUB_LANG_LIST_SORT = copy.deepcopy(_LANG_LIST_SORT)
+(_SUB_LANG_LIST_SORT[0], _SUB_LANG_LIST_SORT[-1]) = (
+    _SUB_LANG_LIST_SORT[-1], _SUB_LANG_LIST_SORT[0])
+LANG_SUB_TRANSLATE = get_sort_dict(LANG_SUB_TRANSLATE, _SUB_LANG_LIST_SORT)
+
+

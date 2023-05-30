@@ -45,6 +45,7 @@
 ### year
 
 1. 2022年
+2. 2022
 
 ### month day hour minute second
 
@@ -205,6 +206,7 @@
 4. 02 Feb 2022 | 02:02 AM
 5. 18:33, 5 Feb 2022
 6. 02 Feb 2022 at 2:02pm
+7. 02:02 PM EST, Sat February 02, 2022
 
 ### year month day hour
 
@@ -215,6 +217,8 @@
 3. 2 February 2022
 
 ### year month
+
+1. February 2022
 
 ### year
 
@@ -397,6 +401,7 @@
 ### year month day hour
 
 ### year month day
+
 1. 29 tháng 3 năm 2023
 
 ### year month
@@ -490,9 +495,6 @@
 ## 科萨语
 
 1. 31 Ukwa gatatu 2023
-
-## 阿塞拜疆语
-1. 5 saat əvvəl
 
 ## 其他
 
