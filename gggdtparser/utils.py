@@ -19,5 +19,6 @@ def get_sort_dict(d, sort_list=None):
         return {k: d[k] for k in sort_list if k in d} | {k: d[
             k] for k in d if k not in sort_list}
     else:
-        return {k: d[k] for k in sort_list if k in d}.update({k: d[
-            k] for k in d if k not in sort_list})
+        _d = {k: d[k] for k in sort_list if k in d}
+        _d.update({k: d[k] for k in d if k not in sort_list})
+        return _d
