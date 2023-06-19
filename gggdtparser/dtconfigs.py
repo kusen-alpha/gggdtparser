@@ -7,6 +7,8 @@ import copy
 import os
 import glob
 import importlib
+import re
+
 from .utils import get_sort_dict
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -70,13 +72,24 @@ LANG_MAPPING = {
 TRANSLATE_LANGS = [
     # 阿拉伯语
     'ara',
-    'ar'
+    'ar',
+    # 泰语
+    'th'
 ]
 
 _LANG_LIST_SORT = ['default', 'en', 'zh', 'zht', 'de', 'fra', 'swe',
                    'vie', 'ru', 'es', 'so', 'mr', 'az', "uk", 'sw',
                    'tr', 'ky', 'ur', '_id', 'rw', 'si', 'tg', 'hi'
                    ]
+
+
+def compile_regex(regex, flags=0):
+    return re.compile(regex, flags)
+
+
+def compile_regex_list(regex_list, flags=0):
+    return [compile_regex(regex, flags) for regex in regex_list]
+
 
 _LANG_DIR = os.path.join(BASE_DIR, 'langs')
 _LANG_FILES = glob.glob(_LANG_DIR + '/*.py')
@@ -90,13 +103,16 @@ for lang_file in _LANG_FILES:
     module_name = 'gggdtparser.langs.' + lang
     module = importlib.import_module(module_name)
     if hasattr(module, 'SUB_TRANSLATE'):
-        LANG_SUB_TRANSLATE[lang] = getattr(module, 'SUB_TRANSLATE')
+        sub_list = []
+        for sub in getattr(module, 'SUB_TRANSLATE'):
+            sub_list.append((compile_regex(sub[0]), sub[1]))
+        LANG_SUB_TRANSLATE[lang] = sub_list
     if hasattr(module, 'ACCURATE_REGEX_LIST'):
-        LANG_ACCURATE_REGEX_LIST[lang] = getattr(
-            module, 'ACCURATE_REGEX_LIST')
+        LANG_ACCURATE_REGEX_LIST[lang] = compile_regex_list(getattr(
+            module, 'ACCURATE_REGEX_LIST'), flags=re.M | re.I | re.S)
     if hasattr(module, 'FUZZY_REGEX_LIST'):
-        LANG_FUZZY_REGEX_LIST[lang] = getattr(
-            module, 'FUZZY_REGEX_LIST')
+        LANG_FUZZY_REGEX_LIST[lang] = compile_regex_list(getattr(
+            module, 'FUZZY_REGEX_LIST'), flags=re.M | re.I | re.S)
 
 LANG_ACCURATE_REGEX_LIST = get_sort_dict(
     LANG_ACCURATE_REGEX_LIST, _LANG_LIST_SORT)
@@ -107,5 +123,3 @@ _SUB_LANG_LIST_SORT = copy.deepcopy(_LANG_LIST_SORT)
 (_SUB_LANG_LIST_SORT[0], _SUB_LANG_LIST_SORT[-1]) = (
     _SUB_LANG_LIST_SORT[-1], _SUB_LANG_LIST_SORT[0])
 LANG_SUB_TRANSLATE = get_sort_dict(LANG_SUB_TRANSLATE, _SUB_LANG_LIST_SORT)
-
-

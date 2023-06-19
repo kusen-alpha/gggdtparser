@@ -26,12 +26,12 @@ class StringDateTimeLanguageHandler(object):
         if not langs:
             for _lang, sub_list in dtconfigs.LANG_SUB_TRANSLATE.items():
                 for sub in sub_list:
-                    string_datetime = re.sub(sub[0], sub[1], string_datetime)
+                    string_datetime = sub[0].sub(sub[1], string_datetime)
         for lang in langs:
             _sub_translate = dtconfigs.LANG_SUB_TRANSLATE.get(
                 lang) or []
             for sub in _sub_translate:
-                string_datetime = re.sub(sub[0], sub[1], string_datetime)
+                string_datetime = sub[0].sub(sub[1], string_datetime)
         return string_datetime
 
 
@@ -117,8 +117,7 @@ class StringDateTimeRegexParser(object):
                         result_accurately, max_datetime, min_datetime):
         for regex in regex_list:
             try:
-                match_obj = re.search(
-                    regex, string_datetime, flags=re.M | re.I | re.S)
+                match_obj = regex.search(string_datetime)
             except (ValueError, re.error) as e:
                 continue
             if not match_obj:
@@ -129,7 +128,6 @@ class StringDateTimeRegexParser(object):
                     result = cls._parse_group_dict(
                         group_dict, result_accurately,
                         max_datetime, min_datetime)
-                    # print(regex)
                     return result
                 except Exception:
                     continue
