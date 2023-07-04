@@ -21,5 +21,6 @@ SUB_TRANSLATE = [
     (r'間', '间'),
     (r'國', '国'),
     (r'鐘', '钟'),
+    (r'個', '个'),
 ]
 FUZZY_REGEX_LIST = []

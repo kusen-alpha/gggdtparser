@@ -23,7 +23,7 @@ SUB_TRANSLATE = [
     (r"avril|avr\.", "4月"),
     (r"mai\.|mai", "5月"),
     (r"juin\.|juin", "6月"),
-    (r"juillet\.|juillet", "7月"),
+    (r"juillet\.|juil\.|juillet", "7月"),
     (r"aout\.|août", "8月"),
     (r"septembre|sept\.", "9月"),
     (r"octobre|oct\.", "10月"),

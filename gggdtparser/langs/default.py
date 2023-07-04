@@ -22,10 +22,10 @@ ACCURATE_REGEX_LIST = [
     r"^(?P<ts>\d{10})$",
 
     # before
-    r"(?P<bd>\d+)\s*天\s*(前|ago)",
+    r"(?P<bd>\d+)\s*(天|日)\s*(前|ago)",
     r"(?P<bM>\d+)\s*分钟\s*(前|ago)",
     r"(?P<bH>\d+)\s*小时\s*(前|ago)",
-    r"(?P<bm>\d+)\s*(个)?月\s*(前|ago)",
+    r"(?P<bm>\d+)\s*(个|個)?月\s*(前|ago)",
     r"(?P<bY>\d+)\s*年\s*(前|ago)",
     r"(?P<bS>\d+)\s*秒\s*(前|ago)",
     r"(?P<ba>\d+)\s*周\s*(前|ago)",
