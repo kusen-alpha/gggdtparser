@@ -67,6 +67,8 @@ LANG_MAPPING = {
     "tg": "tg",
     # 印地语
     "hi": "hi",
+    # 日语
+    "ja": 'ja'
 }
 
 TRANSLATE_LANGS = [
@@ -79,7 +81,8 @@ TRANSLATE_LANGS = [
 
 _LANG_LIST_SORT = ['default', 'en', 'zh', 'zht', 'de', 'fra', 'swe',
                    'vie', 'ru', 'es', 'so', 'mr', 'az', "uk", 'sw',
-                   'tr', 'ky', 'ur', '_id', 'rw', 'si', 'tg', 'hi'
+                   'tr', 'ky', 'ur', '_id', 'rw', 'si', 'tg', 'hi',
+                   'ja'
                    ]
 
 
