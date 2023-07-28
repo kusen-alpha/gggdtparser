@@ -55,7 +55,6 @@ class StringDateTimeRegexParser(object):
         :return:
         """
         string_datetime = cls.clear_string_datetime(string_datetime)
-        print(string_datetime)
         if not langs:
             langs = []
         _langs = []
