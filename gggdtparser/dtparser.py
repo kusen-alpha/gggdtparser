@@ -54,6 +54,8 @@ class StringDateTimeRegexParser(object):
         :param min_datetime: 最小时间，超过解析失败
         :return:
         """
+        string_datetime = cls.clear_string_datetime(string_datetime)
+        print(string_datetime)
         if not langs:
             langs = []
         _langs = []
@@ -85,6 +87,12 @@ class StringDateTimeRegexParser(object):
             result_accurately, max_datetime, min_datetime)
         if result:
             return result
+
+    @classmethod
+    def clear_string_datetime(cls, string_datetime):
+        for regex in dtconfigs.STRING_DATETIME_CLEAR_REGEX:
+            string_datetime = regex.sub(' ', string_datetime)
+        return string_datetime
 
     @classmethod
     def get_default_regex_list(cls, langs, extract_accurately):

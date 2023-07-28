@@ -13,6 +13,11 @@ from .utils import get_sort_dict
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+STRING_DATETIME_CLEAR_REGEX = [
+    re.compile(r'\n+'),
+    re.compile(r'(\r\n)+'),
+    re.compile(r' {2,}')
+]
 LANG_MAPPING = {
     # 英语
     "en": "en",
