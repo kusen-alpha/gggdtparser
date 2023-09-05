@@ -17,8 +17,9 @@
 
 ## 项目特色
 
-1. 文本时间内能包含一些噪音
+1. 模糊抽取解析
 2. 解析速度快
+3. 支持自定义解析规则
 
 ## 使用方法
 
@@ -76,6 +77,41 @@
    31 de marzo de 2023  # 西班牙语
    27 Fev 2023  # 卡拜尔语
    ......
+```
+
+4. 指定formats
+
+```python
+import gggdtparser
+
+dt = gggdtparser.parse("2023-02-20", format_list=["%Y-%m-%d"])
+print(dt)
+```
+
+5. 指定正则
+
+```python
+import gggdtparser
+
+dt = gggdtparser.parse("2023-02-20",
+                       regex_list=[r"(?P<Y>\d{4})(?P<m>\d{2})(?P<d>\d{2})"])
+print(dt)
+```
+
+6. 自定义翻译
+
+```python
+import gggdtparser
+
+
+def translate(s):
+    # 翻译
+    return ""
+
+
+dt = gggdtparser.parse("xxx", translate_func=translate)
+print(dt)
+
 ```
 
 ## 待完善

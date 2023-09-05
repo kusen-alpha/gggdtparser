@@ -80,6 +80,6 @@ SUB_TRANSLATE = [
     (r'AT', ''),
     (r'AM', 'am'),
     (r'PM', 'pm'),
-    (r'yesterday\s*(at)?', '昨天'),
+    (r'[yY]esterday\s*(at)?', '昨天'),
 ]
 FUZZY_REGEX_LIST = []
