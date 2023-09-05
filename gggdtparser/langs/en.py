@@ -46,7 +46,7 @@ ACCURATE_REGEX_LIST = [
     r"(?P<bH>\d+)\s*h\s*ago",
     r"(?P<bH>\d+)\s*小时\s*",
     r"(?P<bH>\d+)\s*hours?\s*(ago)?",
-    r"(?P<bd>\d+)\s*days?\s*(ago)?",
+    r"(?P<bd>\d+)\s*days?\s*(ago)?\*?(at)?\s*(?P<H>\d{2})?\s*[:]?\s*(?P<M>\d{2})?\s*[分]?\s*(?P<apm>am|pm)?",
     r"(?P<bm>\d+)\s*months?\s*(ago)?",
     r"(?P<ba>\d+)\s*weeks?\s*(ago)?",
     r"(?P<bY>\d+)\s*years?\s*(ago)?",

@@ -313,7 +313,7 @@ class StringDateTimeRegexParser(object):
         day = 1 if not day else day
         # 上下午
         apm = group_dict.get('apm')
-        if apm == 'pm' and hour and hour > 12:
+        if apm == 'pm' and hour and hour < 12:
             hour += 12
         parse_datetime = datetime.datetime(
             year=year, month=month,
