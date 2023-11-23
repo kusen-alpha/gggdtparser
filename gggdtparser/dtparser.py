@@ -44,7 +44,7 @@ class StringDateTimeRegexParser(object):
     @classmethod
     def parse(cls, string_datetime, regex_list=None, langs=None,
               result_accurately=True, extract_accurately=False,
-              max_datetime=None, min_datetime=None):
+              max_datetime=None, min_datetime=None, base_datetime=None):
         """
         通过正则对文本的时间进行抽取和解析
         :param string_datetime: 文本时间
@@ -54,6 +54,7 @@ class StringDateTimeRegexParser(object):
         :param extract_accurately: 是否只进行精确抽取
         :param max_datetime: 最大时间，超过解析失败
         :param min_datetime: 最小时间，超过解析失败
+        :param base_datetime: 相对时间计算的基准时间
         :return:
         """
         string_datetime = cls.clear_string_datetime(string_datetime)
@@ -77,15 +78,16 @@ class StringDateTimeRegexParser(object):
         string_datetime = StringDateTimeLanguageHandler.handle(
             string_datetime, langs)
         if regex_list:
+            regex_list = [re.compile(regex) for regex in regex_list]
             result = cls.match_and_parse(
                 string_datetime, regex_list, result_accurately,
-                max_datetime, min_datetime)
+                max_datetime, min_datetime, base_datetime)
             if result:
                 return result
         regex_list = cls.get_default_regex_list(langs, extract_accurately)
         result = cls.match_and_parse(
             string_datetime, regex_list,
-            result_accurately, max_datetime, min_datetime)
+            result_accurately, max_datetime, min_datetime, base_datetime)
         if result:
             return result
 
@@ -123,7 +125,8 @@ class StringDateTimeRegexParser(object):
 
     @classmethod
     def match_and_parse(cls, string_datetime, regex_list,
-                        result_accurately, max_datetime, min_datetime):
+                        result_accurately, max_datetime,
+                        min_datetime, base_datetime):
         for regex in regex_list:
             try:
                 match_obj = regex.search(string_datetime)
@@ -136,16 +139,17 @@ class StringDateTimeRegexParser(object):
                 try:
                     result = cls._parse_group_dict(
                         group_dict, result_accurately,
-                        max_datetime, min_datetime)
+                        max_datetime, min_datetime,
+                        base_datetime)
                     return result
                 except Exception:
                     continue
 
     @classmethod
     def _parse_group_dict(cls, group_dict, result_accurately, max_datetime,
-                          min_datetime):
+                          min_datetime, base_datetime):
         un_result_accurately = not result_accurately
-        now = datetime.datetime.now()
+        now = datetime.datetime.now() if not base_datetime else base_datetime
         timestamp = int(group_dict.get('ts') or 0)
         if timestamp:
             if len(str(timestamp)) == 13:
@@ -427,7 +431,8 @@ def parse_by_format(string_datetime, format_list=None):
 
 def parse(string_datetime, format_list=None, regex_list=None,
           langs=None, result_accurately=True, extract_accurately=False,
-          max_datetime=None, min_datetime=None, translate_func=None):
+          max_datetime=None, min_datetime=None, base_datetime=None,
+          translate_func=None):
     """
     解析文本时间
     :param string_datetime: 字符串时间文本
@@ -438,6 +443,7 @@ def parse(string_datetime, format_list=None, regex_list=None,
     :param extract_accurately:  是否只进行精确抽取
     :param max_datetime: 最大时间
     :param min_datetime: 最小时间
+    :param base_datetime: 基准时间
     :param translate_func: 翻译函数
     :return: datetime.datetime
     """
@@ -452,6 +458,7 @@ def parse(string_datetime, format_list=None, regex_list=None,
     result = parse_by_regex(
         string_datetime, regex_list, langs, result_accurately,
         max_datetime=max_datetime, min_datetime=min_datetime,
+        base_datetime=base_datetime,
         extract_accurately=extract_accurately)
     if result:
         return result
