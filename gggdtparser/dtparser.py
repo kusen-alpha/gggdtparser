@@ -8,6 +8,8 @@ import re
 import random
 import logging
 import datetime
+
+from gggdtparser.utils import s2dt
 from . import dtconfigs
 
 
@@ -260,6 +262,55 @@ class StringDateTimeRegexParser(object):
             cls._update_use_now_config(
                 use_now_config, year=True, month=True,
                 day=True, hour=True, minute=True, second=True)
+
+        # 在xxx之后 after
+        calc_add = False
+        change_after = dict()
+        change_after['aY'] = int(group_dict.get('aY') or 0)
+        change_after['am'] = int(group_dict.get('am') or 0)
+        change_after['ad'] = int(group_dict.get('ad') or 0)
+        change_after['aH'] = int(group_dict.get('aH') or 0)
+        change_after['aM'] = int(group_dict.get('aM') or 0)
+        change_after['aS'] = int(group_dict.get('aS') or 0)
+        change_after['aa'] = int(group_dict.get('aa') or 0)
+        if any(change_after.values()):
+            calc_add = True
+        for key in change_after:
+            if change_after[key] <= 0 or result_accurately:
+                continue
+            change_after[key] -= round(random.random(), 1)
+        if change_after['aY'] > 0:
+            change_day += change_after['aY'] * 365
+            cls._update_use_now_config(use_now_config, year=True,
+                                       month=not result_accurately,
+                                       day=not result_accurately)
+        if change_after['am'] > 0:
+            change_day += change_after['am'] * 30
+            cls._update_use_now_config(use_now_config, year=True,
+                                       month=True, day=True)
+        if change_after['aa'] > 0:
+            change_day += change_after['aa'] * 7
+            cls._update_use_now_config(use_now_config, year=True,
+                                       month=True, day=True)
+        if change_after['ad'] > 0:
+            change_day += change_after['ad']
+            cls._update_use_now_config(use_now_config, year=True,
+                                       month=True, day=True)
+        if change_after['aH'] > 0:
+            change_hour += change_after['aH']
+            cls._update_use_now_config(use_now_config, year=True,
+                                       month=True, day=True, hour=True)
+        if change_after['aM'] > 0:
+            change_minute += change_after['aM']
+            cls._update_use_now_config(use_now_config, year=True,
+                                       month=True,
+                                       day=True, hour=True, minute=True)
+        if change_after['aS'] > 0:
+            change_second += change_after['aS']
+            cls._update_use_now_config(
+                use_now_config, year=True, month=True,
+                day=True, hour=True, minute=True, second=True)
+
         # 抽取到具有特殊时间 special
         special_day = group_dict.get('sd') or ''
         special_other = group_dict.get('so') or ''
@@ -318,7 +369,11 @@ class StringDateTimeRegexParser(object):
         parse_datetime = datetime.datetime(
             year=year, month=month,
             day=day, hour=hour,
-            minute=minute, second=second) - change_timedelta
+            minute=minute, second=second)
+        if calc_add:
+            parse_datetime = parse_datetime + change_timedelta
+        else:
+            parse_datetime = parse_datetime - change_timedelta
         if max_datetime and parse_datetime > max_datetime:
             raise Exception('解析时间超出最大时间')
         if min_datetime and parse_datetime < min_datetime:
@@ -367,11 +422,7 @@ def parse_by_format(string_datetime, format_list=None):
     """
     if not format_list:
         format_list = []
-    for f in format_list:
-        try:
-            return datetime.datetime.strptime(string_datetime, f)
-        except ValueError:
-            continue
+    return s2dt(string_datetime, format_list)
 
 
 def parse(string_datetime, format_list=None, regex_list=None,

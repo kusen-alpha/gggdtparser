@@ -41,6 +41,15 @@ ACCURATE_REGEX_LIST = [
     r"(?P<wS>\d+)\s*秒内",
     r"(?P<wa>\d+)\s*周内",
     r"(?P<wa>\d+)\s*星期内",
+    # after
+    r"(?P<ad>\d+)\s*天后",
+    r"(?P<aM>\d+)\s*分钟后",
+    r"(?P<aH>\d+)\s*小时后",
+    r"(?P<am>\d+)\s*(个)?月后",
+    r"(?P<aY>\d+)\s*年后",
+    r"(?P<aS>\d+)\s*秒后",
+    r"(?P<aa>\d+)\s*周后",
+    r"(?P<aa>\d+)\s*星期后",
     # 特殊语义
     r"(?P<sd>今天)\s*(?P<H>\d+):(?P<M>\d+):(?P<S>\d+)",
     r"(?P<sd>今天)\s*(?P<H>\d+):(?P<M>\d+)",
