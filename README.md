@@ -79,7 +79,7 @@
    ......
 ```
 
-4. 指定formats
+4. 指定formats解析
 
 ```python
 import gggdtparser
@@ -88,7 +88,7 @@ dt = gggdtparser.parse("2023-02-20", format_list=["%Y-%m-%d"])
 print(dt)
 ```
 
-5. 指定正则
+5. 指定正则解析
 
 正则使用有名分组形式，对应关系如下：
 
@@ -147,6 +147,17 @@ def translate(s):
 
 dt = gggdtparser.parse("xxx", translate_func=translate)
 print(dt)
+
+```
+
+7. 时间范围解析
+```python
+
+import datetime
+from gggdtparser import parse_frame
+
+print(parse_frame('2022年10月1日至2023年10月1日', regex_list=[None, ('(?P<am>\d+)\s*(个)?月',)], base_datetime=datetime.datetime(year=2023, month=1, day=1)))
+print(parse_frame('10个月', regex_list=[None, ('(?P<am>\d+)\s*(个)?月',)], base_datetime=datetime.datetime(year=2023, month=1, day=1)))
 
 ```
 
