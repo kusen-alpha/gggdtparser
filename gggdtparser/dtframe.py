@@ -52,6 +52,8 @@ def parse(s, seps=None, format_list=None, regex_list=None,
 
     :return:
     """
+    if not s:
+        return None, None
     if not seps:
         seps = []
     start_format_list, end_format_list = format_list if format_list else (

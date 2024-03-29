@@ -57,6 +57,8 @@ class StringDateTimeRegexParser(object):
         :param base_datetime: 相对时间计算的基准时间
         :return:
         """
+        if not string_datetime:
+            return
         string_datetime = cls.clear_string_datetime(string_datetime)
         if not langs:
             langs = []
