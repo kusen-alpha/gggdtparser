@@ -156,7 +156,7 @@ print(dt)
 import datetime
 from gggdtparser import parse_frame
 
-print(parse_frame('2022年10月1日至2023年10月1日', regex_list=[None, ('(?P<am>\d+)\s*(个)?月',)], base_datetime=datetime.datetime(year=2023, month=1, day=1)))
+print(parse_frame('2022年10月1日至2023年10月1日'))
 print(parse_frame('10个月', regex_list=[None, ('(?P<am>\d+)\s*(个)?月',)], base_datetime=datetime.datetime(year=2023, month=1, day=1)))
 
 ```
