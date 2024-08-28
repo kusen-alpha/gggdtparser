@@ -5,8 +5,8 @@
 
 
 import datetime
-from ..dtparser import parse
-from ..dtparser import check
+from gggdtparser.dtparser import parse
+from gggdtparser.dtparser import check
 
 
 def test(test_string_datetime):

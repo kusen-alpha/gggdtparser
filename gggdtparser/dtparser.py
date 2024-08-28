@@ -129,7 +129,7 @@ class StringDateTimeRegexParser(object):
     def match_and_parse(cls, string_datetime, regex_list,
                         result_accurately, max_datetime,
                         min_datetime, base_datetime):
-        for regex in regex_list:
+        for index, regex in enumerate(regex_list):
             try:
                 match_obj = regex.search(string_datetime)
             except (ValueError, re.error) as e:
