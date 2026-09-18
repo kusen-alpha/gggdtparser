@@ -1,0 +1,37 @@
+# -*- coding:utf-8 -*-
+
+"""
+芬兰语
+"""
+
+ACCURATE_REGEX_LIST = []
+
+SUB_TRANSLATE = [
+    (r"tammikuuta|tammikuu", "1月"),
+    (r"helmikuuta|helmikuu", "2月"),
+    (r"maaliskuuta|maaliskuu", "3月"),
+    (r"huhtikuuta|huhtikuu", "4月"),
+    (r"toukokuuta|toukokuu", "5月"),
+    (r"kesäkuuta|kesäkuu", "6月"),
+    (r"heinäkuuta|heinäkuu", "7月"),
+    (r"elokuuta|elokuu", "8月"),
+    (r"syyskuuta|syyskuu", "9月"),
+    (r"lokakuuta|lokakuu", "10月"),
+    (r"marraskuuta|marraskuu", "11月"),
+    (r"joulukuuta|joulukuu", "12月"),
+    (r"maanantai", ""),
+    (r"tiistai", ""),
+    (r"keskiviikko", ""),
+    (r"torstai", ""),
+    (r"perjantai", ""),
+    (r"lauantai", ""),
+    (r"sunnuntai", ""),
+    (r"(?P<num>\d+)\s*tuntia?\s*sitten", lambda m: "%s小时前" % int(m.group("num"))),
+    (r"(?P<num>\d+)\s*minuuttia?\s*sitten", lambda m: "%s分钟前" % int(m.group("num"))),
+    (r"(?P<num>\d+)\s*päivää\s*sitten", lambda m: "%s天前" % int(m.group("num"))),
+    (r"juuri nyt", "刚刚"),
+    (r"tänään", "今天"),
+    (r"eilen", "昨天"),
+]
+
+FUZZY_REGEX_LIST = []

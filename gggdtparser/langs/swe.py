@@ -5,7 +5,7 @@
 
 
 """
-瑞典语
+葡萄牙语
 """
 
 ACCURATE_REGEX_LIST = [
@@ -19,17 +19,18 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
-    (r"janeiro", "1月"),
-    (r"fevereiro", "2月"),
-    (r"março", "3月"),
-    (r"abril", "4月"),
-    (r"maio", "5月"),
-    (r"junho", "6月"),
-    (r"julho", "7月"),
-    (r"agosto", "8月"),
-    (r"setembro", "9月"),
-    (r"outubro", "10月"),
-    (r"novembro", "11月"),
-    (r"dezembro", "12月"),
+    (r"(de)?\s*janeiro\s*(de)?", "1月"),
+    (r"Fev\.?", "2月"),
+    (r"(de)?\s*fevereiro\s*(de)?", "2月"),
+    (r"(de)?\s*março\s*(de)?", "3月"),
+    (r"(de)?\s*abril\s*(de)?", "4月"),
+    (r"(de)?\s*maio\s*(de)?", "5月"),
+    (r"(de)?\s*junho\s*(de)?", "6月"),
+    (r"(de)?\s*julho\s*(de)?", "7月"),
+    (r"(de)?\s*agosto\s*(de)?", "8月"),
+    (r"(de)?\s*setembro\s*(de)?", "9月"),
+    (r"(de)?\s*outubro\s*(de)?", "10月"),
+    (r"(de)?\s*novembro\s*(de)?", "11月"),
+    (r"(de)?\s*dezembro\s*(de)?", "12月"),
 ]
 FUZZY_REGEX_LIST = []

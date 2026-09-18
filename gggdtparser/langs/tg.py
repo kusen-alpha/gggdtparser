@@ -14,4 +14,5 @@ SUB_TRANSLATE = [
 ]
 
 FUZZY_REGEX_LIST = [
+    r"(?P<bM>\d+)\s*дақиқалар\s*аввал",
 ]

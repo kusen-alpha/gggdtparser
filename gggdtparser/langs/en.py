@@ -32,16 +32,20 @@ ACCURATE_REGEX_LIST = [
     # Wed 29 Mar 2023 at 3:04
 
     # May 15 2023 21:08:42
-    r"(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*(?P<Y>\d{4})\s*(?P<H>\d{1,2}):(?P<M>\d{1,2}):(?P<S>\d{1,2})",
+    r"(?P<m>\d{1,2})\s*(?:[月]\s*|\s+)(?P<d>\d{1,2})\s*(?P<Y>\d{4})\s*(?P<H>\d{1,2}):(?P<M>\d{1,2}):(?P<S>\d{1,2})",
     # May 08 2023, 6.00pm
-    r"(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*(?P<Y>\d{4}),\s*(?P<H>\d{1,2})\.(?P<M>\d{1,2})\s*(?P<apm>am|pm)",
+    r"(?P<m>\d{1,2})\s*(?:[月]\s*|\s+)(?P<d>\d{1,2})\s*(?P<Y>\d{4}),\s*(?P<H>\d{1,2})\.(?P<M>\d{1,2})\s*(?P<apm>am|pm)",
     # May 08 2023
-    r"(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*(?P<Y>\d{4})",
+    r"(?P<m>\d{1,2})\s*(?:[月]\s*|\s+)(?P<d>\d{1,2})\s*(?P<Y>\d{4})",
+    # RFC822: Wed, 02 Feb 2022 14:30:20 +0530
+    r"(?P<d>\d{1,2})\s+(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})\s+(?P<H>\d{1,2}):(?P<M>\d{1,2}):(?P<S>\d{1,2})(?:\s*[+-]?\d{4}|\s*GMT)?",
     # 25 10 2021
-    r"(?P<d>\d{1,2})\s*(?P<m>\d{1,2})\s*(?P<Y>\d{4})",
+    r"(?P<d>\d{1,2})\s+(?P<m>\d{1,2})\s*(?P<Y>\d{4})",
+    # December 23, 2022 / 15:20 -> 翻译后: 12月 23, 2022 / 15:20
+    r"(?P<m>\d{1,2})\s*月\s+(?P<d>\d{1,2})(?!\d)\s*[,]?\s*(?P<Y>\d{4})\s*/?\s*(?P<H>\d{1,2}):(?P<M>\d{1,2})",
     # 23 December, 2022 / 15:20
-    r"(?P<d>\d{1,2})\s*(?P<m>\d{1,2})\s*[月]?\s*,?\s*(?P<Y>\d{4})\s*/?\s*(?P<H>\d{1,2}):(?P<M>\d{1,2})",
-    r"(?P<m>\d{1,2})\s*(?P<Y>\d{4})",  # 10 2021
+    r"(?P<d>\d{1,2})(?!\d)\s*(?P<m>\d{1,2})\s*[月]?\s*,?\s*(?P<Y>\d{4})\s*/?\s*(?P<H>\d{1,2}):(?P<M>\d{1,2})",
+    r"(?P<m>\d{1,2})\s*[月]?\s+(?P<Y>\d{4})",  # 10 2021
     r"(?P<bS>\d+)\s*seconds?\s*(ago)?",
     r"(?P<bM>\d+)\s*m\s*ago",
     r"(?P<bM>\d+)\s*minutes?\s*(ago)?",
@@ -55,8 +59,10 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r"(?P<num>\d{1,2})(?:st|nd|rd|th)\b", lambda m: m.group("num")),
+    (r"\bof\b", ""),
     (r"January|JANUARY|Jan\.|Jan", "1月"),
-    (r"February|FEBRUARY|Feb\.", "2月"),
+    (r"February|FEBRUARY|Feb\.?|FEB", "2月"),
     (r"March|MARCH|Mar\.|Mar|Mai", "3月"),
     (r"April|APRIL|Apr\.|Apr", "4月"),
     (r"May\.|May|MAY", "5月"),

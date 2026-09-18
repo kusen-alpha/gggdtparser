@@ -12,7 +12,11 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r'Ukwa gatatu', '3月'),
     (r'Ukwa kane', '4月'),
     (r'Iminota', '分钟'),
 ]
-FUZZY_REGEX_LIST = []
+FUZZY_REGEX_LIST = [
+    r"(?P<bM>\d+)\s*iraheze",
+    r"(?P<bM>\d+)\s*分钟\s*iraheze",
+]

@@ -7,6 +7,8 @@
 
 __all__ = ['parse']
 
+import re
+
 from . import dtparser
 
 SEPS = (
@@ -18,19 +20,25 @@ SEPS = (
 def _parse(s, sep, start_format_list, end_format_list, start_regex_list,
            end_regex_list, base_datetime):
     start, end = None, None
-    try:
-        left, right = s.split(sep)
-    except ValueError:
+    parts = s.split(sep)
+    if len(parts) != 2 and sep == '-':
+        dashed_parts = re.split(r'\s+-\s+', s)
+        if len(dashed_parts) == 2:
+            parts = dashed_parts
+    if len(parts) != 2:
         if base_datetime:
             start = base_datetime
             end = dtparser.parse(
                 s, end_format_list, end_regex_list,
                 base_datetime=base_datetime)
         return start, end
+    left, right = parts
     if left:
         start = dtparser.parse(
             left, start_format_list, start_regex_list,
             base_datetime=base_datetime)
+    elif base_datetime:
+        start = base_datetime
     if right:
         end = dtparser.parse(
             right, end_format_list, end_regex_list,
@@ -52,15 +60,28 @@ def parse(s, seps=None, format_list=None, regex_list=None,
 
     :return:
     """
-    if not s:
+    if not isinstance(s, str) or not s:
         return None, None
     if not seps:
         seps = []
-    start_format_list, end_format_list = format_list if format_list else (
-        None, None)
+    if format_list:
+        try:
+            start_format_list, end_format_list = format_list
+        except (TypeError, ValueError):
+            start_format_list = end_format_list = None
+    else:
+        start_format_list = end_format_list = None
 
-    start_regex_list, end_regex_list = regex_list if regex_list else (
-        None, None)
+    if regex_list:
+        try:
+            start_regex_list, end_regex_list = regex_list
+        except (TypeError, ValueError):
+            if isinstance(regex_list, (tuple, list)) and len(regex_list) == 1:
+                start_regex_list = end_regex_list = regex_list[0]
+            else:
+                start_regex_list = end_regex_list = None
+    else:
+        start_regex_list = end_regex_list = None
     for sep in seps:
         start, end = _parse(
             s, sep, start_format_list, end_format_list,
@@ -71,7 +92,7 @@ def parse(s, seps=None, format_list=None, regex_list=None,
         start, end = _parse(
             s, sep, start_format_list, end_format_list,
             start_regex_list, end_regex_list, base_datetime)
-        if any([start, end]):
+        if start and end:
             return start, end
     return None, None
 

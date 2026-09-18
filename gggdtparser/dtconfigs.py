@@ -23,23 +23,28 @@ LANG_MAPPING = {
     "en": "en",
     # 中文
     "zh": "zh",
-    "zh-CN": "zh",
-    "zh-CHS": "zh",
+    "zh-cn": "zh",
+    "zh-chs": "zh",
+    "zh-hans": "zh",
     # 繁体/中国台湾
-    "cht": "cht",
-    "zh-TW": "cht",
-    "zh-CHT": "cht",
+    "cht": "zht",
+    "zht": "zht",
+    "zh-tw": "zht",
+    "zh-cht": "zht",
+    "zh-hant": "zht",
     # 德语
     "de": "de",
     # 法语
     "fra": "fra",
-    "fr": "fr",
-    # 瑞典语
+    "fr": "fra",
+    # 葡萄牙语(模块名保留 swe)
     "swe": 'swe',
-    "sv": 'sv',
+    "sv": 'sv_se',
+    "pt": 'swe',
+    "por": 'swe',
     # 越南语
     "vie": 'vie',
-    "vi": 'vi',
+    "vi": 'vie',
     # 阿塞拜疆语
     'az': 'az',
     # 俄语
@@ -73,21 +78,52 @@ LANG_MAPPING = {
     # 印地语
     "hi": "hi",
     # 日语
-    "ja": 'ja'
+    "ja": 'ja',
+    # 韩语
+    "ko": 'ko',
+    # 意大利语
+    "it": "it",
+    # 荷兰语
+    "nl": "nl",
+    # 波兰语
+    "pl": "pl",
+    # 希腊语
+    "el": "el",
+    # 泰语
+    "th": "th",
+    # 芬兰语
+    "fi": "fi",
+    # 匈牙利语
+    "hu": "hu",
+    # 捷克语
+    "cs": "cs",
+    # 瑞典语
+    "sv_se": "sv_se",
+    # 挪威语/丹麦语共享工具词形，模块分开以便各自扩展
+    "nb": "nb",
+    "no": "nb",
+    "nn": "nb",
+    "da": "da",
+    # 希伯来语
+    "he": "he",
+    "iw": "he",
 }
 
 TRANSLATE_LANGS = [
     # 阿拉伯语
     'ara',
     'ar',
-    # 泰语
-    'th'
+    # 孟加拉语
+    'bn',
+    # 波斯语
+    'fa',
 ]
 
 _LANG_LIST_SORT = ['default', 'en', 'zh', 'zht', 'de', 'fra', 'swe',
                    'vie', 'ru', 'es', 'so', 'mr', 'az', "uk", 'sw',
-                   'tr', 'ky', 'ur', '_id', 'rw', 'si', 'tg', 'hi',
-                   'ja'
+    'tr', 'ky', 'ur', '_id', 'rw', 'si', 'tg', 'hi',
+                   'ja', 'ko', 'it', 'nl', 'pl', 'el', 'th', 'fi',
+                   'hu', 'cs', 'sv_se', 'nb', 'da', 'he'
                    ]
 
 
