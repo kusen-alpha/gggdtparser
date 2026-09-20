@@ -21,6 +21,17 @@ _GL_UNIT_RE = (
     r"semana[s]?|mes(?:es)?|ano[s]?"
 )
 
+_GL_WEEKDAYS = {
+    "luns": "周一",
+    "martes": "周二",
+    "mércores": "周三",
+    "xoves": "周四",
+    "venres": "周五",
+    "sábado": "周六",
+    "domingo": "周日",
+}
+_GL_WEEKDAYS_RE = "|".join(sorted(_GL_WEEKDAYS, key=len, reverse=True))
+
 
 def _gl_later(match):
     return "%s%s后" % (match.group("a"), _GL_UNIT_MAP[match.group("b")])
@@ -31,6 +42,21 @@ def _gl_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:vindeiro|vindeira|próximo|próxima)\s+(%s)\b"
+     % _GL_WEEKDAYS_RE,
+     lambda m: "下%s" % _GL_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:pasado|pasada)\s+(%s)\b" % _GL_WEEKDAYS_RE,
+     lambda m: "上%s" % _GL_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:este|esta)\s+(%s)\b" % _GL_WEEKDAYS_RE,
+     lambda m: "这%s" % _GL_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bhoxe\s+(?:pola\s+mañá|de\s+mañá)\b", "今天 08:00 am"),
+    (r"(?i)\bhoxe\s+(?:ao\s+mediodía|mediodía)\b", "今天 12:00 pm"),
+    (r"(?i)\bhoxe\s+pola\s+tarde\b", "今天 15:00 pm"),
+    (r"(?i)\bhoxe\s+pola\s+noite\b", "今天 22:00 pm"),
+    (r"(?i)\bmañá\s+(?:pola\s+mañá|de\s+mañá)\b", "明天 08:00 am"),
+    (r"(?i)\bonte\s+(?:á\s+noite|pola\s+noite)\b", "昨天 22:00 pm"),
+    (r"(?i)\bmedianoite\b", "12:00 am"),
+    (r"(?i)\bmediodía\b", "12:00 pm"),
     (r"(?i)\bxaneiro\b", "1月"),
     (r"(?i)\bfebreiro\b", "2月"),
     (r"(?i)\bmarzo\b", "3月"),
@@ -59,3 +85,7 @@ SUB_TRANSLATE = [
     (r"(?i)o\s+próximo\s+ano|o\s+ano\s+que\s+vén", "明年"),
     (r"(?i)o\s+ano\s+pasado", "去年"),
 ]
+
+for _weekday in sorted(_GL_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday,
+                          _GL_WEEKDAYS[_weekday]))

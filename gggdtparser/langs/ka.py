@@ -22,6 +22,28 @@ _KA_UNIT_RE = (
 )
 _KA_UNIT_IN_RE = r"წამში|წუთში|საათში|დღეში|კვირაში|თვეში|წელში"
 
+_KA_WEEKDAYS = {
+    "ორშაბათი": "周一",
+    "ორშაბათს": "周一",
+    "სამშაბათი": "周二",
+    "სამშაბათს": "周二",
+    "ოთხშაბათი": "周三",
+    "ოთხშაბათს": "周三",
+    "ხუთშაბათი": "周四",
+    "ხუთშაბათს": "周四",
+    "პარასკევი": "周五",
+    "პარასკევს": "周五",
+    "შაბათი": "周六",
+    "შაბათს": "周六",
+    "კვირა": "周日",
+    "კვირას": "周日",
+}
+_KA_WEEKDAYS_RE = "|".join(sorted(_KA_WEEKDAYS, key=len, reverse=True))
+_KA_WEEKDAYS_DIR_RE = (
+    r"ორშაბათი|ორშაბათს|სამშაბათი|სამშაბათს|ოთხშაბათი|ოთხშაბათს|"
+    r"ხუთშაბათი|ხუთშაბათს|პარასკევი|პარასკევს|შაბათი|შაბათს"
+)
+
 
 def _ka_later(match):
     return "%s%s后" % (match.group(1), _KA_UNITS[match.group(2)])
@@ -32,6 +54,20 @@ def _ka_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"\b(?:მომავალი|მომავალ|შემდეგი)\s+(%s)\b" % _KA_WEEKDAYS_DIR_RE,
+     lambda m: "下%s" % _KA_WEEKDAYS[m.group(1)]),
+    (r"\b(?:გასული|გასულ|წინა)\s+(%s)\b" % _KA_WEEKDAYS_DIR_RE,
+     lambda m: "上%s" % _KA_WEEKDAYS[m.group(1)]),
+    (r"\b(?:ამ|ეს)\s+(%s)\b" % _KA_WEEKDAYS_DIR_RE,
+     lambda m: "这%s" % _KA_WEEKDAYS[m.group(1)]),
+    (r"\bდღეს\s+დილით\b", "今天 08:00 am"),
+    (r"\bდღეს\s+შუადღეს\b", "今天 12:00 pm"),
+    (r"\bდღეს\s+საღამოს\b", "今天 20:00 pm"),
+    (r"\bდღეს\s+ღამით\b", "今天 22:00 pm"),
+    (r"\bხვალ\s+დილით\b", "明天 08:00 am"),
+    (r"\bგუშინ\s+საღამოს\b", "昨天 20:00 pm"),
+    (r"\bშუაღამე\b", "12:00 am"),
+    (r"\bშუადღე\b", "12:00 pm"),
     (r"\bიანვარი\b", "1月"),
     (r"\bთებერვალი\b", "2月"),
     (r"\bმარტი\b", "3月"),
@@ -59,3 +95,6 @@ SUB_TRANSLATE = [
     (r"\bმომავალ\s+წელს\b", "明年"),
     (r"\bგასულ\s+წელს\b", "去年"),
 ]
+
+for _weekday in sorted(_KA_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"\b%s\b" % _weekday, _KA_WEEKDAYS[_weekday]))

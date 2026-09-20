@@ -27,6 +27,17 @@ _EO_MONTHS = {
 }
 _EO_MONTHS_RE = "|".join(sorted(_EO_MONTHS, key=len, reverse=True))
 
+_EO_WEEKDAYS = {
+    "lundo": "周一", "lundon": "周一",
+    "mardo": "周二", "mardon": "周二",
+    "merkredo": "周三", "merkredon": "周三",
+    "ĵaŭdo": "周四", "ĵaŭdon": "周四",
+    "vendredo": "周五", "vendredon": "周五",
+    "sabato": "周六", "sabaton": "周六",
+    "dimanĉo": "周日", "dimanĉon": "周日",
+}
+_EO_WEEKDAYS_RE = "|".join(sorted(_EO_WEEKDAYS, key=len, reverse=True))
+
 
 def _eo_month_no(name):
     return _EO_MONTHS[name.lower()]
@@ -57,6 +68,23 @@ def _eo_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:venonta|venontan|sekva|sekvan)\s+(%s)\b"
+     % _EO_WEEKDAYS_RE,
+     lambda m: "下%s" % _EO_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:pasinta|pasintan|antaŭa|antaŭan)\s+(%s)\b"
+     % _EO_WEEKDAYS_RE,
+     lambda m: "上%s" % _EO_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:ĉi\s+tiu|tiu\s+ĉi)\s+(%s)\b" % _EO_WEEKDAYS_RE,
+     lambda m: "这%s" % _EO_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bhodiaŭ\s+matene\b", "今天 08:00 am"),
+    (r"(?i)\bhodiaŭ\s+tagmeze\b", "今天 12:00 pm"),
+    (r"(?i)\bhodiaŭ\s+posttagmeze\b", "今天 15:00 pm"),
+    (r"(?i)\bhodiaŭ\s+vespere\b", "今天 20:00 pm"),
+    (r"(?i)\bhodiaŭ\s+nokte\b", "今天 22:00 pm"),
+    (r"(?i)\bmorgaŭ\s+matene\b", "明天 08:00 am"),
+    (r"(?i)\bhieraŭ\s+vespere\b", "昨天 20:00 pm"),
+    (r"(?i)\bnoktomezo\b", "12:00 am"),
+    (r"(?i)\btagmezo\b", "12:00 pm"),
     (r"(?i)(?P<d>\d{1,2})(?:-?a)?\s*(?:de\s+)?(?P<name>%s)\s+(?P<Y>\d{4})"
      % _EO_MONTHS_RE, _eo_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -81,3 +109,7 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_EO_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\b" % _month, _EO_MONTHS[_month]))
+
+for _weekday in sorted(_EO_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday,
+                          _EO_WEEKDAYS[_weekday]))

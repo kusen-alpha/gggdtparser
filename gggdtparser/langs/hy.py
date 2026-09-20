@@ -21,6 +21,20 @@ _HY_UNIT_RE = (
     r"օր(?:ում)?|շաբաթ(?:ում)?|ամիս(?:ում)?|տար(?:ի|ում)"
 )
 
+_HY_WEEKDAYS = {
+    "երկուշաբթի": "周一",
+    "երեքշաբթի": "周二",
+    "չորեքշաբթի": "周三",
+    "հինգշաբթի": "周四",
+    "ուրբաթ": "周五",
+    "շաբաթ": "周六",
+    "կիրակի": "周日",
+}
+_HY_WEEKDAYS_RE = "|".join(sorted(_HY_WEEKDAYS, key=len, reverse=True))
+_HY_WEEKDAYS_DIR_RE = (
+    r"երկուշաբթի|երեքշաբթի|չորեքշաբթի|հինգշաբթի|ուրբաթ|կիրակի"
+)
+
 
 def _hy_later(match):
     return "%s%s后" % (match.group(1), _HY_UNITS[match.group(2)])
@@ -31,6 +45,20 @@ def _hy_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:հաջորդ|գալիք)\s+(%s)" % _HY_WEEKDAYS_DIR_RE,
+     lambda m: "下%s" % _HY_WEEKDAYS[m.group(1)]),
+    (r"(?:անցյալ|նախորդ)\s+(%s)" % _HY_WEEKDAYS_DIR_RE,
+     lambda m: "上%s" % _HY_WEEKDAYS[m.group(1)]),
+    (r"(?:այս|սույն)\s+(%s)" % _HY_WEEKDAYS_DIR_RE,
+     lambda m: "这%s" % _HY_WEEKDAYS[m.group(1)]),
+    (r"այսօր\s+առավոտյան", "今天 08:00 am"),
+    (r"այսօր\s+կեսօրին", "今天 12:00 pm"),
+    (r"այսօր\s+երեկոյան", "今天 20:00 pm"),
+    (r"այսօր\s+գիշերը", "今天 22:00 pm"),
+    (r"վաղը\s+առավոտյան", "明天 08:00 am"),
+    (r"երեկ\s+երեկոյան", "昨天 20:00 pm"),
+    (r"կեսգիշեր", "12:00 am"),
+    (r"կեսօր", "12:00 pm"),
     (r"հունվար(ի)?", "1月"),
     (r"փետրվար(ի)?", "2月"),
     (r"մարտ(ի)?", "3月"),
@@ -58,3 +86,6 @@ SUB_TRANSLATE = [
     (r"հաջորդ\s+տարի", "明年"),
     (r"անցյալ\s+տարի", "去年"),
 ]
+
+for _weekday in sorted(_HY_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _HY_WEEKDAYS[_weekday]))

@@ -21,6 +21,24 @@ _MT_UNIT_RE = (
     r"ġimgħat|ġimgħa|xahar|xhur|sena|snin"
 )
 
+_MT_WEEKDAYS = {
+    "it-tnejn": "周一",
+    "tnejn": "周一",
+    "it-tlieta": "周二",
+    "tlieta": "周二",
+    "l-erbgħa": "周三",
+    "erbgħa": "周三",
+    "il-ħamis": "周四",
+    "ħamis": "周四",
+    "il-ġimgħa": "周五",
+    "ġimgħa": "周五",
+    "is-sibt": "周六",
+    "sibt": "周六",
+    "il-ħadd": "周日",
+    "ħadd": "周日",
+}
+_MT_WEEKDAYS_RE = "|".join(sorted(_MT_WEEKDAYS, key=len, reverse=True))
+
 
 def _mt_later(match):
     return "%s%s后" % (match.group("a"), _MT_UNIT_MAP[match.group("b")])
@@ -31,6 +49,21 @@ def _mt_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(%s)\s+li\s+jmiss\b" % _MT_WEEKDAYS_RE,
+     lambda m: "下%s" % _MT_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+li\s+għadd(?:a|iet)\b" % _MT_WEEKDAYS_RE,
+     lambda m: "上%s" % _MT_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bdan\s+(%s)\b" % _MT_WEEKDAYS_RE,
+     lambda m: "这%s" % _MT_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\billum\s+filgħodu\b", "今天 08:00 am"),
+    (r"(?i)\billum\s+wara\s+nofsinhar\b", "今天 15:00 pm"),
+    (r"(?i)\billum\s+nofsinhar\b", "今天 12:00 pm"),
+    (r"(?i)\billum\s+filgħaxija\b", "今天 20:00 pm"),
+    (r"(?i)\billum\s+bil-lejl\b", "今天 22:00 pm"),
+    (r"(?i)\bgħada\s+filgħodu\b", "明天 08:00 am"),
+    (r"(?i)\bilbieraħ\s+filgħaxija\b", "昨天 20:00 pm"),
+    (r"(?i)\bnofs\s+il-lejl\b", "12:00 am"),
+    (r"(?i)\bnofsinhar\b", "12:00 pm"),
     (r"(?i)\bJannar\b", "1月"),
     (r"(?i)\bFrar\b", "2月"),
     (r"(?i)\bMarzu\b", "3月"),
@@ -58,3 +91,7 @@ SUB_TRANSLATE = [
     (r"(?i)is-sena\s+d-dieħla", "明年"),
     (r"(?i)is-sena\s+li\s+għaddiet", "去年"),
 ]
+
+for _weekday in sorted(_MT_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday,
+                          _MT_WEEKDAYS[_weekday]))

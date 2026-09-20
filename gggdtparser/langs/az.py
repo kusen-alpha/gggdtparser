@@ -7,11 +7,37 @@
 阿塞拜疆语
 """
 
+_AZ_WEEKDAYS = {
+    "bazar ertəsi": "周一",
+    "çərşənbə axşamı": "周二",
+    "çərşənbə": "周三",
+    "cümə axşamı": "周四",
+    "cümə": "周五",
+    "şənbə": "周六",
+    "bazar": "周日",
+}
+_AZ_WEEKDAYS_RE = "|".join(sorted(_AZ_WEEKDAYS, key=len, reverse=True))
+
 ACCURATE_REGEX_LIST = [
 
 ]
 FUZZY_REGEX_LIST = []
 SUB_TRANSLATE = [
+    (r"(?i)\bgələn\s+(%s)\b" % _AZ_WEEKDAYS_RE,
+     lambda m: "下%s" % _AZ_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bkeçən\s+(%s)\b" % _AZ_WEEKDAYS_RE,
+     lambda m: "上%s" % _AZ_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bbu\s+(%s)\b" % _AZ_WEEKDAYS_RE,
+     lambda m: "这%s" % _AZ_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bbu\s+gün\s+səhər\b", "今天 08:00 am"),
+    (r"(?i)\bbu\s+gün\s+günorta\b", "今天 12:00 pm"),
+    (r"(?i)\bbu\s+gün\s+günortadan\s+sonra\b", "今天 15:00 pm"),
+    (r"(?i)\bbu\s+gün\s+axşam\b", "今天 20:00 pm"),
+    (r"(?i)\bbu\s+gün\s+gecə\b", "今天 22:00 pm"),
+    (r"(?i)\bsabah\s+səhər\b", "明天 08:00 am"),
+    (r"(?i)\bdünən\s+axşam\b", "昨天 20:00 pm"),
+    (r"(?i)\bgecə\s+yarısı\b", "12:00 am"),
+    (r"(?i)\bgünorta\b", "12:00 pm"),
     (r'Yanvar', '1月'),
     (r'Fevral', '2月'),
     (r'Mart', '3月'),
@@ -49,3 +75,7 @@ SUB_TRANSLATE = [
     (r'əvvəl', '前'),
     (r'saat', '小时'),
 ]
+
+for _weekday in sorted(_AZ_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday,
+                          _AZ_WEEKDAYS[_weekday]))

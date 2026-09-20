@@ -21,6 +21,20 @@ _MK_UNIT_RE = (
     r"недел[аи]|месец(?:и)?|годин[аи]"
 )
 
+_MK_WEEKDAYS = {
+    "понеделник": "周一",
+    "вторник": "周二",
+    "среда": "周三",
+    "четврток": "周四",
+    "петок": "周五",
+    "сабота": "周六",
+    "недела": "周日",
+}
+_MK_WEEKDAYS_RE = "|".join(sorted(_MK_WEEKDAYS, key=len, reverse=True))
+_MK_WEEKDAYS_DIR_RE = (
+    r"понеделник|вторник|среда|четврток|петок|сабота"
+)
+
 
 def _mk_later(match):
     return "%s%s后" % (match.group(1), _MK_UNITS[match.group(2)])
@@ -31,6 +45,21 @@ def _mk_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"\b(?:следниот|следната)\s+(%s)\b" % _MK_WEEKDAYS_DIR_RE,
+     lambda m: "下%s" % _MK_WEEKDAYS[m.group(1)]),
+    (r"\b(?:минатиот|минатата)\s+(%s)\b" % _MK_WEEKDAYS_DIR_RE,
+     lambda m: "上%s" % _MK_WEEKDAYS[m.group(1)]),
+    (r"\b(?:овој|оваа)\s+(%s)\b" % _MK_WEEKDAYS_DIR_RE,
+     lambda m: "这%s" % _MK_WEEKDAYS[m.group(1)]),
+    (r"\bденес\s+(?:наутро|утрово)\b", "今天 08:00 am"),
+    (r"\bденес\s+пладне\b", "今天 12:00 pm"),
+    (r"\bденес\s+попладне\b", "今天 15:00 pm"),
+    (r"\bденес\s+навечер\b", "今天 20:00 pm"),
+    (r"\bденес\s+ноќеска\b", "今天 22:00 pm"),
+    (r"\bутре\s+(?:наутро|утринва)\b", "明天 08:00 am"),
+    (r"\bвчера\s+навечер\b", "昨天 20:00 pm"),
+    (r"\bполноќ\b", "12:00 am"),
+    (r"\bпладне\b", "12:00 pm"),
     (r"\bјануари\b", "1月"),
     (r"\bфевруари\b", "2月"),
     (r"\bмарт\b", "3月"),
@@ -58,3 +87,6 @@ SUB_TRANSLATE = [
     (r"\bследната\s+година\b", "明年"),
     (r"\bминатата\s+година\b", "去年"),
 ]
+
+for _weekday in sorted(_MK_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"\b%s\b" % _weekday, _MK_WEEKDAYS[_weekday]))

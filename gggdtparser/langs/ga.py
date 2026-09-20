@@ -21,6 +21,23 @@ _GA_UNIT_RE = (
     r"l(?:á|aethanta)|seachtain(?:í)?|mí(?:onna)?|bliain|blianta"
 )
 
+_GA_WEEKDAYS = {
+    "dé luain": "周一",
+    "luan": "周一",
+    "dé máirt": "周二",
+    "máirt": "周二",
+    "dé céadaoin": "周三",
+    "céadaoin": "周三",
+    "déardaoin": "周四",
+    "dé haoine": "周五",
+    "haoine": "周五",
+    "dé sathairn": "周六",
+    "sathairn": "周六",
+    "dé domhnaigh": "周日",
+    "domhnach": "周日",
+}
+_GA_WEEKDAYS_RE = "|".join(sorted(_GA_WEEKDAYS, key=len, reverse=True))
+
 
 def _ga_later(match):
     return "%s%s后" % (match.group("a"), _GA_UNIT_MAP[match.group("b")])
@@ -31,6 +48,19 @@ def _ga_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(%s)\s+seo\s+chugainn\b" % _GA_WEEKDAYS_RE,
+     lambda m: "下%s" % _GA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+seo\s+caite\b" % _GA_WEEKDAYS_RE,
+     lambda m: "上%s" % _GA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+seo\b" % _GA_WEEKDAYS_RE,
+     lambda m: "这%s" % _GA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\binniu\s+ar\s+maidin\b", "今天 08:00 am"),
+    (r"(?i)\binniu\s+tráthnóna\b", "今天 15:00 pm"),
+    (r"(?i)\banocht\b", "今天 22:00 pm"),
+    (r"(?i)\bamárach\s+ar\s+maidin\b", "明天 08:00 am"),
+    (r"(?i)\baréir\b", "昨天 22:00 pm"),
+    (r"(?i)\bmeán\s+oíche\b", "12:00 am"),
+    (r"(?i)\bmeán\s+lae\b", "12:00 pm"),
     (r"(?i)\bEanáir\b", "1月"),
     (r"(?i)\bFeabhra\b", "2月"),
     (r"(?i)\bMárta\b", "3月"),
@@ -60,3 +90,7 @@ SUB_TRANSLATE = [
     (r"(?i)an\s+bhliain\s+seo\s+chugainn|an\s+bhliain\s+chugainn", "明年"),
     (r"(?i)an\s+bhliain\s+seo\s+caite", "去年"),
 ]
+
+for _weekday in sorted(_GA_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday,
+                          _GA_WEEKDAYS[_weekday]))
