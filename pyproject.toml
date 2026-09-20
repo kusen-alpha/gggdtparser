@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gggdtparser"
+description = "通用、便捷、准确的字符串时间解析工具"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "kusen", email = "1194542196@qq.com"}]
+keywords = ["datetime", "date", "time", "parser", "nlp", "regex"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/kusen-alpha/gggdtparser"
+"Bug Tracker" = "https://github.com/kusen-alpha/gggdtparser/issues"
+Documentation = "https://github.com/kusen-alpha/gggdtparser/blob/master/README.md"
+"Source Code" = "https://github.com/kusen-alpha/gggdtparser"
+
+[project.optional-dependencies]
+test = ["pytest>=6"]
+tz = [
+    "backports.zoneinfo; python_version < '3.9'",
+    "tzdata; python_version >= '3.9'",
+]
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+include = ["gggdtparser*"]
+exclude = ["tests*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "gggdtparser.__version__"}

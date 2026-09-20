@@ -47,9 +47,9 @@ def test_english_ordinals(text, expected):
 @pytest.mark.parametrize(
     "text,expected",
     [
-        ("2022-02-02T14:30:20.123Z", dt(2022, 2, 2, 14, 30, 20)),
+        ("2022-02-02T14:30:20.123Z", dt(2022, 2, 2, 14, 30, 20, 123000)),
         ("2022-02-02T14:30:20+00:00", dt(2022, 2, 2, 14, 30, 20)),
-        ("2022-02-02t14:30:20.123z", dt(2022, 2, 2, 14, 30, 20)),
+        ("2022-02-02t14:30:20.123z", dt(2022, 2, 2, 14, 30, 20, 123000)),
     ],
 )
 def test_iso_millis_and_utc(text, expected):
@@ -74,7 +74,7 @@ def test_rfc822_with_seconds(text, expected):
         ("２０２２／０２／０２", dt(2022, 2, 2)),
         ("２０２２年０２月０２日 １４：３０", dt(2022, 2, 2, 14, 30)),
         ("２０２２−０２−０２Ｔ１４：３０：２０．１２３Ｚ",
-         dt(2022, 2, 2, 14, 30, 20)),
+         dt(2022, 2, 2, 14, 30, 20, 123000)),
     ],
 )
 def test_fullwidth_digits_and_separators(text, expected):

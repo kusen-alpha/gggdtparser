@@ -16,6 +16,16 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:nächste|kommende)\s+Woche\s+(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\b",
+     lambda m: "下%s" % {
+         "montag": "周一", "dienstag": "周二", "mittwoch": "周三",
+         "donnerstag": "周四", "freitag": "周五", "samstag": "周六",
+         "sonntag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:letzte|vergangene)\s+Woche\s+(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\b",
+     lambda m: "上%s" % {
+         "montag": "周一", "dienstag": "周二", "mittwoch": "周三",
+         "donnerstag": "周四", "freitag": "周五", "samstag": "周六",
+         "sonntag": "周日"}[m.group(1).lower()]),
     (r"(?i)\b(?:(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag))\s+(?:nächste[nrs]?|kommende[nrs]?)\b",
      lambda m: "下%s" % {
          "montag": "周一", "dienstag": "周二", "mittwoch": "周三",
@@ -74,6 +84,10 @@ SUB_TRANSLATE = [
     (r"(?i)\b(?:Oktober|Okt\.?)(?!\w)", "10月"),
     (r"(?i)\b(?:November|Nov\.?)(?!\w)", "11月"),
     (r"(?i)\b(?:Dezember|Dez\.?)(?!\w)", "12月"),
+    (r"(?i)\bum\s+(?P<H>\d{1,2})\s*Uhr\b",
+     lambda m: "%d:00" % int(m.group("H"))),
+    (r"(?i)(?<![\d:.])(?P<H>\d{1,2})\s*Uhr\b",
+     lambda m: "%d:00" % int(m.group("H"))),
     (r"Uhr", "am"),
     (r"une heure", "1 heure"),
     (r"il y a heure", "il y a 1 heure"),
@@ -83,6 +97,26 @@ SUB_TRANSLATE = [
     (r"morgen", "明天"),
     (r"übermorgen|uebermorgen", "后天"),
     (r"gerade eben|jetzt gerade", "刚刚"),
+    (r"(?i)\bin\s+einer\s+halben\s+Stunde\b", "30分钟后"),
+    (r"(?i)\bvor\s+einer\s+halben\s+Stunde\b", "30分钟前"),
+    (r"(?i)\bin\s+einer\s+(?P<unit>Minute|Stunde|Woche)\b",
+     lambda m: "1%s后" % {
+         "minute": "分钟", "stunde": "小时", "woche": "周"}[
+             m.group("unit").lower()]),
+    (r"(?i)\bin\s+einem\s+(?P<unit>Tag|Monat|Jahr)\b",
+     lambda m: "1%s后" % {
+         "tag": "天", "monat": "月", "jahr": "年"}[
+             m.group("unit").lower()]),
+    (r"(?i)\bvor\s+einer\s+(?P<unit>Minute|Stunde|Woche)\b",
+     lambda m: "1%s前" % {
+         "minute": "分钟", "stunde": "小时", "woche": "周"}[
+             m.group("unit").lower()]),
+    (r"(?i)\bvor\s+einem\s+(?P<unit>Tag|Monat|Jahr)\b",
+     lambda m: "1%s前" % {
+         "tag": "天", "monat": "月", "jahr": "年"}[
+             m.group("unit").lower()]),
+    (r"(?i)\beine\s+Stunde\s+später\b", "1小时后"),
+    (r"(?i)\beine\s+Stunde\s+(?:her|früher)\b", "1小时前"),
     (r"in\s+(?P<num>\d+)\s*(?P<unit>Sekunde|Sekunden|Minute|Minuten|Stunde|Stunden|Tag|Tage|Tagen|Woche|Wochen|Monat|Monate|Monaten|Jahr|Jahre|Jahren)(?:\s+später)?",
      lambda m: "%s%s后" % (
          m.group("num"),

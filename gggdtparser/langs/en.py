@@ -8,6 +8,30 @@
 英语
 """
 
+
+def _en_period_clock(match):
+    hour = int(match.group("H"))
+    part = match.group("part").lower()
+    if part in ("afternoon", "evening", "night"):
+        hour = 12 if hour == 12 else (hour + 12 if hour < 12 else hour)
+    else:
+        hour = 0 if hour == 12 else hour
+    return "%02d:00" % hour
+
+
+_EN_NUM_WORDS = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+    "eleven": 11, "twelve": 12, "fifteen": 15, "twenty": 20,
+    "twenty five": 25, "thirty": 30, "forty": 40,
+    "forty five": 45, "fifty": 50, "quarter": 15, "half": 30,
+}
+
+
+def _en_word_num(value):
+    return _EN_NUM_WORDS[value.lower().replace("-", " ")]
+
+
 ACCURATE_REGEX_LIST = [
     # Thu February 02 02:02:02 2022
     r"(?P<m>\d{1,2})\s*[\-\|/\.月]?\s*(?P<d>\d{1,2})\s*[\-\|/\.日]?\s*(?P<H>\d{1,2})\s*[:时h]\s*(?P<M>\d{1,2})\s*[:分]\s*(?P<S>\d{1,2})\s*[秒]?\s*(?P<Y>\d{4})\s*[\-\|/\.年]?",
@@ -21,7 +45,7 @@ ACCURATE_REGEX_LIST = [
     r"(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*,\s*(?P<Y>\d{4})\s*(?P<H>\d{1,2})[:](?P<M>\d{1,2})",
 
     # 5:36 PM EST, Sat March 11, 2023
-    r"(?P<H>\d{1,2})[:](?P<M>\d{1,2})\s*(?P<apm>am|pm)\s*[,]?\s*(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*,\s*(?P<Y>\d{4})",
+    r"(?P<H>\d{1,2})[:](?P<M>\d{1,2})\s*(?P<apm>am|pm)\s*[,]?\s*(?:周[一二三四五六日天1-7]\s*)?\s*(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*,\s*(?P<Y>\d{4})",
     # Feb 02, 2022
     r"(?P<m>\d{1,2})\s*[月]?\s*(?P<d>\d{1,2})\s*,\s*(?P<Y>\d{4})",
 
@@ -38,7 +62,7 @@ ACCURATE_REGEX_LIST = [
     # May 08 2023
     r"(?P<m>\d{1,2})\s*(?:[月]\s*|\s+)(?P<d>\d{1,2})\s*(?P<Y>\d{4})",
     # RFC822: Wed, 02 Feb 2022 14:30:20 +0530
-    r"(?P<d>\d{1,2})\s+(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})\s+(?P<H>\d{1,2}):(?P<M>\d{1,2}):(?P<S>\d{1,2})(?:\s*[+-]?\d{4}|\s*GMT)?",
+    r"(?P<d>\d{1,2})\s+(?P<m>\d{1,2})\s*[月]\s*(?P<Y>\d{4})\s+(?P<H>\d{1,2}):(?P<M>\d{1,2}):(?P<S>\d{1,2})",
     # 25 10 2021
     r"(?P<d>\d{1,2})\s+(?P<m>\d{1,2})\s*(?P<Y>\d{4})",
     # December 23, 2022 / 15:20 -> 翻译后: 12月 23, 2022 / 15:20
@@ -78,30 +102,63 @@ SUB_TRANSLATE = [
     (r'Autumn|AUTUMN', '8月'),
     (r'Winter|WINTER', '11月'),
     (r'EST|CST|MST|PST|AKST|HST', ''),
-    (r"(?i)\b(?P<dir>next|last|this)\s+(?P<name>monday|mon\.?|tuesday|tues\.?|thursday|thurs\.?|thur\.?|wednesday|wed\.?|friday|fri\.?|saturday|sat\.?|sunday|sun\.?)\b",
+    (r"(?i)\b(?P<dir>next|last|this)\s+(?P<name>monday|mon\.?|tuesday|tues\.?|tue\.?|thursday|thurs\.?|thur\.?|thu\.?|wednesday|wed\.?|friday|fri\.?|saturday|sat\.?|sunday|sun\.?)\b",
      lambda m: "%s周%s" % (
          {"next": "下", "last": "上"}.get(m.group("dir").lower(), "这"),
          {
              "monday": "一", "mon": "一", "mon.": "一",
-             "tuesday": "二", "tues": "二", "tues.": "二",
+             "tuesday": "二", "tues": "二", "tues.": "二", "tue": "二",
+             "tue.": "二",
              "wednesday": "三", "wed": "三", "wed.": "三",
              "thursday": "四", "thurs": "四", "thurs.": "四",
-             "thur": "四", "thur.": "四",
+             "thur": "四", "thur.": "四", "thu": "四", "thu.": "四",
              "friday": "五", "fri": "五", "fri.": "五",
              "saturday": "六", "sat": "六", "sat.": "六",
              "sunday": "日", "sun": "日", "sun.": "日",
          }.get(m.group("name").lower(), ""))),
-    (r'Monday|Mon\.?', ''),
-    (r'Tuesday|Tues\.?', ''),
-    (r'Wednesday|Wed\.?', ''),
-    (r'Thursday|Thurs\.?|Thur\.?', ''),
-    (r'Friday|Fri\.?', ''),
-    (r'Saturday|Sat\.?', ''),
-    (r'Sunday|Sun\.?', ''),
+    (r"(?i)\b(?P<name>monday|mon\.?|tuesday|tues\.?|tue\.?|"
+     r"wednesday|wed\.?|thursday|thurs\.?|thur\.?|thu\.?|"
+     r"friday|fri\.?|saturday|sat\.?|sunday|sun\.?)\b",
+     lambda m: "周%s" % {
+         "monday": "一", "mon": "一", "mon.": "一",
+         "tuesday": "二", "tues": "二", "tues.": "二", "tue": "二",
+         "tue.": "二",
+         "wednesday": "三", "wed": "三", "wed.": "三",
+         "thursday": "四", "thurs": "四", "thurs.": "四",
+         "thur": "四", "thur.": "四", "thu": "四", "thu.": "四",
+         "friday": "五", "fri": "五", "fri.": "五",
+         "saturday": "六", "sat": "六", "sat.": "六",
+         "sunday": "日", "sun": "日", "sun.": "日",
+     }[m.group("name").lower()]),
+    (r"(?i)(?P<H>\d{1,2})\s*o'?clock\b",
+     lambda m: "%d:00" % int(m.group("H"))),
+    (r"(?i)\b(?P<H>one|two|three|four|five|six|seven|eight|nine|"
+     r"ten|eleven|twelve)\s*(?:o'?clock|oclock)\b",
+     lambda m: "%d:00" % _en_word_num(m.group("H"))),
+    (r"(?i)\b(?:a\s+)?(?P<M>one|two|three|four|five|six|seven|eight|nine|"
+     r"ten|eleven|twelve|fifteen|twenty(?:[- ]five)?|thirty|forty(?:[- ]five)?|"
+     r"fifty|quarter|half)\s+(?:minutes?\s+)?(?:past|after)\s+"
+     r"(?P<H>one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b",
+     lambda m: "%d:%02d" % (
+         _en_word_num(m.group("H")), _en_word_num(m.group("M")))),
+    (r"(?i)\b(?:a\s+)?(?P<M>one|two|three|four|five|six|seven|eight|nine|"
+     r"ten|eleven|twelve|fifteen|twenty(?:[- ]five)?|thirty|forty(?:[- ]five)?|"
+     r"fifty|quarter|half)\s+(?:minutes?\s+)?(?:to|before)\s+"
+     r"(?P<H>one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b",
+     lambda m: "%d:%02d" % (
+         12 if _en_word_num(m.group("H")) == 1
+         else _en_word_num(m.group("H")) - 1,
+         (60 - _en_word_num(m.group("M"))) % 60)),
+    (r"(?i)\b(?P<H>one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+"
+     r"(?P<M>fifteen|twenty(?:[- ]five)?|thirty|forty(?:[- ]five)?|fifty)\b",
+     lambda m: "%d:%02d" % (
+         _en_word_num(m.group("H")), _en_word_num(m.group("M")))),
     (r'AT', ''),
     (r'AM', 'am'),
     (r'PM', 'pm'),
     (r"(?i)\b(?P<apm>a|p)\.m\.", lambda m: "am" if m.group("apm").lower() == "a" else "pm"),
+    (r"(?i)(?<![:\d])(?P<H>\d{1,2})\s*(?P<apm>am|pm)\b",
+     lambda m: "%d:00 %s" % (int(m.group("H")), m.group("apm").lower())),
     (r"(?i)\bnoon\b", "12:00 pm"),
     (r"(?i)\bmidnight\b", "12:00 am"),
     (r"(?i)\bthis\s+morning\b", "今天 08:00 am"),
@@ -123,6 +180,16 @@ SUB_TRANSLATE = [
     (r"(?i)\bquarter past\s*(?P<H>\d{1,2})\b", lambda m: "%d:15" % int(m.group("H"))),
     (r"(?i)\bquarter to\s*(?P<H>\d{1,2})\b",
      lambda m: "%d:45" % (int(m.group("H")) - 1 or 12)),
+    (r"(?i)\b(?:a\s+)?quarter\s+after\s*(?P<H>\d{1,2})\b",
+     lambda m: "%d:15" % int(m.group("H"))),
+    (r"(?i)\b(?P<M>\d{1,2})\s+minutes?\s+past\s*(?P<H>\d{1,2})\b",
+     lambda m: "%d:%02d" % (int(m.group("H")), int(m.group("M")))),
+    (r"(?i)\b(?P<M>\d{1,2})\s+minutes?\s+(?:to|before)\s*(?P<H>\d{1,2})\b",
+     lambda m: "%d:%02d" % (
+         12 if int(m.group("H")) == 1 else int(m.group("H")) - 1,
+         (60 - int(m.group("M"))) % 60)),
+    (r"(?i)\b(?P<H>\d{1,2})\s+(?:(?:in\s+the)|at)\s+(?P<part>morning|afternoon|evening|night)\b",
+     _en_period_clock),
     (r"(?i)\bin\s+(?P<num>\d+)\s+hours?", lambda m: "%s小时后" % m.group("num")),
     (r"(?i)\bin\s+(?P<num>\d+)\s+minutes?", lambda m: "%s分钟后" % m.group("num")),
     (r"(?i)\bin\s+(?P<num>\d+)\s+days?", lambda m: "%s天后" % m.group("num")),
@@ -152,6 +219,7 @@ SUB_TRANSLATE = [
          "day": "天", "week": "周", "month": "月", "year": "年"
      }[m.group("unit").lower()]),
     (r"(?i)\bin\s+half\s+an\s+hour\b", "30分钟后"),
+    (r"(?i)\bhalf\s+an\s+hour\s+later\b", "30分钟后"),
     (r"(?i)\bhalf\s+an\s+hour\s+ago\b", "30分钟前"),
     (r'[yY]esterday\s*(at)?', '昨天'),
 ]

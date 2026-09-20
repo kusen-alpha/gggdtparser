@@ -305,6 +305,8 @@ _LANG_FILES = glob.glob(_LANG_DIR + '/*.py')
 _LANG_FILES = [filename for filename in _LANG_FILES if
                '__init__' not in filename]
 LANG_SUB_TRANSLATE = {}
+LANG_SUB_TRANSLATE_SOURCES = {}
+LANG_SUB_TRANSLATE_CACHE = {}
 LANG_ACCURATE_REGEX_LIST = {}
 LANG_FUZZY_REGEX_LIST = {}
 for lang_file in _LANG_FILES:
@@ -312,10 +314,8 @@ for lang_file in _LANG_FILES:
     module_name = 'gggdtparser.langs.' + lang
     module = importlib.import_module(module_name)
     if hasattr(module, 'SUB_TRANSLATE'):
-        sub_list = []
-        for sub in getattr(module, 'SUB_TRANSLATE'):
-            sub_list.append((compile_regex(sub[0]), sub[1]))
-        LANG_SUB_TRANSLATE[lang] = sub_list
+        LANG_SUB_TRANSLATE_SOURCES[lang] = list(
+            getattr(module, 'SUB_TRANSLATE'))
     if hasattr(module, 'ACCURATE_REGEX_LIST'):
         LANG_ACCURATE_REGEX_LIST[lang] = compile_regex_list(getattr(
             module, 'ACCURATE_REGEX_LIST'), flags=re.M | re.I | re.S)
@@ -331,4 +331,25 @@ LANG_FUZZY_REGEX_LIST = get_sort_dict(
 _SUB_LANG_LIST_SORT = copy.deepcopy(_LANG_LIST_SORT)
 (_SUB_LANG_LIST_SORT[0], _SUB_LANG_LIST_SORT[-1]) = (
     _SUB_LANG_LIST_SORT[-1], _SUB_LANG_LIST_SORT[0])
-LANG_SUB_TRANSLATE = get_sort_dict(LANG_SUB_TRANSLATE, _SUB_LANG_LIST_SORT)
+LANG_SUB_TRANSLATE_SOURCES = get_sort_dict(
+    LANG_SUB_TRANSLATE_SOURCES, _SUB_LANG_LIST_SORT)
+SUB_TRANSLATE_LANG_ORDER = tuple(LANG_SUB_TRANSLATE_SOURCES.keys())
+
+
+def get_lang_sub_translate(lang):
+    """编译并缓存一个语言的替换规则，避免在包导入阶段全量编译。"""
+    if lang not in LANG_SUB_TRANSLATE_CACHE:
+        sub_list = []
+        for sub in LANG_SUB_TRANSLATE_SOURCES[lang]:
+            sub_list.append((compile_regex(sub[0]), sub[1]))
+        LANG_SUB_TRANSLATE_CACHE[lang] = sub_list
+        LANG_SUB_TRANSLATE[lang] = sub_list
+    return LANG_SUB_TRANSLATE_CACHE[lang]
+
+
+def get_all_lang_sub_translates():
+    """按固定顺序返回全部语言的替换规则，供自动模式使用。"""
+    return [
+        (lang, get_lang_sub_translate(lang))
+        for lang in SUB_TRANSLATE_LANG_ORDER
+    ]

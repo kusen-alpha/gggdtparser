@@ -23,6 +23,14 @@ dt = datetime.datetime
          (dt(2022, 1, 1), dt(2022, 12, 31))),
         ("2022-01-01 ~ 2022-12-31", ["~"],
          (dt(2022, 1, 1), dt(2022, 12, 31))),
+        ("2022年10月1日到2023年10月1日", None,
+         (dt(2022, 10, 1), dt(2023, 10, 1))),
+        ("2022-01-01 — 2022-12-31", None,
+         (dt(2022, 1, 1), dt(2022, 12, 31))),
+        ("2022-01-01 – 2022-12-31", None,
+         (dt(2022, 1, 1), dt(2022, 12, 31))),
+        ("2022-01-01 ～ 2022-12-31", None,
+         (dt(2022, 1, 1), dt(2022, 12, 31))),
         ("2022-01-01 至 2022-12-31 ~ 2022-12-30", ["~"],
          (dt(2022, 1, 1), dt(2022, 12, 30))),
     ],
@@ -86,6 +94,36 @@ def test_parse_frame_default_range_sep_list():
     assert result == (dt(2022, 1, 1), dt(2022, 12, 31))
 
 
+def test_parse_frame_preserves_timezone_offsets():
+    result = parse_frame(
+        "2022-01-01T00:00:00+08:00至2022-01-02T00:00:00-05:00",
+        timezone=False,
+    )
+    tz8 = datetime.timezone(datetime.timedelta(hours=8))
+    tz5 = datetime.timezone(-datetime.timedelta(hours=5))
+    assert result == (
+        dt(2022, 1, 1, tzinfo=tz8),
+        dt(2022, 1, 2, tzinfo=tz5),
+    )
+
+
+def test_parse_frame_converts_timezone():
+    result = parse_frame(
+        "2022-01-01T00:00:00+08:00至2022-01-01T12:00:00-05:00",
+        timezone=datetime.timezone.utc,
+    )
+    assert result == (
+        dt(2021, 12, 31, 16, tzinfo=datetime.timezone.utc),
+        dt(2022, 1, 1, 17, tzinfo=datetime.timezone.utc),
+    )
+
+
+def test_parse_frame_passes_langs():
+    result = parse_frame(
+        "2022年1月1日至2022年12月31日", langs=["zh"])
+    assert result == (dt(2022, 1, 1), dt(2022, 12, 31))
+
+
 @pytest.mark.parametrize(
     "text",
     [
@@ -102,4 +140,3 @@ def test_parse_frame_no_range(text):
 @pytest.mark.parametrize("value", [None, 123, 3.14, [], {}])
 def test_parse_frame_rejects_non_string(value):
     assert parse_frame(value) == (None, None)
-

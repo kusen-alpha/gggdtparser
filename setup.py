@@ -3,8 +3,7 @@
 # email: 1194542196@qq.com
 # date: 2023/3/27
 
-import setuptools
+from setuptools import setup
 
-setuptools.setup(
-    py_modules=['gggdtparser']
-)
+
+setup()

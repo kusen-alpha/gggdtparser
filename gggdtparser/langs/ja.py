@@ -7,10 +7,65 @@
 日语
 """
 
+
+def _ja_clock_time(match):
+    part = match.group("part")
+    hour = int(match.group("H"))
+    if match.group("half"):
+        minute = 30
+    else:
+        minute = int(match.group("M") or 0)
+    if "一昨日" in part:
+        day = "前天"
+    elif "明後日" in part or "明日" in part or "明朝" in part:
+        day = "明天"
+    elif "昨日" in part or "昨夜" in part:
+        day = "昨天"
+    else:
+        day = "今天"
+    if any(p in part for p in ("午後", "夕方", "夜")) \
+            or part in ("今夜", "今晩", "昨夜"):
+        hour = 12 if hour == 12 else (hour + 12 if hour < 12 else hour)
+    else:
+        hour = 0 if hour == 12 else hour
+    return "%s %02d:%02d" % (day, hour, minute)
+
+
+_JA_WEEKDAY_MAP = {
+    "月": "一", "火": "二", "水": "三", "木": "四",
+    "金": "五", "土": "六", "日": "日",
+}
+
+
+def _ja_noon(match):
+    day = match.group("day")
+    return {
+        "今日": "今天", "明日": "明天", "昨日": "昨天",
+        "一昨日": "前天", "明後日": "后天",
+    }[day] + " 12:00"
+
+
+def _ja_period_clock_time(match):
+    hour = int(match.group("H"))
+    if match.group("half"):
+        minute = 30
+    else:
+        minute = int(match.group("M") or 0)
+    if match.group("period") in ("午後", "夕方", "夜"):
+        hour = 12 if hour == 12 else (hour + 12 if hour < 12 else hour)
+    else:
+        hour = 0 if hour == 12 else hour
+    return "%02d:%02d" % (hour, minute)
+
+
 ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r"再来週の([月火水木金土日])曜日", lambda m: "下下周%s" % _JA_WEEKDAY_MAP[m.group(1)]),
+    (r"(?:先々週|先先週)の([月火水木金土日])曜日", lambda m: "上上周%s" % _JA_WEEKDAY_MAP[m.group(1)]),
+    (r"再来週|再々週", "下下周"),
+    (r"先々週|先先週", "上上周"),
     (r"来週の(?:[月火水木金土日])曜日", lambda m: "下%s" % {
         "月": "周一", "火": "周二", "水": "周三", "木": "周四",
         "金": "周五", "土": "周六", "日": "周日"}[m.group(0)[3]]),
@@ -22,11 +77,16 @@ SUB_TRANSLATE = [
         "金": "周五", "土": "周六", "日": "周日"}[m.group(0)[3]]),
     (r"今週の(?:[月火水木金土日])曜日", lambda m: "这%s" % {
         "月": "周一", "火": "周二", "水": "周三", "木": "周四",
-        "金": "周五", "土": "周六", "日": "周日"}[m.group(0)[3]]),
+         "金": "周五", "土": "周六", "日": "周日"}[m.group(0)[3]]),
     (r"(?:[月火水木金土日])曜日?",
      lambda m: "周%s" % {
          "月": "一", "火": "二", "水": "三", "木": "四",
          "金": "五", "土": "六", "日": "日"}[m.group(0)[0]]),
+    (r"(?P<part>(?:今日|明日|昨日|一昨日|明後日)の(?:午前|午後|朝|夕方|夜)|今朝|明朝|今夜|今晩|昨夜)\s*(?P<H>\d{1,2})\s*時\s*(?:(?P<M>\d{1,2})\s*分?|(?P<half>半))?",
+     _ja_clock_time),
+    (r"の\s*(?P<period>午前|午後|朝|夕方|夜)\s*(?P<H>\d{1,2})\s*時\s*(?:(?P<M>\d{1,2})\s*分?|(?P<half>半))?",
+     _ja_period_clock_time),
+    (r"(?P<day>今日|明日|昨日|一昨日|明後日)の正午", _ja_noon),
     (r"今朝", "今天 08:00 am"),
     (r"今日の朝", "今天 08:00 am"),
     (r"今日の午後", "今天 15:00 pm"),

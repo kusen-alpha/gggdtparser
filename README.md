@@ -1,7 +1,7 @@
 # gggdtparser
 
-通用时间解析器(General General General DateTime Parser)
-，是基于Python编写的字符串时间抽取解析工具,经过了众多测试用例进行测试，具有通用、高效、准确的解析能力。
+通用时间解析器(General General General DateTime Parser)，
+是基于Python编写的字符串时间抽取解析工具，经过了大量测试用例验证，具有通用、高效、准确的解析能力。
 
 ## 项目背景
 
@@ -20,12 +20,17 @@
 1. 模糊抽取解析
 2. 解析速度快
 3. 支持自定义解析规则
+4. 支持时区偏移保留与转换
 
 ## 使用方法
 
 ### 安装
 
     pip install gggdtparser
+
+如果需要在 Windows 上按 IANA 名称（如`Asia/Shanghai`）解析时区：
+
+    pip install gggdtparser[tz]
 
 ### 使用
 
@@ -46,7 +51,7 @@
 ### 详细案例
 
 1. 参考dtformat.md中支持的格式。
-2. 参考test.py中的测试案例。
+2. 参考tests/目录中的测试案例。
 
 ### 特色案例
 
@@ -75,8 +80,8 @@
 ```
    31 март 2023  # 俄语
    31 de marzo de 2023  # 西班牙语
-   27 Fev 2023  # 卡拜尔语
-   ......
+   27 fev 2023  # 葡萄牙语
+    ......
 ```
 
 4. 指定formats解析
@@ -100,6 +105,7 @@ print(dt)
 |  H  |      时      |     (?P\<H>\d{1,2})时      |
 |  M  |      分      |     (?P\<M>\d{1,2})分      |
 |  S  |      秒      |     (?P\<S>\d{1,2})秒      |
+|  f  |   秒的小数部分  |   (?P\<f>\d{1,})           |
 | bY  |   在...年前    | (?P\<bY>\d+)\s*(年)\s*(前)  |
 | bm  |   在...月前    | (?P\<bm>\d+)\s*(月)\s*(前)  |
 | bd  |   在...日前    | (?P\<bd>\d+)\s*(天)\s*(前)  |
@@ -114,13 +120,13 @@ print(dt)
 | wM  |   在...分内    | (?P\<wM>\d+)\s*(分钟)\s*(内) |
 | wS  |   在...秒内    | (?P\<wS>\d+)\s*(秒)\s*(内)  |
 | wa  |   在...星期内   | (?P\<wa>\d+)\s*(周)\s*(内)  |
-| aY  |   在...年后    | (?P\<wY>\d+)\s*(年)\s*(后)  |
-| am  |   在...月后    | (?P\<wm>\d+)\s*(月)\s*(后) |
+| aY  |   在...年后    | (?P\<aY>\d+)\s*(年)\s*(后)  |
+| am  |   在...月后    | (?P\<am>\d+)\s*(月)\s*(后) |
 | ad  |   在...日后    | (?P\<wd>\d+)\s*(天)\s*(后)  |
-| aH  |   在...时后    | (?P\<wH>\d+)\s*(小时)\s*(后) |
-| aM  |   在...分后    | (?P\<wM>\d+)\s*(分钟)\s*(后) |
-| aS  |   在...秒后    | (?P\<wS>\d+)\s*(秒)\s*(后)  |
-| aa  |   在...星期后   | (?P\<wa>\d+)\s*(周)\s*(后)  |
+| aH  |   在...时后    | (?P\<aH>\d+)\s*(小时)\s*(后) |
+| aM  |   在...分后    | (?P\<aM>\d+)\s*(分钟)\s*(后) |
+| aS  |   在...秒后    | (?P\<aS>\d+)\s*(秒)\s*(后)  |
+| aa  |   在...星期后   | (?P\<aa>\d+)\s*(周)\s*(后)  |
 | sd  | 今天/昨天/前天/刚刚 |        (?P\<sd>前天)        | 
 | apm |    上午下午     |       (?P\<apm>am)        | 
 
@@ -161,10 +167,41 @@ print(parse_frame('10个月', regex_list=[None, ('(?P<am>\d+)\s*(个)?月',)], b
 
 ```
 
+常见的范围分隔符（至、到、—、–、~、～）可自动识别，也可通过`seps`参数指定。
+范围解析的`langs`、`timezone`参数与单条解析保持一致，会透传给起止时间。
+
+8. 时区偏移解析
+
+默认行为保持不变，解析结果仍是不带时区的本地挂钟时间；需要时区信息时可通过
+`timezone`参数开启。
+
+```python
+import datetime
+import gggdtparser
+
+# 保留原文中的时区偏移，返回带 tzinfo 的 datetime
+dt = gggdtparser.parse("2022-02-02T02:02:02+08:00", timezone=False)
+
+# 转换到目标时区
+utc = datetime.timezone.utc
+dt = gggdtparser.parse(
+    "2022-02-02T02:02:02+08:00", timezone=utc)
+print(dt)  # 2022-02-01 18:02:02+00:00
+```
+
+`timezone`也支持`parse_by_format`，并且时间戳会按 UTC 绝对时刻转换。除数字
+偏移外，还接受 IANA 时区名称（如`Asia/Shanghai`）；Python 3.9+ 使用标准库
+`zoneinfo`，Python 3.8 需要安装`backports.zoneinfo`，Windows 还需要`tzdata`
+数据包。
+
+支持保留 RFC822 邮件日期与带小数秒的 ISO 时间的原文偏移，例如
+`Wed, 02 Feb 2022 14:30:20 +0530`、`2022-02-02T02:02:02.123+08:00`，
+小数秒按微秒精度保留。
+
 ## 待完善
 
 1. 兼容更多语言
-2. 对时区的解析
+2. Windows 默认没有 IANA 时区数据库，使用 IANA 名称时需安装`tzdata`
 
 ## 关于作者
 

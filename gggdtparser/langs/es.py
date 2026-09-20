@@ -22,6 +22,19 @@ _ES_WEEKDAY_ABBRS = {
 }
 
 
+def _es_clock_time(match):
+    hour_raw = match.group("H")
+    hour = 1 if hour_raw.lower() == "una" else int(hour_raw)
+    minute = int(match.group("M") or 0)
+    part = (match.group("part") or "").lower()
+    apm = (match.group("apm") or "").lower()
+    if part in ("tarde", "noche") or apm == "pm":
+        hour = 12 if hour == 12 else (hour + 12 if hour < 12 else hour)
+    elif apm == "am":
+        hour = 0 if hour == 12 else hour
+    return "%d:%02d" % (hour, minute)
+
+
 SUB_TRANSLATE = [
     (r"(?i)\b(?:lun|mar|mi[ée]|jue|vie|s[áa]b|dom)\.?\s+"
      r"(?P<d>\d{1,2})\s+(?:de\s+)?"
@@ -76,6 +89,18 @@ SUB_TRANSLATE = [
     (r"(?i)\bmañana\s+por\s+la\s+mañana\b", "明天 08:00 am"),
     (r"(?i)\bmañana\s+por\s+la\s+tarde\b", "明天 15:00 pm"),
     (r"(?i)\bmañana\s+por\s+la\s+noche\b", "明天 20:00 pm"),
+    (r"(?i)\bayer\s+por\s+la\s+(?:mañana)\b", "昨天 08:00 am"),
+    (r"(?i)\bayer\s+por\s+la\s+(?:tarde)\b", "昨天 15:00 pm"),
+    (r"(?i)\bayer\s+por\s+la\s+(?:noche)\b", "昨天 20:00 pm"),
+    (r"(?i)\bhoy\s+por\s+la\s+(?:mañana)\b", "今天 08:00 am"),
+    (r"(?i)\bhoy\s+por\s+la\s+(?:tarde)\b", "今天 15:00 pm"),
+    (r"(?i)\bhoy\s+por\s+la\s+(?:noche)\b", "今天 20:00 pm"),
+    (r"(?i)\ba\s+las\s+(?P<H>\d{1,2})(?::(?P<M>\d{1,2}))?\s*"
+     r"(?:de\s+la\s+)?(?P<part>mañana|madrugada|tarde|noche)?\s*(?P<apm>am|pm)?\b",
+     _es_clock_time),
+    (r"(?i)\ba\s+la\s+(?P<H>una|\d{1,2})\s*"
+     r"(?:de\s+la\s+)?(?P<part>mañana|madrugada|tarde|noche)?\s*(?P<apm>am|pm)?\b",
+     _es_clock_time),
     (r"(?i)\ba\s+mediodía\b|\ba\s+mediodia\b", "12:00 pm"),
     (r"(?i)\ba\s+medianoche\b", "12:00 am"),
     (r"(?i)(de)?\s*enero\s*(de)?", "1月"),

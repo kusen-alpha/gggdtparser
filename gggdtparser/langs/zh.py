@@ -7,11 +7,51 @@
 中文
 """
 
+
+def _cn_period_hour(match):
+    part = match.group("part")
+    hour = int(match.group("H"))
+    if match.group("half"):
+        minute = 30
+    else:
+        minute = int(match.group("M") or 0)
+    if "明" in part:
+        day = "明天"
+    elif "昨" in part:
+        day = "昨天"
+    elif "前" in part:
+        day = "前天"
+    elif "后" in part:
+        day = "后天"
+    elif any(k in part for k in ("今天", "今晚", "今夜", "今早")):
+        day = "今天"
+    else:
+        day = None
+    if any(p in part for p in ("晚上", "夜里", "夜间", "深夜")) \
+            or part in ("今晚", "今夜", "明晚", "昨晚"):
+        hour = 0 if hour == 12 else (hour + 12 if hour < 12 else hour)
+    elif any(p in part for p in ("下午", "傍晚")):
+        hour = 12 if hour == 12 else (hour + 12 if hour < 12 else hour)
+    elif "中午" in part:
+        pass
+    elif "午夜" in part or "半夜" in part:
+        hour = 0 if hour == 12 else hour
+    else:
+        hour = 0 if hour == 12 else hour
+    if day is None:
+        return " %02d:%02d" % (hour, minute)
+    return "%s %02d:%02d" % (day, hour, minute)
+
+
 ACCURATE_REGEX_LIST = [
 
 ]
 
 SUB_TRANSLATE = [
+    (r"(?P<part>(?:今天|明天|昨天|前天|后天)(?:凌晨|清晨|早上|早晨|上午|中午|下午|傍晚|晚上|夜里|夜间|深夜)?|今晚|今夜|明晚|昨晚|今早)\s*(?P<H>\d{1,2})\s*[点时]\s*(?:(?P<M>\d{1,2})\s*分?|(?P<half>半))?",
+     _cn_period_hour),
+    (r"(?P<part>凌晨|清晨|早上|早晨|上午|中午|下午|傍晚|晚上|夜里|夜间|深夜|午夜|半夜)\s*(?P<H>\d{1,2})\s*[点时]\s*(?:(?P<M>\d{1,2})\s*分?|(?P<half>半))?",
+     _cn_period_hour),
     (r'星期([一二三四五六日天])', lambda m: "周%s" % m.group(1)),
     (r'周([一二三四五六日天])', lambda m: "周%s" % m.group(1)),
     (r'禮拜([一二三四五六日天])', lambda m: "周%s" % m.group(1)),

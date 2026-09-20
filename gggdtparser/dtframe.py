@@ -13,12 +13,17 @@ from . import dtparser
 
 SEPS = (
     '至',
-    '-'
+    '到',
+    '—',
+    '–',
+    '~',
+    '～',
+    '-',
 )
 
 
 def _parse(s, sep, start_format_list, end_format_list, start_regex_list,
-           end_regex_list, base_datetime):
+           end_regex_list, base_datetime, langs=None, timezone=None):
     start, end = None, None
     parts = s.split(sep)
     if len(parts) != 2 and sep == '-':
@@ -30,24 +35,24 @@ def _parse(s, sep, start_format_list, end_format_list, start_regex_list,
             start = base_datetime
             end = dtparser.parse(
                 s, end_format_list, end_regex_list,
-                base_datetime=base_datetime)
+                base_datetime=base_datetime, langs=langs, timezone=timezone)
         return start, end
     left, right = parts
     if left:
         start = dtparser.parse(
             left, start_format_list, start_regex_list,
-            base_datetime=base_datetime)
+            base_datetime=base_datetime, langs=langs, timezone=timezone)
     elif base_datetime:
         start = base_datetime
     if right:
         end = dtparser.parse(
             right, end_format_list, end_regex_list,
-            base_datetime=base_datetime)
+            base_datetime=base_datetime, langs=langs, timezone=timezone)
     return start, end
 
 
 def parse(s, seps=None, format_list=None, regex_list=None,
-          base_datetime=None, ):
+          base_datetime=None, langs=None, timezone=None):
     """
 
     :param s:
@@ -57,6 +62,8 @@ def parse(s, seps=None, format_list=None, regex_list=None,
     :param regex_list: 正则表达式
         [(start, start, ....), (end, end, ....)]
     :param base_datetime: 相对时间的基准，当起始时间没有解析到时，当做时间的范围的起始
+    :param langs: 语言列表，透传给单条时间解析
+    :param timezone: False 保留原文偏移；tzinfo/时区串则转换到目标时区
 
     :return:
     """
@@ -85,13 +92,15 @@ def parse(s, seps=None, format_list=None, regex_list=None,
     for sep in seps:
         start, end = _parse(
             s, sep, start_format_list, end_format_list,
-            start_regex_list, end_regex_list, base_datetime)
+            start_regex_list, end_regex_list, base_datetime,
+            langs=langs, timezone=timezone)
         if any([start, end]):
             return start, end
     for sep in SEPS:
         start, end = _parse(
             s, sep, start_format_list, end_format_list,
-            start_regex_list, end_regex_list, base_datetime)
+            start_regex_list, end_regex_list, base_datetime,
+            langs=langs, timezone=timezone)
         if start and end:
             return start, end
     return None, None

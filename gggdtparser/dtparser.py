@@ -6,9 +6,22 @@
 
 import re
 import random
+import functools
 import logging
 import calendar
 import datetime
+
+try:
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+except ImportError:  # pragma: no cover - Python 3.8 without backports.zoneinfo
+    try:
+        from backports.zoneinfo import (
+            ZoneInfo,
+            ZoneInfoNotFoundError,
+        )
+    except ImportError:
+        ZoneInfo = None
+        ZoneInfoNotFoundError = ValueError
 
 from gggdtparser.utils import s2dt
 from . import dtconfigs
@@ -30,6 +43,133 @@ _FULLWIDTH_TRANSLATE.update({
 })
 _FULLWIDTH_TRANSLATE = str.maketrans(_FULLWIDTH_TRANSLATE)
 
+_NO_TRANSLATION_TOKEN_REGEX = re.compile(
+    r'(?i)(?<=\d)T(?=\d)|\b(?:am|pm)\b|\b(?:z|utc|gmt)\b')
+_OFFSET_TEXT_REGEX = re.compile(
+    r'[ \t]*(?P<zone>Z|UTC|GMT|[+-]\d{2}:?\d{2})(?=\s|[^\w]|$)',
+    re.I)
+
+
+def _timezone_from_text(zone_text):
+    upper = zone_text.upper()
+    if upper in ('Z', 'UTC', 'GMT'):
+        return datetime.timezone.utc
+    digits = zone_text[1:].replace(':', '')
+    if len(digits) != 4:
+        raise ValueError('时区偏移格式不正确: %s' % zone_text)
+    hours = int(digits[:2])
+    minutes = int(digits[2:])
+    if hours > 23 or minutes > 59:
+        raise ValueError('时区偏移超出范围: %s' % zone_text)
+    sign = 1 if zone_text[0] == '+' else -1
+    return datetime.timezone(
+        sign * datetime.timedelta(hours=hours, minutes=minutes))
+
+
+def _fraction_to_microseconds(fraction):
+    if not fraction:
+        return 0
+    digits = fraction[:6]
+    return int(digits) * 10 ** (6 - len(digits))
+
+
+def _resolve_timezone(timezone):
+    if isinstance(timezone, datetime.tzinfo):
+        return timezone
+    if isinstance(timezone, str):
+        if '/' in timezone:
+            if ZoneInfo is None:
+                raise ValueError(
+                    'IANA 时区解析需要 zoneinfo（Python 3.9+）'
+                    '或 backports.zoneinfo 包')
+            try:
+                return ZoneInfo(timezone)
+            except ZoneInfoNotFoundError:
+                raise ValueError('未知的 IANA 时区: %s' % timezone)
+        return _timezone_from_text(timezone)
+    raise ValueError(
+        'timezone 参数仅支持 tzinfo、IANA 时区名'
+        '或时区偏移字符串，如 Asia/Shanghai、UTC、+08:00')
+
+
+def _apply_datetime_timezone(dt, timezone):
+    if timezone is None or timezone is False:
+        return dt
+    target = _resolve_timezone(timezone)
+    if dt.tzinfo is not None:
+        return dt.astimezone(target)
+    return dt.replace(tzinfo=target)
+
+
+def _detect_zone_text(text, span):
+    match = _OFFSET_TEXT_REGEX.match(text, span[1])
+    if not match:
+        return None
+    return match.group('zone')
+
+
+def _apply_text_timezone(dt, text, span, timezone):
+    if timezone is None:
+        return dt
+    zone_text = _detect_zone_text(text, span)
+    if timezone is False:
+        if zone_text is None:
+            return dt
+        return dt.replace(tzinfo=_timezone_from_text(zone_text))
+    target = _resolve_timezone(timezone)
+    if zone_text is not None:
+        return dt.replace(
+            tzinfo=_timezone_from_text(zone_text)).astimezone(target)
+    if dt.tzinfo is not None:
+        return dt.astimezone(target)
+    return dt.replace(tzinfo=target)
+
+
+def _check_datetime_bounds(dt, max_datetime, min_datetime):
+    """边界校验，naive 与 aware 混用时按 UTC 比较。"""
+    if max_datetime is None and min_datetime is None:
+        return
+    compare_dt = dt
+    if dt.tzinfo is None:
+        compare_dt = dt.replace(tzinfo=datetime.timezone.utc)
+    if max_datetime is not None:
+        compare_max = max_datetime
+        if compare_max.tzinfo is None:
+            compare_max = compare_max.replace(tzinfo=datetime.timezone.utc)
+        if compare_dt > compare_max:
+            raise Exception('解析时间超出最大时间')
+    if min_datetime is not None:
+        compare_min = min_datetime
+        if compare_min.tzinfo is None:
+            compare_min = compare_min.replace(tzinfo=datetime.timezone.utc)
+        if compare_dt < compare_min:
+            raise Exception('解析时间超出最小时间')
+
+
+def _needs_language_translation(string_datetime):
+    """纯数字/分隔符和 ISO 约定字符不需要多语言翻译。"""
+    return bool(re.search(
+        r'[^\x00-\x7F]|[A-Za-z]',
+        _NO_TRANSLATION_TOKEN_REGEX.sub('', string_datetime)))
+
+
+@functools.lru_cache(maxsize=4096)
+def _translate_cached(string_datetime, langs):
+    if not langs and not _needs_language_translation(string_datetime):
+        return string_datetime
+    if not langs:
+        for _lang, sub_list in dtconfigs.get_all_lang_sub_translates():
+            for sub in sub_list:
+                string_datetime = sub[0].sub(sub[1], string_datetime)
+        return string_datetime
+    for lang in langs:
+        _sub_translate = dtconfigs.get_lang_sub_translate(lang)
+        for sub in _sub_translate:
+            string_datetime = sub[0].sub(sub[1], string_datetime)
+    for sub in dtconfigs.get_lang_sub_translate('default'):
+        string_datetime = sub[0].sub(sub[1], string_datetime)
+    return string_datetime
+
 
 class StringDateTimeLanguageHandler(object):
 
@@ -41,24 +181,7 @@ class StringDateTimeLanguageHandler(object):
         :param langs:
         :return:
         """
-        if not langs:
-            langs = []
-        if not langs:
-            for _lang, sub_list in dtconfigs.LANG_SUB_TRANSLATE.items():
-                for sub in sub_list:
-                    repl = sub[1] if callable(sub[1]) else sub[1]
-                    string_datetime = sub[0].sub(repl, string_datetime)
-        for lang in langs:
-            _sub_translate = dtconfigs.LANG_SUB_TRANSLATE.get(
-                lang) or []
-            for sub in _sub_translate:
-                repl = sub[1] if callable(sub[1]) else sub[1]
-                string_datetime = sub[0].sub(repl, string_datetime)
-        if langs:
-            for sub in dtconfigs.LANG_SUB_TRANSLATE.get('default') or []:
-                repl = sub[1] if callable(sub[1]) else sub[1]
-                string_datetime = sub[0].sub(repl, string_datetime)
-        return string_datetime
+        return _translate_cached(string_datetime, tuple(langs or ()))
 
 
 class StringDateTimeRegexParser(object):
@@ -68,7 +191,8 @@ class StringDateTimeRegexParser(object):
     @classmethod
     def parse(cls, string_datetime, regex_list=None, langs=None,
               result_accurately=True, extract_accurately=False,
-              max_datetime=None, min_datetime=None, base_datetime=None):
+              max_datetime=None, min_datetime=None, base_datetime=None,
+              timezone=None):
         """
         通过正则对文本的时间进行抽取和解析
         :param string_datetime: 文本时间
@@ -79,8 +203,11 @@ class StringDateTimeRegexParser(object):
         :param max_datetime: 最大时间，超过解析失败
         :param min_datetime: 最小时间，超过解析失败
         :param base_datetime: 相对时间计算的基准时间
+        :param timezone: False 保留原文偏移；tzinfo/时区串则转换到目标时区
         :return:
         """
+        if timezone is not None and timezone is not False:
+            _resolve_timezone(timezone)
         if not isinstance(string_datetime, str):
             return None
         if not string_datetime:
@@ -119,13 +246,14 @@ class StringDateTimeRegexParser(object):
             regex_list = compiled_regex_list
             result = cls.match_and_parse(
                 string_datetime, regex_list, result_accurately,
-                max_datetime, min_datetime, base_datetime)
+                max_datetime, min_datetime, base_datetime, timezone)
             if result:
                 return result
         regex_list = cls.get_default_regex_list(langs, extract_accurately)
         result = cls.match_and_parse(
             string_datetime, regex_list,
-            result_accurately, max_datetime, min_datetime, base_datetime)
+            result_accurately, max_datetime, min_datetime, base_datetime,
+            timezone)
         if result:
             return result
 
@@ -138,35 +266,37 @@ class StringDateTimeRegexParser(object):
 
     @classmethod
     def get_default_regex_list(cls, langs, extract_accurately):
+        return cls._get_cached_default_regex_list(
+            tuple(langs or ()), bool(extract_accurately))
+
+    @staticmethod
+    @functools.lru_cache(maxsize=128)
+    def _get_cached_default_regex_list(langs, extract_accurately):
         regex_list = []
         if langs:
             regex_list.extend(
                 dtconfigs.LANG_ACCURATE_REGEX_LIST.get('default') or [])
             for lang in langs:
-                regex_list.extend(cls._get_default_regex_list(lang, True))
+                regex_list.extend(
+                    dtconfigs.LANG_ACCURATE_REGEX_LIST.get(lang) or [])
             regex_list.extend(
                 dtconfigs.LANG_FUZZY_REGEX_LIST.get('default') or [])
             if not extract_accurately:
                 for lang in langs:
-                    regex_list.extend(cls._get_default_regex_list(lang, False))
-            return regex_list
+                    regex_list.extend(
+                        dtconfigs.LANG_FUZZY_REGEX_LIST.get(lang) or [])
+            return tuple(regex_list)
         for value in dtconfigs.LANG_ACCURATE_REGEX_LIST.values():
             regex_list.extend(value or [])
         if not extract_accurately:
             for value in dtconfigs.LANG_FUZZY_REGEX_LIST.values():
                 regex_list.extend(value or [])
-        return regex_list
-
-    @classmethod
-    def _get_default_regex_list(cls, lang, extract_accurately):
-        if extract_accurately:
-            return dtconfigs.LANG_ACCURATE_REGEX_LIST.get(lang) or []
-        return dtconfigs.LANG_FUZZY_REGEX_LIST.get(lang) or []
+        return tuple(regex_list)
 
     @classmethod
     def match_and_parse(cls, string_datetime, regex_list,
                         result_accurately, max_datetime,
-                        min_datetime, base_datetime):
+                        min_datetime, base_datetime, timezone=None):
         valid_results = []
         failed_spans = []
         full_date_failed = False
@@ -188,7 +318,7 @@ class StringDateTimeRegexParser(object):
                     result = cls._parse_group_dict(
                         group_dict, result_accurately,
                         max_datetime, min_datetime,
-                        base_datetime)
+                        base_datetime, timezone)
                 except Exception:
                     failed_spans.append((span, specificity))
                     if cls._is_full_date_group(group_dict):
@@ -197,6 +327,9 @@ class StringDateTimeRegexParser(object):
                             full_date_failed_specificity, specificity)
                     continue
                 if result is not None:
+                    if timezone is not None:
+                        result = _apply_text_timezone(
+                            result, string_datetime, span, timezone)
                     valid_results.append(
                         (index, specificity, span, group_dict, result))
         if not valid_results:
@@ -224,7 +357,7 @@ class StringDateTimeRegexParser(object):
     @classmethod
     def _group_specificity(cls, group_dict):
         """统计匹配到的有效字段数量，用于在多个命中中选更精确的结果。"""
-        keys = ('Y', 'mgY', 'm', 'd', 'H', 'M', 'S', 'sd', 'so',
+        keys = ('Y', 'mgY', 'm', 'd', 'H', 'M', 'S', 'f', 'sd', 'so',
                 'sy', 'sm', 'wday', 'wdir',
                 'bY', 'bm', 'bd', 'bH', 'bM', 'bS', 'ba',
                 'wY', 'wm', 'wd', 'wH', 'wM', 'wS', 'wa',
@@ -259,18 +392,20 @@ class StringDateTimeRegexParser(object):
 
     @classmethod
     def _parse_group_dict(cls, group_dict, result_accurately, max_datetime,
-                          min_datetime, base_datetime):
+                          min_datetime, base_datetime, timezone=None):
         un_result_accurately = not result_accurately
         now = datetime.datetime.now() if not base_datetime else base_datetime
         timestamp = int(group_dict.get('ts') or 0)
         if timestamp:
             if len(str(timestamp)) == 13:
                 timestamp = int(timestamp) // 1000
-            parse_datetime = datetime.datetime.fromtimestamp(timestamp)
-            if max_datetime and parse_datetime > max_datetime:
-                raise Exception('解析时间超出最大时间')
-            if min_datetime and parse_datetime < min_datetime:
-                raise Exception('解析时间超出最小时间')
+            if timezone is None or timezone is False:
+                parse_datetime = datetime.datetime.fromtimestamp(timestamp)
+            else:
+                parse_datetime = datetime.datetime.fromtimestamp(
+                    timestamp, datetime.timezone.utc)
+            _check_datetime_bounds(
+                parse_datetime, max_datetime, min_datetime)
             return parse_datetime
         year = group_dict.get('Y')  # or now.year
         if year and isinstance(year, str) and len(year) == 2:
@@ -512,7 +647,12 @@ class StringDateTimeRegexParser(object):
             target_weekday = weekday_map.get(weekday)
             if target_weekday:
                 base_weekday = now.weekday() + 1
-                if weekday_dir in ("下", "下个"):
+                if weekday_dir in ("下下", "下下个"):
+                    shift = 14 - base_weekday + target_weekday
+                elif weekday_dir in ("上上", "上上个"):
+                    shift = -(
+                        14 + ((base_weekday - target_weekday) % 7 or 7))
+                elif weekday_dir in ("下", "下个"):
                     shift = 7 - base_weekday + target_weekday
                 elif weekday_dir in ("上", "上个"):
                     shift = -((base_weekday - target_weekday) % 7 or 7)
@@ -564,7 +704,8 @@ class StringDateTimeRegexParser(object):
         parse_datetime = datetime.datetime(
             year=year, month=month,
             day=day, hour=hour,
-            minute=minute, second=second)
+            minute=minute, second=second,
+            microsecond=_fraction_to_microseconds(group_dict.get('f')))
         parse_datetime = cls._shift_years(
             parse_datetime, year_change if calc_add else -year_change)
         parse_datetime = cls._shift_months(
@@ -576,10 +717,8 @@ class StringDateTimeRegexParser(object):
             parse_datetime = parse_datetime + change_timedelta
         else:
             parse_datetime = parse_datetime - change_timedelta
-        if max_datetime and parse_datetime > max_datetime:
-            raise Exception('解析时间超出最大时间')
-        if min_datetime and parse_datetime < min_datetime:
-            raise Exception('解析时间超出最小时间')
+        _check_datetime_bounds(
+            parse_datetime, max_datetime, min_datetime)
         return parse_datetime
 
     @classmethod
@@ -641,7 +780,7 @@ class StringDateTimeRegexParser(object):
 parse_by_regex = StringDateTimeRegexParser.parse
 
 
-def parse_by_format(string_datetime, format_list=None):
+def parse_by_format(string_datetime, format_list=None, timezone=None):
     """
     通过format进行时间解析
     :param string_datetime:
@@ -654,13 +793,16 @@ def parse_by_format(string_datetime, format_list=None):
         format_list = []
     if isinstance(format_list, str):
         format_list = [format_list]
-    return s2dt(string_datetime, format_list)
+    result = s2dt(string_datetime, format_list)
+    if result is None or timezone is None:
+        return result
+    return _apply_datetime_timezone(result, timezone)
 
 
 def parse(string_datetime, format_list=None, regex_list=None,
           langs=None, result_accurately=True, extract_accurately=False,
           max_datetime=None, min_datetime=None, base_datetime=None,
-          translate_func=None):
+          translate_func=None, timezone=None):
     """
     解析文本时间
     :param string_datetime: 字符串时间文本
@@ -673,6 +815,7 @@ def parse(string_datetime, format_list=None, regex_list=None,
     :param min_datetime: 最小时间
     :param base_datetime: 基准时间
     :param translate_func: 翻译函数
+    :param timezone: False 保留原文偏移；tzinfo/时区串则转换到目标时区
     :return: datetime.datetime
     """
     # format
@@ -682,18 +825,18 @@ def parse(string_datetime, format_list=None, regex_list=None,
         return None
     if translate_func and callable(translate_func):
         string_datetime = translate_func(string_datetime)
-    result = parse_by_format(string_datetime, format_list)
+    result = parse_by_format(string_datetime, format_list, timezone=timezone)
     if result:
-        if max_datetime and result > max_datetime:
-            return None
-        if min_datetime and result < min_datetime:
+        try:
+            _check_datetime_bounds(result, max_datetime, min_datetime)
+        except Exception:
             return None
         return result
     result = parse_by_regex(
         string_datetime, regex_list, langs, result_accurately,
         max_datetime=max_datetime, min_datetime=min_datetime,
         base_datetime=base_datetime,
-        extract_accurately=extract_accurately)
+        extract_accurately=extract_accurately, timezone=timezone)
     if result:
         return result
 
@@ -712,5 +855,5 @@ def check(dst_dt, check_dt):
 
 
 if __name__ == '__main__':
-    result1 = parse('2022年', fs=['%Y年'])
+    result1 = parse('2022年', format_list=['%Y年'])
     print(result1)
