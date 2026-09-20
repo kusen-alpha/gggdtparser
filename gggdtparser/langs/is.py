@@ -21,6 +21,16 @@ _IS_UNIT_RE = (
     r"dag(?:ur|a|ögum)|vik(?:a|ur|um)|mánuð(?:i|um)|ár(?:um)?"
 )
 
+_IS_WEEKDAYS = {
+    "mánudagur": "周一", "mánudag": "周一",
+    "þriðjudagur": "周二", "þriðjudag": "周二",
+    "miðvikudagur": "周三", "miðvikudag": "周三",
+    "fimmtudagur": "周四", "fimmtudag": "周四",
+    "föstudagur": "周五", "föstudag": "周五",
+    "laugardagur": "周六", "laugardag": "周六",
+    "sunnudagur": "周日", "sunnudag": "周日",
+}
+
 
 def _is_later(match):
     return "%s%s后" % (match.group(1), _IS_UNITS[match.group(2)])
@@ -31,6 +41,12 @@ def _is_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:næsti|næsta)\s+(mánudagur|mánudag|þriðjudagur|þriðjudag|miðvikudagur|miðvikudag|fimmtudagur|fimmtudag|föstudagur|föstudag|laugardagur|laugardag|sunnudagur|sunnudag)\b",
+     lambda m: "下%s" % _IS_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:síðasti|síðasta|liðinn)\s+(mánudagur|mánudag|þriðjudagur|þriðjudag|miðvikudagur|miðvikudag|fimmtudagur|fimmtudag|föstudagur|föstudag|laugardagur|laugardag|sunnudagur|sunnudag)\b",
+     lambda m: "上%s" % _IS_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:þessi|þennan)\s+(mánudagur|mánudag|þriðjudagur|þriðjudag|miðvikudagur|miðvikudag|fimmtudagur|fimmtudag|föstudagur|föstudag|laugardagur|laugardag|sunnudagur|sunnudag)\b",
+     lambda m: "这%s" % _IS_WEEKDAYS[m.group(1).lower()]),
     (r"\bjanúar\b", "1月"),
     (r"\bfebrúar\b", "2月"),
     (r"\bmars\b", "3月"),
@@ -45,6 +61,15 @@ SUB_TRANSLATE = [
     (r"\bdesember\b", "12月"),
     (r"\bí\s+fyrradag\b", "前天"),
     (r"\bhinn\s+daginn\b", "后天"),
+    (r"(?i)\bí\s+morgun\b", "今天 08:00 am"),
+    (r"(?i)\beftir\s+hádegi\b", "今天 15:00 pm"),
+    (r"(?i)\bí\s+kvöld\b", "今天 20:00 pm"),
+    (r"(?i)\bí\s+nótt\b", "今天 22:00 pm"),
+    (r"(?i)\bí\s+fyrramálið\b", "明天 08:00 am"),
+    (r"(?i)\bá\s+morgun\s+í\s+kvöld\b", "明天 20:00 pm"),
+    (r"(?i)\bí\s+gærkvöldi\b", "昨天 20:00 pm"),
+    (r"(?i)\bhádegi\b", "12:00 pm"),
+    (r"(?i)\bmiðnætti\b", "12:00 am"),
     (r"\bí\s+dag\b", "今天"),
     (r"\bí\s+gær\b", "昨天"),
     (r"\bá\s+morgun\b", "明天"),

@@ -23,6 +23,16 @@ _TK_MONTHS = {
 }
 _TK_MONTHS_RE = "|".join(sorted(_TK_MONTHS, key=len, reverse=True))
 
+_TK_WEEKDAYS = {
+    "duşenbe": "周一",
+    "sişenbe": "周二",
+    "çarşenbe": "周三",
+    "penşenbe": "周四",
+    "anna": "周五",
+    "şenbe": "周六",
+    "ýekşenbe": "周日",
+}
+
 
 def _tk_month_no(name):
     return _TK_MONTHS[name.lower()]
@@ -53,11 +63,26 @@ def _tk_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\bindiki\s+(duşenbe|sişenbe|çarşenbe|penşenbe|anna|şenbe|ýekşenbe)\b",
+     lambda m: "下%s" % _TK_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bgeçen\s+(duşenbe|sişenbe|çarşenbe|penşenbe|anna|şenbe|ýekşenbe)\b",
+     lambda m: "上%s" % _TK_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bşu\s+(duşenbe|sişenbe|çarşenbe|penşenbe|anna|şenbe|ýekşenbe)\b",
+     lambda m: "这%s" % _TK_WEEKDAYS[m.group(1).lower()]),
     (r"(?i)(?P<d>\d{1,2})\s*(?:nji|njy)?\s*(?P<name>%s)\s+(?P<Y>\d{4})"
      % _TK_MONTHS_RE, _tk_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
      % _TK_MONTHS_RE, _tk_month_first),
     (r"(?i)(?P<name>%s)\s+(?P<Y>\d{4})" % _TK_MONTHS_RE, _tk_month_year),
+    (r"(?i)\bşu\s+gün\s+irden\b", "今天 08:00 am"),
+    (r"(?i)\bşu\s+gün\s+öýlän\b", "12:00 pm"),
+    (r"(?i)\bşu\s+gün\s+günortandan\s+soň\b", "今天 15:00 pm"),
+    (r"(?i)\bşu\s+gün\s+agşam\b", "今天 20:00 pm"),
+    (r"(?i)\bertir\s+irden\b", "明天 08:00 am"),
+    (r"(?i)\bertir\s+agşam\b", "明天 20:00 pm"),
+    (r"(?i)\bdüýn\s+agşam\b", "昨天 20:00 pm"),
+    (r"(?i)\b(?:günorta|günortan)\b", "12:00 pm"),
+    (r"(?i)\b(?:gijäniň\s+ýarynda|ýary\s+gije)\b", "12:00 am"),
     (r"(?i)\bşu\s+gün\b", "今天"),
     (r"(?i)\bdüýn\b", "昨天"),
     (r"(?i)\bertir\b", "明天"),

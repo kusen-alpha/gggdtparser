@@ -24,6 +24,16 @@ _ET_UNIT_RE = (
     r"nädala|nädalat?|kuud?|aasta|aastat"
 )
 
+_ET_WEEKDAYS = {
+    "esmaspäev": "周一", "esmaspäeval": "周一",
+    "teisipäev": "周二", "teisipäeval": "周二",
+    "kolmapäev": "周三", "kolmapäeval": "周三",
+    "neljapäev": "周四", "neljapäeval": "周四",
+    "reede": "周五", "reedel": "周五",
+    "laupäev": "周六", "laupäeval": "周六",
+    "pühapäev": "周日", "pühapäeval": "周日",
+}
+
 
 def _et_later(match):
     return "%s%s后" % (match.group(1), _ET_UNITS[match.group(2)])
@@ -34,6 +44,12 @@ def _et_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:järgmine|järgmise|järgmisel|tulev|tuleva|tuleval)\s+(esmaspäev|esmaspäeval|teisipäev|teisipäeval|kolmapäev|kolmapäeval|neljapäev|neljapäeval|reede|reedel|laupäev|laupäeval|pühapäev|pühapäeval)\b",
+     lambda m: "下%s" % _ET_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:eelmine|eelmise|eelmisel|möödunud)\s+(esmaspäev|esmaspäeval|teisipäev|teisipäeval|kolmapäev|kolmapäeval|neljapäev|neljapäeval|reede|reedel|laupäev|laupäeval|pühapäev|pühapäeval)\b",
+     lambda m: "上%s" % _ET_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:see|sel(?:le)?)\s+(esmaspäev|esmaspäeval|teisipäev|teisipäeval|kolmapäev|kolmapäeval|neljapäev|neljapäeval|reede|reedel|laupäev|laupäeval|pühapäev|pühapäeval)\b",
+     lambda m: "这%s" % _ET_WEEKDAYS[m.group(1).lower()]),
     (r"\bjaanuar\b", "1月"),
     (r"\bveebruar\b", "2月"),
     (r"\bmärts\b", "3月"),
@@ -48,6 +64,14 @@ SUB_TRANSLATE = [
     (r"\bdetsember\b", "12月"),
     (r"\büleeile\b", "前天"),
     (r"\bülehomme\b", "后天"),
+    (r"(?i)\btäna\s+hommikul\b", "今天 08:00 am"),
+    (r"(?i)\btäna\s+pärastlõunal\b", "今天 15:00 pm"),
+    (r"(?i)\btäna\s+õhtul\b", "今天 20:00 pm"),
+    (r"(?i)\bhomme\s+hommikul\b", "明天 08:00 am"),
+    (r"(?i)\bhomme\s+õhtul\b", "明天 20:00 pm"),
+    (r"(?i)\beile\s+õhtul\b", "昨天 20:00 pm"),
+    (r"(?i)\bkeskpäeval\b", "12:00 pm"),
+    (r"(?i)\bkeskööl\b", "12:00 am"),
     (r"\btäna\b", "今天"),
     (r"\beile\b", "昨天"),
     (r"\bhomme\b", "明天"),

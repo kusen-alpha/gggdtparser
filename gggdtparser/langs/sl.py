@@ -21,6 +21,16 @@ _SL_UNIT_RE = (
     r"teden|tedna|tednov|mesec(?:a|ev)?|let[io]?|let"
 )
 
+_SL_WEEKDAYS = {
+    "ponedeljek": "周一",
+    "torek": "周二",
+    "sreda": "周三", "sredo": "周三",
+    "četrtek": "周四",
+    "petek": "周五",
+    "sobota": "周六", "soboto": "周六",
+    "nedelja": "周日", "nedeljo": "周日",
+}
+
 
 def _sl_later(match):
     return "%s%s后" % (match.group(1), _SL_UNITS[match.group(2)])
@@ -31,6 +41,12 @@ def _sl_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:naslednj[ieoa]|prihodnj[ieoa])\s+(ponedeljek|torek|sreda|sredo|četrtek|petek|sobota|soboto|nedelja|nedeljo)\b",
+     lambda m: "下%s" % _SL_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:prejšnj[ieoa]|minul[ieoa])\s+(ponedeljek|torek|sreda|sredo|četrtek|petek|sobota|soboto|nedelja|nedeljo)\b",
+     lambda m: "上%s" % _SL_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:ta|to)\s+(ponedeljek|torek|sreda|sredo|četrtek|petek|sobota|soboto|nedelja|nedeljo)\b",
+     lambda m: "这%s" % _SL_WEEKDAYS[m.group(1).lower()]),
     (r"\bjanuar\b", "1月"),
     (r"\bfebruar\b", "2月"),
     (r"\bmarec\b", "3月"),
@@ -45,6 +61,14 @@ SUB_TRANSLATE = [
     (r"\bdecember\b", "12月"),
     (r"\bpredvčerajšnjim\b", "前天"),
     (r"\bpojutrišnjem\b", "后天"),
+    (r"(?i)\bdanes\s+zjutraj\b", "今天 08:00 am"),
+    (r"(?i)\bdanes\s+popoldne\b", "今天 15:00 pm"),
+    (r"(?i)\bdanes\s+zvečer\b", "今天 20:00 pm"),
+    (r"(?i)\bjutri\s+zjutraj\b", "明天 08:00 am"),
+    (r"(?i)\bjutri\s+zvečer\b", "明天 20:00 pm"),
+    (r"(?i)\bvčeraj\s+zvečer\b", "昨天 20:00 pm"),
+    (r"(?i)\bopoldne\b", "12:00 pm"),
+    (r"(?i)\bpolnoči\b", "12:00 am"),
     (r"\bdanes\b", "今天"),
     (r"\bvčeraj\b", "昨天"),
     (r"\bjutri\b", "明天"),

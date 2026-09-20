@@ -21,6 +21,16 @@ _LV_UNIT_RE = (
     r"dienas|dienām|nedēļas|nedēļām|mēneši|mēnešiem|gadi|gadiem"
 )
 
+_LV_WEEKDAYS = {
+    "pirmdiena": "周一", "pirmdienā": "周一",
+    "otrdiena": "周二", "otrdienā": "周二",
+    "trešdiena": "周三", "trešdienā": "周三",
+    "ceturtdiena": "周四", "ceturtdienā": "周四",
+    "piektdiena": "周五", "piektdienā": "周五",
+    "sestdiena": "周六", "sestdienā": "周六",
+    "svētdiena": "周日", "svētdienā": "周日",
+}
+
 
 def _lv_later(match):
     return "%s%s后" % (match.group(1), _LV_UNITS[match.group(2)])
@@ -31,6 +41,12 @@ def _lv_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:nākamā|nākamajā|nākošā|nākošajā)\s+(pirmdiena|pirmdienā|otrdiena|otrdienā|trešdiena|trešdienā|ceturtdiena|ceturtdienā|piektdiena|piektdienā|sestdiena|sestdienā|svētdiena|svētdienā)\b",
+     lambda m: "下%s" % _LV_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:pagājušā|pagājušajā|iepriekšējā|iepriekšējajā)\s+(pirmdiena|pirmdienā|otrdiena|otrdienā|trešdiena|trešdienā|ceturtdiena|ceturtdienā|piektdiena|piektdienā|sestdiena|sestdienā|svētdiena|svētdienā)\b",
+     lambda m: "上%s" % _LV_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:šī|šajā)\s+(pirmdiena|pirmdienā|otrdiena|otrdienā|trešdiena|trešdienā|ceturtdiena|ceturtdienā|piektdiena|piektdienā|sestdiena|sestdienā|svētdiena|svētdienā)\b",
+     lambda m: "这%s" % _LV_WEEKDAYS[m.group(1).lower()]),
     (r"\bjanvāris\b", "1月"),
     (r"\bfebruāris\b", "2月"),
     (r"\bmarts\b", "3月"),
@@ -45,6 +61,14 @@ SUB_TRANSLATE = [
     (r"\bdecembris\b", "12月"),
     (r"\baizvakar\b", "前天"),
     (r"\bparīt\b", "后天"),
+    (r"(?i)\bšorīt\b", "今天 08:00 am"),
+    (r"(?i)\bšodien\s+pēcpusdienā\b", "今天 15:00 pm"),
+    (r"(?i)\bšovakar\b", "今天 20:00 pm"),
+    (r"(?i)\brīt\s+no\s+rīta\b", "明天 08:00 am"),
+    (r"(?i)\brīt\s+vakarā\b", "明天 20:00 pm"),
+    (r"(?i)\bvakar\s+vakarā\b", "昨天 20:00 pm"),
+    (r"(?i)\bpusdienlaikā\b", "12:00 pm"),
+    (r"(?i)\bpusnaktī\b", "12:00 am"),
     (r"\bšodien\b", "今天"),
     (r"\bvakar\b", "昨天"),
     (r"\brīt\b", "明天"),
