@@ -1,0 +1,455 @@
+# -*- coding: utf-8 -*-
+
+import datetime
+
+import pytest
+
+from gggdtparser import parse
+
+
+dt = datetime.datetime
+BASE = dt(2026, 9, 18, 15, 4, 5)
+
+EXPECTED = {
+    "today": dt(2026, 9, 18),
+    "yesterday": dt(2026, 9, 17),
+    "tomorrow": dt(2026, 9, 19),
+    "day_before_yesterday": dt(2026, 9, 16),
+    "day_after_tomorrow": dt(2026, 9, 20),
+    "two_hours_later": dt(2026, 9, 18, 17, 0, 0),
+    "two_hours_ago": dt(2026, 9, 18, 13, 0, 0),
+    "two_minutes_later": dt(2026, 9, 18, 15, 6, 0),
+    "two_minutes_ago": dt(2026, 9, 18, 15, 2, 0),
+    "next_week": dt(2026, 9, 25),
+    "last_week": dt(2026, 9, 11),
+    "next_month": dt(2026, 10, 18),
+    "last_month": dt(2026, 8, 18),
+    "next_year": dt(2027, 1, 1),
+    "last_year": dt(2025, 1, 1),
+}
+
+LANG_SCENARIOS = {
+    "be": {
+        "today": "сёння",
+        "yesterday": "учора",
+        "tomorrow": "заўтра",
+        "day_before_yesterday": "пазаўчора",
+        "day_after_tomorrow": "паслязаўтра",
+        "two_hours_later": "праз 2 гадзіны",
+        "two_hours_ago": "2 гадзіны таму",
+        "two_minutes_later": "праз 2 хвіліны",
+        "two_minutes_ago": "2 хвіліны таму",
+        "next_week": "наступны тыдзень",
+        "last_week": "мінулы тыдзень",
+        "next_month": "наступны месяц",
+        "last_month": "мінулы месяц",
+        "next_year": "наступны год",
+        "last_year": "мінулы год",
+    },
+    "bs": {
+        "today": "danas",
+        "yesterday": "jučer",
+        "tomorrow": "sutra",
+        "day_before_yesterday": "prekjučer",
+        "day_after_tomorrow": "prekosutra",
+        "two_hours_later": "za 2 sata",
+        "two_hours_ago": "prije 2 sata",
+        "two_minutes_later": "za 2 minute",
+        "two_minutes_ago": "prije 2 minute",
+        "next_week": "sljedeća sedmica",
+        "last_week": "prošla sedmica",
+        "next_month": "sljedeći mjesec",
+        "last_month": "prošli mjesec",
+        "next_year": "sljedeća godina",
+        "last_year": "prošla godina",
+    },
+    "mn": {
+        "today": "өнөөдөр",
+        "yesterday": "өчигдөр",
+        "tomorrow": "маргааш",
+        "day_before_yesterday": "нөгөөдөр",
+        "day_after_tomorrow": "нөгөө маргааш",
+        "two_hours_later": "2 цагийн дараа",
+        "two_hours_ago": "2 цагийн өмнө",
+        "two_minutes_later": "2 минутын дараа",
+        "two_minutes_ago": "2 минутын өмнө",
+        "next_week": "ирэх долоо хоног",
+        "last_week": "өнгөрсөн долоо хоног",
+        "next_month": "ирэх сар",
+        "last_month": "өнгөрсөн сар",
+        "next_year": "ирэх жил",
+        "last_year": "өнгөрсөн жил",
+    },
+    "kn": {
+        "today": "ಇಂದು",
+        "yesterday": "ನಿನ್ನೆ",
+        "tomorrow": "ನಾಳೆ",
+        "day_before_yesterday": "ನಿನ್ನೆ ಮೊನ್ನೆ",
+        "day_after_tomorrow": "ನಾಳೆ ಮರುದಿನ",
+        "two_hours_later": "2 ಗಂಟೆಗಳ ನಂತರ",
+        "two_hours_ago": "2 ಗಂಟೆಗಳ ಹಿಂದೆ",
+        "two_minutes_later": "2 ನಿಮಿಷಗಳ ನಂತರ",
+        "two_minutes_ago": "2 ನಿಮಿಷಗಳ ಹಿಂದೆ",
+        "next_week": "ಮುಂದಿನ ವಾರ",
+        "last_week": "ಕಳೆದ ವಾರ",
+        "next_month": "ಮುಂದಿನ ತಿಂಗಳು",
+        "last_month": "ಕಳೆದ ತಿಂಗಳು",
+        "next_year": "ಮುಂದಿನ ವರ್ಷ",
+        "last_year": "ಕಳೆದ ವರ್ಷ",
+    },
+    "ml": {
+        "today": "ഇന്ന്",
+        "yesterday": "ഇന്നലെ",
+        "tomorrow": "നാളെ",
+        "day_before_yesterday": "മിനിഞ്ഞാന്ന്",
+        "day_after_tomorrow": "മറ്റന്നാൾ",
+        "two_hours_later": "2 മണിക്കൂറിന് ശേഷം",
+        "two_hours_ago": "2 മണിക്കൂർ മുമ്പ്",
+        "two_minutes_later": "2 മിനിറ്റിന് ശേഷം",
+        "two_minutes_ago": "2 മിനിറ്റ് മുമ്പ്",
+        "next_week": "അടുത്ത ആഴ്ച",
+        "last_week": "കഴിഞ്ഞ ആഴ്ച",
+        "next_month": "അടുത്ത മാസം",
+        "last_month": "കഴിഞ്ഞ മാസം",
+        "next_year": "അടുത്ത വർഷം",
+        "last_year": "കഴിഞ്ഞ വർഷം",
+    },
+    "or": {
+        "today": "ଆଜି",
+        "yesterday": "ଗତକାଲି",
+        "tomorrow": "ଆସନ୍ତାକାଲି",
+        "day_before_yesterday": "ଗତ ପରଶୁ",
+        "day_after_tomorrow": "ଆସନ୍ତା ପରଶୁ",
+        "two_hours_later": "2 ଘଣ୍ଟା ପରେ",
+        "two_hours_ago": "2 ଘଣ୍ଟା ପୂର୍ବେ",
+        "two_minutes_later": "2 ମିନିଟ ପରେ",
+        "two_minutes_ago": "2 ମିନିଟ ପୂର୍ବେ",
+        "next_week": "ଆସନ୍ତା ସପ୍ତାହ",
+        "last_week": "ଗତ ସପ୍ତାହ",
+        "next_month": "ଆସନ୍ତା ମାସ",
+        "last_month": "ଗତ ମାସ",
+        "next_year": "ଆସନ୍ତା ବର୍ଷ",
+        "last_year": "ଗତ ବର୍ଷ",
+    },
+    "as": {
+        "today": "আজি",
+        "yesterday": "যোৱাকালি",
+        "tomorrow": "কাইলৈ",
+        "day_before_yesterday": "পৰহি",
+        "day_after_tomorrow": "পৰহিলৈ",
+        "two_hours_later": "2 ঘণ্টা পিছত",
+        "two_hours_ago": "2 ঘণ্টা আগত",
+        "two_minutes_later": "2 মিনিট পিছত",
+        "two_minutes_ago": "2 মিনিট আগত",
+        "next_week": "পৰৱৰ্তী সপ্তাহ",
+        "last_week": "বিগত সপ্তাহ",
+        "next_month": "পৰৱৰ্তী মাহ",
+        "last_month": "বিগত মাহ",
+        "next_year": "পৰৱৰ্তী বছৰ",
+        "last_year": "বিগত বছৰ",
+    },
+    "cy": {
+        "today": "heddiw",
+        "yesterday": "ddoe",
+        "tomorrow": "yfory",
+        "day_before_yesterday": "echdoe",
+        "day_after_tomorrow": "drennydd",
+        "two_hours_later": "mewn 2 awr",
+        "two_hours_ago": "2 awr yn ôl",
+        "two_minutes_later": "mewn 2 funud",
+        "two_minutes_ago": "2 funud yn ôl",
+        "next_week": "wythnos nesaf",
+        "last_week": "wythnos ddiwethaf",
+        "next_month": "mis nesaf",
+        "last_month": "mis diwethaf",
+        "next_year": "blwyddyn nesaf",
+        "last_year": "blwyddyn ddiwethaf",
+    },
+    "ga": {
+        "today": "inniu",
+        "yesterday": "inné",
+        "tomorrow": "amárach",
+        "day_before_yesterday": "arú inné",
+        "day_after_tomorrow": "arú amárach",
+        "two_hours_later": "i 2 uair",
+        "two_hours_ago": "2 uair ó shin",
+        "two_minutes_later": "i 2 nóiméad",
+        "two_minutes_ago": "2 nóiméad ó shin",
+        "next_week": "an tseachtain seo chugainn",
+        "last_week": "an tseachtain seo caite",
+        "next_month": "an mhí seo chugainn",
+        "last_month": "an mhí seo caite",
+        "next_year": "an bhliain seo chugainn",
+        "last_year": "an bhliain seo caite",
+    },
+    "eu": {
+        "today": "gaur",
+        "yesterday": "atzo",
+        "tomorrow": "bihar",
+        "day_before_yesterday": "herenegun",
+        "day_after_tomorrow": "etzi",
+        "two_hours_later": "2 ordutan",
+        "two_hours_ago": "duela 2 ordu",
+        "two_minutes_later": "2 minututan",
+        "two_minutes_ago": "duela 2 minutu",
+        "next_week": "datorren astea",
+        "last_week": "joan den astea",
+        "next_month": "datorren hilabetea",
+        "last_month": "joan den hilabetea",
+        "next_year": "datorren urtea",
+        "last_year": "joan den urtea",
+    },
+    "gl": {
+        "today": "hoxe",
+        "yesterday": "onte",
+        "tomorrow": "mañá",
+        "day_before_yesterday": "antonte",
+        "day_after_tomorrow": "pasadomañá",
+        "two_hours_later": "en 2 horas",
+        "two_hours_ago": "hai 2 horas",
+        "two_minutes_later": "en 2 minutos",
+        "two_minutes_ago": "hai 2 minutos",
+        "next_week": "a próxima semana",
+        "last_week": "a semana pasada",
+        "next_month": "o próximo mes",
+        "last_month": "o mes pasado",
+        "next_year": "o próximo ano",
+        "last_year": "o ano pasado",
+    },
+    "mt": {
+        "today": "illum",
+        "yesterday": "ilbieraħ",
+        "tomorrow": "għada",
+        "day_before_yesterday": "ilbieraħ ilbieraħ",
+        "day_after_tomorrow": "pitgħada",
+        "two_hours_later": "wara 2 sigħat",
+        "two_hours_ago": "2 sigħat ilu",
+        "two_minutes_later": "wara 2 minuti",
+        "two_minutes_ago": "2 minuti ilu",
+        "next_week": "il-ġimgħa d-dieħla",
+        "last_week": "il-ġimgħa li għaddiet",
+        "next_month": "ix-xahar id-dieħel",
+        "last_month": "ix-xahar li għadda",
+        "next_year": "is-sena d-dieħla",
+        "last_year": "is-sena li għaddiet",
+    },
+    "lb": {
+        "today": "haut",
+        "yesterday": "gëschter",
+        "tomorrow": "muer",
+        "day_before_yesterday": "virgëschter",
+        "day_after_tomorrow": "iwwermuer",
+        "two_hours_later": "an 2 Stonnen",
+        "two_hours_ago": "virun 2 Stonnen",
+        "two_minutes_later": "an 2 Minutten",
+        "two_minutes_ago": "virun 2 Minutten",
+        "next_week": "nächste Woch",
+        "last_week": "lescht Woch",
+        "next_month": "nächste Mount",
+        "last_month": "leschte Mount",
+        "next_year": "nächst Joer",
+        "last_year": "lescht Joer",
+    },
+    "my": {
+        "today": "ဒီနေ့",
+        "yesterday": "မနေ့က",
+        "tomorrow": "မနက်ဖြန်",
+        "day_before_yesterday": "တစ်နေ့က",
+        "day_after_tomorrow": "သန်ဘက်ခါ",
+        "two_hours_later": "2 နာရီအကြာ",
+        "two_hours_ago": "2 နာရီအကြာက",
+        "two_minutes_later": "2 မိနစ်အကြာ",
+        "two_minutes_ago": "2 မိနစ်အကြာက",
+        "next_week": "နောက်အပတ်",
+        "last_week": "ပြီးခဲ့တဲ့အပတ်",
+        "next_month": "နောက်လ",
+        "last_month": "ပြီးခဲ့တဲ့လ",
+        "next_year": "နောက်နှစ်",
+        "last_year": "ပြီးခဲ့တဲ့နှစ်",
+    },
+    "km": {
+        "today": "ថ្ងៃនេះ",
+        "yesterday": "ថ្ងៃម្សិលមិញ",
+        "tomorrow": "ថ្ងៃស្អែក",
+        "day_before_yesterday": "ម្សិលមិញទៀត",
+        "day_after_tomorrow": "ខានស្អែក",
+        "two_hours_later": "2 ម៉ោងទៀត",
+        "two_hours_ago": "2 ម៉ោងមុន",
+        "two_minutes_later": "2 នាទីទៀត",
+        "two_minutes_ago": "2 នាទីមុន",
+        "next_week": "សប្តាហ៍ក្រោយ",
+        "last_week": "សប្តាហ៍មុន",
+        "next_month": "ខែក្រោយ",
+        "last_month": "ខែមុន",
+        "next_year": "ឆ្នាំក្រោយ",
+        "last_year": "ឆ្នាំមុន",
+    },
+    "lo": {
+        "today": "ມື້ນີ້",
+        "yesterday": "ມື້ວານ",
+        "tomorrow": "ມື້ອື່ນ",
+        "day_before_yesterday": "ມື້ກ່ອນມື້ວານ",
+        "day_after_tomorrow": "ມື້ອື່ນໆ",
+        "two_hours_later": "ອີກ 2 ຊົ່ວໂມງ",
+        "two_hours_ago": "2 ຊົ່ວໂມງກ່ອນ",
+        "two_minutes_later": "ອີກ 2 ນາທີ",
+        "two_minutes_ago": "2 ນາທີກ່ອນ",
+        "next_week": "ອາທິດໜ້າ",
+        "last_week": "ອາທິດແລ້ວ",
+        "next_month": "ເດືອນໜ້າ",
+        "last_month": "ເດືອນແລ້ວ",
+        "next_year": "ປີໜ້າ",
+        "last_year": "ປີແລ້ວ",
+    },
+}
+
+LANG_MONTHS = {
+    "be": [
+        "студзень", "люты", "сакавік", "красавік", "май", "чэрвень",
+        "ліпень", "жнівень", "верасень", "кастрычнік", "лістапад",
+        "снежань",
+    ],
+    "bs": [
+        "januar", "februar", "mart", "april", "maj", "juni", "juli",
+        "august", "septembar", "oktobar", "novembar", "decembar",
+    ],
+    "mn": [
+        "нэгдүгээр сар", "хоёрдугаар сар", "гуравдугаар сар",
+        "дөрөвдүгээр сар", "тавдугаар сар", "зургаадугаар сар",
+        "долоодугаар сар", "наймдугаар сар", "есдүгээр сар",
+        "аравдугаар сар", "арваннэгдүгээр сар",
+        "арванхоёрдугаар сар",
+    ],
+    "kn": [
+        "ಜನವರಿ", "ಫೆಬ್ರವರಿ", "ಮಾರ್ಚ್", "ಏಪ್ರಿಲ್", "ಮೇ", "ಜೂನ್",
+        "ಜುಲೈ", "ಆಗಸ್ಟ್", "ಸೆಪ್ಟೆಂಬರ್", "ಅಕ್ಟೋಬರ್", "ನವೆಂಬರ್",
+        "ಡಿಸೆಂಬರ್",
+    ],
+    "ml": [
+        "ജനുവരി", "ഫെബ്രുവരി", "മാർച്ച്", "ഏപ്രിൽ", "മേയ്", "ജൂൺ",
+        "ജൂലൈ", "ഓഗസ്റ്റ്", "സെപ്റ്റംബർ", "ഒക്ടോബർ", "നവംബർ",
+        "ഡിസംബർ",
+    ],
+    "or": [
+        "ଜାନୁଆରୀ", "ଫେବୃଆରୀ", "ମାର୍ଚ୍ଚ", "ଅପ୍ରେଲ", "ମଇ", "ଜୁନ",
+        "ଜୁଲାଇ", "ଅଗଷ୍ଟ", "ସେପ୍ଟେମ୍ବର", "ଅକ୍ଟୋବର", "ନଭେମ୍ବର",
+        "ଡିସେମ୍ବର",
+    ],
+    "as": [
+        "জানুৱাৰী", "ফেব্ৰুৱাৰী", "মাৰ্চ", "এপ্ৰিল", "মে'", "জুন",
+        "জুলাই", "আগষ্ট", "ছেপ্টেম্বৰ", "অক্টোবৰ", "নৱেম্বৰ",
+        "ডিচেম্বৰ",
+    ],
+    "cy": [
+        "Ionawr", "Chwefror", "Mawrth", "Ebrill", "Mai", "Mehefin",
+        "Gorffennaf", "Awst", "Medi", "Hydref", "Tachwedd", "Rhagfyr",
+    ],
+    "ga": [
+        "Eanáir", "Feabhra", "Márta", "Aibreán", "Bealtaine",
+        "Meitheamh", "Iúil", "Lúnasa", "Meán Fómhair",
+        "Deireadh Fómhair", "Samhain", "Nollaig",
+    ],
+    "eu": [
+        "urtarrila", "otsaila", "martxoa", "apirila", "maiatza",
+        "ekaina", "uztaila", "abuztua", "iraila", "urria", "azaroa",
+        "abendua",
+    ],
+    "gl": [
+        "xaneiro", "febreiro", "marzo", "abril", "maio", "xuño",
+        "xullo", "agosto", "setembro", "outubro", "novembro",
+        "decembro",
+    ],
+    "mt": [
+        "Jannar", "Frar", "Marzu", "April", "Mejju", "Ġunju",
+        "Lulju", "Awwissu", "Settembru", "Ottubru", "Novembru",
+        "Diċembru",
+    ],
+    "lb": [
+        "Januar", "Februar", "Mäerz", "Abrëll", "Mee", "Juni",
+        "Juli", "August", "September", "Oktober", "November",
+        "Dezember",
+    ],
+    "my": [
+        "ဇန်နဝါရီ", "ဖေဖော်ဝါရီ", "မတ်", "ဧပြီ", "မေ", "ဇွန်",
+        "ဇူလိုင်", "ဩဂုတ်", "စက်တင်ဘာ", "အောက်တိုဘာ", "နိုဝင်ဘာ",
+        "ဒီဇင်ဘာ",
+    ],
+    "km": [
+        "មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា",
+        "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ",
+    ],
+    "lo": [
+        "ມັງກອນ", "ກຸມພາ", "ມີນາ", "ເມສາ", "ພຶດສະພາ",
+        "ມິຖຸນາ", "ກໍລະກົດ", "ສິງຫາ", "ກັນຍາ", "ຕຸລາ",
+        "ພະຈິກ", "ທັນວາ",
+    ],
+}
+
+
+def _iter_cases():
+    for lang, scenarios in sorted(LANG_SCENARIOS.items()):
+        for key, text in scenarios.items():
+            yield lang, key, text, EXPECTED[key]
+
+
+def _iter_months():
+    for lang, months in sorted(LANG_MONTHS.items()):
+        for index, month in enumerate(months, start=1):
+            yield lang, "5 %s 2022" % month, dt(2022, index, 5)
+
+
+@pytest.mark.parametrize(
+    "lang,key,text,expected",
+    list(_iter_cases()),
+)
+def test_wave3_natural_language_scenarios(lang, key, text, expected):
+    assert parse(text, langs=[lang], base_datetime=BASE) == expected
+
+
+@pytest.mark.parametrize(
+    "lang,text,expected",
+    list(_iter_months()),
+)
+def test_wave3_month_names(lang, text, expected):
+    assert parse(text, langs=[lang]) == expected
+
+
+@pytest.mark.parametrize(
+    "lang,text,expected",
+    [
+        ("be-BY", "заўтра", EXPECTED["tomorrow"]),
+        ("bs-BA", "sutra", EXPECTED["tomorrow"]),
+        ("mn-MN", "маргааш", EXPECTED["tomorrow"]),
+        ("kn-IN", "ನಾಳೆ", EXPECTED["tomorrow"]),
+        ("ml-IN", "നാളെ", EXPECTED["tomorrow"]),
+        ("or-IN", "ଆସନ୍ତାକାଲି", EXPECTED["tomorrow"]),
+        ("as-IN", "কাইলৈ", EXPECTED["tomorrow"]),
+        ("cy-GB", "yfory", EXPECTED["tomorrow"]),
+        ("ga-IE", "amárach", EXPECTED["tomorrow"]),
+        ("eu-ES", "bihar", EXPECTED["tomorrow"]),
+        ("gl-ES", "mañá", EXPECTED["tomorrow"]),
+        ("mt-MT", "għada", EXPECTED["tomorrow"]),
+        ("lb-LU", "muer", EXPECTED["tomorrow"]),
+        ("my-MM", "မနက်ဖြန်", EXPECTED["tomorrow"]),
+        ("km-KH", "ថ្ងៃស្អែក", EXPECTED["tomorrow"]),
+        ("lo-LA", "ມື້ອື່ນ", EXPECTED["tomorrow"]),
+    ],
+)
+def test_wave3_bcp47_language_aliases(lang, text, expected):
+    assert parse(text, langs=[lang], base_datetime=BASE) == expected
+
+
+@pytest.mark.parametrize(
+    "lang,text",
+    [
+        ("kn", "೨೦೨೨/೦೨/೦೩"),
+        ("ml", "൨൦൨൨/൦൨/൦൩"),
+        ("or", "୨୦୨୨/୦୨/୦୩"),
+        ("as", "২০২২/০২/০৩"),
+        ("my", "၂၀၂၂/၀၂/၀၃"),
+        ("km", "២០២២/០២/០៣"),
+        ("lo", "໒໐໒໒/໐໒/໐໓"),
+    ],
+)
+def test_wave3_native_digit_dates(lang, text):
+    assert parse(text, langs=[lang]) == dt(2022, 2, 3)

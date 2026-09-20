@@ -49,8 +49,23 @@ SUB_TRANSLATE = [
     (r"(?P<num>\d+)\s*tahun\s+yang\s+lalu",
      lambda m: "%s年前" % int(m.group("num"))),
     (r"baru saja", "刚刚"),
+    (r"kemarin\s+dulu\b", "前天"),
+    (r"lusa\b", "后天"),
     (r"hari ini", "今天"),
     (r"kemarin", "昨天"),
+    (r"besok|esok\b", "明天"),
+    (r"dalam\s+(?P<num>\d+)\s*(?P<unit>detik|menit|jam|hari|minggu|bulan|tahun)|(?P<num2>\d+)\s*(?P<unit2>detik|menit|jam|hari|minggu|bulan|tahun)\s+lagi",
+     lambda m: "%s%s后" % (
+         m.group("num") or m.group("num2"),
+         {"detik": "秒", "menit": "分钟", "jam": "小时",
+          "hari": "天", "minggu": "周", "bulan": "月",
+          "tahun": "年"}[(m.group("unit") or m.group("unit2"))])),
+    (r"minggu\s+depan\b", "下周"),
+    (r"minggu\s+lalu\b", "上周"),
+    (r"bulan\s+depan\b", "下个月"),
+    (r"bulan\s+lalu\b", "上个月"),
+    (r"tahun\s+depan\b", "明年"),
+    (r"tahun\s+lalu\b", "去年"),
 ]
 FUZZY_REGEX_LIST = [
     r"(?P<bH>\d+)\s*jam\s*yang\s*lalu",

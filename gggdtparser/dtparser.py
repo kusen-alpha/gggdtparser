@@ -90,14 +90,18 @@ class StringDateTimeRegexParser(object):
             langs = []
         _langs = []
         for lang in langs:
-            try:
-                _langs.append(dtconfigs.LANG_MAPPING[lang.lower()])
-            except KeyError:
-                if lang.lower() in dtconfigs.TRANSLATE_LANGS:
+            lang_lower = lang.lower()
+            mapped_lang = dtconfigs.LANG_MAPPING.get(lang_lower)
+            if mapped_lang is None and '-' in lang_lower:
+                mapped_lang = dtconfigs.LANG_MAPPING.get(
+                    lang_lower.split('-', 1)[0])
+            if mapped_lang is None:
+                if lang_lower in dtconfigs.TRANSLATE_LANGS:
                     logging.warning("语言:%s推荐先进行翻译" % lang)
                 else:
                     logging.error("语言:%s设置有误" % lang)
                 return
+            _langs.append(mapped_lang)
         langs = _langs
         if not regex_list:
             regex_list = []
@@ -221,6 +225,7 @@ class StringDateTimeRegexParser(object):
     def _group_specificity(cls, group_dict):
         """统计匹配到的有效字段数量，用于在多个命中中选更精确的结果。"""
         keys = ('Y', 'mgY', 'm', 'd', 'H', 'M', 'S', 'sd', 'so',
+                'sy', 'sm', 'wday', 'wdir',
                 'bY', 'bm', 'bd', 'bH', 'bM', 'bS', 'ba',
                 'wY', 'wm', 'wd', 'wH', 'wM', 'wS', 'wa',
                 'aY', 'am', 'ad', 'aH', 'aM', 'aS', 'aa',
@@ -433,8 +438,25 @@ class StringDateTimeRegexParser(object):
                 day=True, hour=True, minute=True, second=True)
 
         # 抽取到具有特殊时间 special
+        special_year = group_dict.get('sy') or ''
+        special_month = group_dict.get('sm') or ''
         special_day = group_dict.get('sd') or ''
         special_other = group_dict.get('so') or ''
+        if special_year:
+            if special_year == "明年":
+                year_change -= 1
+            elif special_year == "去年":
+                year_change += 1
+            cls._update_use_now_config(
+                use_now_config, year=True,
+                month=not result_accurately, day=not result_accurately)
+        if special_month:
+            if special_month in ("下个月", "下月"):
+                month_change -= 1
+            elif special_month in ("上个月", "上月"):
+                month_change += 1
+            cls._update_use_now_config(
+                use_now_config, year=True, month=True, day=True)
         if special_day:
             if special_day == "今天":
                 change_day += 0
@@ -450,6 +472,53 @@ class StringDateTimeRegexParser(object):
                     second=un_result_accurately)
             elif special_day == "前天":
                 change_day += 2
+                cls._update_use_now_config(
+                    use_now_config, year=True, month=True, day=True,
+                    hour=un_result_accurately, minute=un_result_accurately,
+                    second=un_result_accurately)
+            elif special_day == "明天":
+                change_day += -1
+                cls._update_use_now_config(
+                    use_now_config, year=True, month=True, day=True,
+                    hour=un_result_accurately, minute=un_result_accurately,
+                    second=un_result_accurately)
+            elif special_day == "后天":
+                change_day += -2
+                cls._update_use_now_config(
+                    use_now_config, year=True, month=True, day=True,
+                    hour=un_result_accurately, minute=un_result_accurately,
+                    second=un_result_accurately)
+            elif special_day in ("下周", "下星期"):
+                change_day += -7
+                cls._update_use_now_config(
+                    use_now_config, year=True, month=True, day=True,
+                    hour=un_result_accurately, minute=un_result_accurately,
+                    second=un_result_accurately)
+            elif special_day in ("上周", "上星期"):
+                change_day += 7
+                cls._update_use_now_config(
+                    use_now_config, year=True, month=True, day=True,
+                    hour=un_result_accurately, minute=un_result_accurately,
+                    second=un_result_accurately)
+        weekday = group_dict.get('wday') or ''
+        weekday_dir = group_dict.get('wdir') or ''
+        if weekday:
+            weekday_map = {
+                '一': 1, '二': 2, '三': 3, '四': 4,
+                '五': 5, '六': 6, '日': 7, '天': 7,
+                '1': 1, '2': 2, '3': 3, '4': 4,
+                '5': 5, '6': 6, '7': 7,
+            }
+            target_weekday = weekday_map.get(weekday)
+            if target_weekday:
+                base_weekday = now.weekday() + 1
+                if weekday_dir in ("下", "下个"):
+                    shift = (target_weekday - base_weekday) % 7 or 7
+                elif weekday_dir in ("上", "上个"):
+                    shift = -((base_weekday - target_weekday) % 7 or 7)
+                else:
+                    shift = target_weekday - base_weekday
+                change_day += -shift
                 cls._update_use_now_config(
                     use_now_config, year=True, month=True, day=True,
                     hour=un_result_accurately, minute=un_result_accurately,

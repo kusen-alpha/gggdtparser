@@ -1,0 +1,87 @@
+# -*- coding:utf-8 -*-
+
+
+"""
+孟加拉语
+"""
+
+_BN_DIGITS = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
+
+_BN_MONTHS = {
+    "জানুয়ারি": "1月",
+    "জানুয়ারী": "1月",
+    "ফেব্রুয়ারি": "2月",
+    "ফেব্রুয়ারী": "2月",
+    "মার্চ": "3月",
+    "এপ্রিল": "4月",
+    "মে": "5月",
+    "জুন": "6月",
+    "জুলাই": "7月",
+    "আগস্ট": "8月",
+    "সেপ্টেম্বর": "9月",
+    "অক্টোবর": "10月",
+    "নভেম্বর": "11月",
+    "ডিসেম্বর": "12月",
+}
+
+_BN_MONTHS_RE = "|".join(sorted(_BN_MONTHS, key=len, reverse=True))
+
+
+def _to_ascii(value):
+    return value.translate(_BN_DIGITS)
+
+
+def _numeric_date(match):
+    return "%s/%s/%s" % (
+        _to_ascii(match.group("Y")),
+        _to_ascii(match.group("m")),
+        _to_ascii(match.group("d")),
+    )
+
+
+def _named_date(match):
+    day = _to_ascii(match.group("d"))
+    year = _to_ascii(match.group("Y"))
+    return "%s %s %s" % (day, _BN_MONTHS[match.group("name")], year)
+
+
+SUB_TRANSLATE = [
+    (r"(?<!\d)(?P<Y>[০-৯]{4})[\-\/\.]\s*(?P<m>[০-৯]{1,2})[\-\/\.]\s*(?P<d>[০-৯]{1,2})(?!\d)",
+     _numeric_date),
+    (r"(?P<d>[০-৯]{1,2}|\d{1,2})\s*(?P<name>%s)\s*(?P<Y>[০-৯]{4}|\d{4})"
+     % _BN_MONTHS_RE, _named_date),
+    (r"(?P<name>%s)\s*(?P<d>[০-৯]{1,2}|\d{1,2})[,\s]+\s*(?P<Y>[০-৯]{4}|\d{4})"
+     % _BN_MONTHS_RE, _named_date),
+    (r"(?P<name>%s)\s*(?P<Y>[০-৯]{4})" % _BN_MONTHS_RE,
+     lambda m: "%s %s" % (_BN_MONTHS[m.group("name")], _to_ascii(m.group("Y")))),
+    (r"গত\s+পরশু", "前天"),
+    (r"আগামী\s+পরশু", "后天"),
+    (r"গতকাল", "昨天"),
+    (r"আজ", "今天"),
+    (r"আগামীকাল", "明天"),
+    (r"এখন|এইমাত্র", "刚刚"),
+    (r"(?P<num>\d+)\s*(?P<unit>সেকেন্ড|মিনিট|ঘণ্টা|ঘন্টা|দিন|সপ্তাহ|মাস|বছর)\s+পর(?:ে)?",
+     lambda m: "%s%s后" % (
+         _to_ascii(m.group("num")),
+         {"সেকেন্ড": "秒", "মিনিট": "分钟", "ঘণ্টা": "小时",
+          "ঘন্টা": "小时", "দিন": "天", "সপ্তাহ": "周",
+          "মাস": "月", "বছর": "年"}[m.group("unit")])),
+    (r"(?P<num>\d+)\s*(?P<unit>সেকেন্ড|মিনিট|ঘণ্টা|ঘন্টা|দিন|সপ্তাহ|মাস|বছর)\s+আগে",
+     lambda m: "%s%s前" % (
+         _to_ascii(m.group("num")),
+         {"সেকেন্ড": "秒", "মিনিট": "分钟", "ঘণ্টা": "小时",
+          "ঘন্টা": "小时", "দিন": "天", "সপ্তাহ": "周",
+          "মাস": "月", "বছর": "年"}[m.group("unit")])),
+    (r"(?:আগামী|পরের)\s+সপ্তাহে", "下周"),
+    (r"গত\s+সপ্তাহে", "上周"),
+    (r"(?:আগামী|পরের)\s+মাসে", "下个月"),
+    (r"গত\s+মাসে", "上个月"),
+    (r"(?:আগামী|পরের)\s+বছর", "明年"),
+    (r"গত\s+বছর", "去年"),
+]
+
+for _month in sorted(_BN_MONTHS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_month, _BN_MONTHS[_month]))
+
+ACCURATE_REGEX_LIST = []
+FUZZY_REGEX_LIST = []

@@ -83,9 +83,10 @@ def test_parse_existing_lang_expanded(lang, text, expected):
     assert parse(text, langs=[lang]) == expected
 
 
-@pytest.mark.parametrize("lang", ["ar", "fa", "bn"])
-def test_unknown_writing_recommended_for_translation(lang):
-    assert parse("2022-02-02", langs=[lang]) is None
+def test_native_script_langs_without_translation():
+    assert parse("2 فبراير 2022", langs=["ar"]) == dt(2022, 2, 2)
+    assert parse("۱۴۰۱/۱۱/۱۲", langs=["fa"]) == dt(2023, 2, 1)
+    assert parse("১৫ মার্চ ২০২৩", langs=["bn"]) == dt(2023, 3, 15)
 
 
 @pytest.mark.parametrize(

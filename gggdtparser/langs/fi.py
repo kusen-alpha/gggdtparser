@@ -30,8 +30,23 @@ SUB_TRANSLATE = [
     (r"(?P<num>\d+)\s*minuuttia?\s*sitten", lambda m: "%s分钟前" % int(m.group("num"))),
     (r"(?P<num>\d+)\s*päivää\s*sitten", lambda m: "%s天前" % int(m.group("num"))),
     (r"juuri nyt", "刚刚"),
+    (r"toissapäivänä", "前天"),
+    (r"ylihuomenna", "后天"),
     (r"tänään", "今天"),
     (r"eilen", "昨天"),
+    (r"huomenna", "明天"),
+    (r"(?P<num>\d+)\s*(?P<unit>sekunnin|minuutin|tunnin|päivän|viikon|kuukauden|vuoden)\s+(?:kuluttua|päästä)",
+     lambda m: "%s%s后" % (
+         m.group("num"),
+         {"sekunnin": "秒", "minuutin": "分钟", "tunnin": "小时",
+          "päivän": "天", "viikon": "周", "kuukauden": "月",
+          "vuoden": "年"}[m.group("unit")])),
+    (r"ensi\s+viikolla\b", "下周"),
+    (r"viime\s+viikolla\b", "上周"),
+    (r"ensi\s+kuussa\b", "下个月"),
+    (r"viime\s+kuussa\b", "上个月"),
+    (r"ensi\s+vuonna\b", "明年"),
+    (r"viime\s+vuonna\b", "去年"),
 ]
 
 FUZZY_REGEX_LIST = []
