@@ -26,6 +26,26 @@ _TA_MONTHS = {
 
 _TA_MONTHS_RE = "|".join(sorted(_TA_MONTHS, key=len, reverse=True))
 
+_TA_WEEKDAYS = {
+    "திங்கள்": "周一",
+    "திங்கட்கிழமை": "周一",
+    "திங்கள்கிழமை": "周一",
+    "செவ்வாய்": "周二",
+    "செவ்வாய்க்கிழமை": "周二",
+    "புதன்": "周三",
+    "புதன்கிழமை": "周三",
+    "வியாழன்": "周四",
+    "வியாழக்கிழமை": "周四",
+    "வெள்ளி": "周五",
+    "வெள்ளிக்கிழமை": "周五",
+    "சனி": "周六",
+    "சனிக்கிழமை": "周六",
+    "ஞாயிறு": "周日",
+    "ஞாயிற்றுக்கிழமை": "周日",
+}
+
+_TA_WEEKDAYS_RE = "|".join(sorted(_TA_WEEKDAYS, key=len, reverse=True))
+
 
 def _to_ascii(value):
     return value.translate(_TA_DIGITS)
@@ -46,6 +66,19 @@ def _named_date(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:அடுத்த|வருகிற|வரும்)\s+(%s)" % _TA_WEEKDAYS_RE,
+     lambda m: "下%s" % _TA_WEEKDAYS[m.group(1)]),
+    (r"(?:கடந்த|முந்தைய|போன)\s+(%s)" % _TA_WEEKDAYS_RE,
+     lambda m: "上%s" % _TA_WEEKDAYS[m.group(1)]),
+    (r"இந்த\s+(%s)" % _TA_WEEKDAYS_RE,
+     lambda m: "这%s" % _TA_WEEKDAYS[m.group(1)]),
+    (r"இன்று\s+காலை", "今天 08:00 am"),
+    (r"இன்று\s+மதியம்", "今天 12:00 pm"),
+    (r"இன்று\s+மாலை", "今天 20:00 pm"),
+    (r"இன்று\s+இரவு", "今天 22:00 pm"),
+    (r"நாளை\s+காலை", "明天 08:00 am"),
+    (r"நேற்று\s+இரவு", "昨天 22:00 pm"),
+    (r"நள்ளிரவு", "12:00 am"),
     (r"(?<!\d)(?P<Y>[௦-௯]{4})[\-\/\.]\s*(?P<m>[௦-௯]{1,2})[\-\/\.]\s*(?P<d>[௦-௯]{1,2})(?!\d)",
      _numeric_date),
     (r"(?P<d>[௦-௯]{1,2}|\d{1,2})\s*(?P<name>%s)\s*(?P<Y>[௦-௯]{4}|\d{4})"
@@ -92,6 +125,9 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_TA_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((_month, _TA_MONTHS[_month]))
+
+for _weekday in sorted(_TA_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _TA_WEEKDAYS[_weekday]))
 
 ACCURATE_REGEX_LIST = []
 FUZZY_REGEX_LIST = []

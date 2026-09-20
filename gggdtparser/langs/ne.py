@@ -18,6 +18,20 @@ _NE_UNITS = {
     "सेकेन्ड": "秒", "मिनेट": "分钟", "घण्टा": "小时",
     "दिन": "天", "हप्ता": "周", "महिना": "月", "वर्ष": "年",
 }
+_NE_WEEKDAYS = {
+    "सोमबार": "周一",
+    "मङ्गलबार": "周二",
+    "मंगलबार": "周二",
+    "बुधबार": "周三",
+    "बिहिबार": "周四",
+    "बिहीबार": "周四",
+    "शुक्रबार": "周五",
+    "शनिबार": "周六",
+    "शनिवार": "周六",
+    "आइतबार": "周日",
+    "आइतवार": "周日",
+}
+_NE_WEEKDAYS_RE = "|".join(sorted(_NE_WEEKDAYS, key=len, reverse=True))
 _NE_UNIT_RE = r"सेकेन्ड|मिनेट|घण्टा|दिन|हप्ता|महिना|वर्ष"
 
 
@@ -30,6 +44,19 @@ def _ne_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:अर्को|आउने)\s+(%s)" % _NE_WEEKDAYS_RE,
+     lambda m: "下%s" % _NE_WEEKDAYS[m.group(1)]),
+    (r"(?:गत|पछिल्लो|विगत)\s+(%s)" % _NE_WEEKDAYS_RE,
+     lambda m: "上%s" % _NE_WEEKDAYS[m.group(1)]),
+    (r"(?:यो|यही)\s+(%s)" % _NE_WEEKDAYS_RE,
+     lambda m: "这%s" % _NE_WEEKDAYS[m.group(1)]),
+    (r"आज\s+बिहान", "今天 08:00 am"),
+    (r"आज\s+दिउँसो", "今天 12:00 pm"),
+    (r"आज\s+साँझ(?:\s+मा)?", "今天 20:00 pm"),
+    (r"आज\s+राति", "今天 22:00 pm"),
+    (r"भोलि\s+बिहान", "明天 08:00 am"),
+    (r"हिजो\s+राति", "昨天 22:00 pm"),
+    (r"मध्यराति|मध्यरात", "12:00 am"),
     (r"[०-९]+", lambda m: m.group(0).translate(_NE_DIGITS)),
     (r"जनवरी", "1月"),
     (r"फेब्रुअरी", "2月"),
@@ -58,3 +85,6 @@ SUB_TRANSLATE = [
     (r"अर्को\s+वर्ष", "明年"),
     (r"गत\s+वर्ष", "去年"),
 ]
+
+for _weekday in sorted(_NE_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _NE_WEEKDAYS[_weekday]))

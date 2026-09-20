@@ -24,6 +24,18 @@ _PA_MONTHS = {
 
 _PA_MONTHS_RE = "|".join(sorted(_PA_MONTHS, key=len, reverse=True))
 
+_PA_WEEKDAYS = {
+    "ਸੋਮਵਾਰ": "周一",
+    "ਮੰਗਲਵਾਰ": "周二",
+    "ਬੁੱਧਵਾਰ": "周三",
+    "ਵੀਰਵਾਰ": "周四",
+    "ਸ਼ੁੱਕਰਵਾਰ": "周五",
+    "ਸ਼ਨੀਵਾਰ": "周六",
+    "ਐਤਵਾਰ": "周日",
+}
+
+_PA_WEEKDAYS_RE = "|".join(sorted(_PA_WEEKDAYS, key=len, reverse=True))
+
 
 def _to_ascii(value):
     return value.translate(_PA_DIGITS)
@@ -44,6 +56,19 @@ def _named_date(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:ਅਗਲੇ|ਆਉਣ\s+ਵਾਲੇ)\s+(%s)" % _PA_WEEKDAYS_RE,
+     lambda m: "下%s" % _PA_WEEKDAYS[m.group(1)]),
+    (r"(?:ਪਿਛਲੇ|ਬੀਤੇ)\s+(%s)" % _PA_WEEKDAYS_RE,
+     lambda m: "上%s" % _PA_WEEKDAYS[m.group(1)]),
+    (r"ਇਸ\s+(%s)" % _PA_WEEKDAYS_RE,
+     lambda m: "这%s" % _PA_WEEKDAYS[m.group(1)]),
+    (r"ਅੱਜ\s+ਸਵੇਰੇ", "今天 08:00 am"),
+    (r"ਅੱਜ\s+ਦੁਪਹਿਰੇ", "今天 12:00 pm"),
+    (r"ਅੱਜ\s+ਸ਼ਾਮ(?:\s+ਨੂੰ)?", "今天 20:00 pm"),
+    (r"ਅੱਜ\s+ਰਾਤ", "今天 22:00 pm"),
+    (r"ਕੱਲ੍ਹ\s+ਸਵੇਰੇ", "明天 08:00 am"),
+    (r"(?:ਬੀਤਿਆ\s+ਕੱਲ੍ਹ\s+ਰਾਤ|ਪਿਛਲੀ\s+ਰਾਤ)", "昨天 22:00 pm"),
+    (r"ਅੱਧੀ\s+ਰਾਤ", "12:00 am"),
     (r"(?<!\d)(?P<Y>[੦-੯]{4})[\-\/\.]\s*(?P<m>[੦-੯]{1,2})[\-\/\.]\s*(?P<d>[੦-੯]{1,2})(?!\d)",
      _numeric_date),
     (r"(?P<d>[੦-੯]{1,2}|\d{1,2})\s*(?P<name>%s)\s*(?P<Y>[੦-੯]{4}|\d{4})"
@@ -79,6 +104,9 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_PA_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((_month, _PA_MONTHS[_month]))
+
+for _weekday in sorted(_PA_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _PA_WEEKDAYS[_weekday]))
 
 ACCURATE_REGEX_LIST = []
 FUZZY_REGEX_LIST = []

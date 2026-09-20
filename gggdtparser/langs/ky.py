@@ -8,11 +8,36 @@
 吉尔吉斯语
 """
 
+_KY_WEEKDAYS = {
+    "дүйшөмбү": "周一",
+    "шейшемби": "周二",
+    "шаршемби": "周三",
+    "бейшемби": "周四",
+    "жума": "周五",
+    "ишемби": "周六",
+    "жекшемби": "周日",
+}
+
+_KY_WEEKDAYS_RE = "|".join(sorted(_KY_WEEKDAYS, key=len, reverse=True))
+
 ACCURATE_REGEX_LIST = [
     r"(?P<bH>\d+)\s*саат мурда",
 ]
 
 SUB_TRANSLATE = [
+    (r'(?:келерки|кийинки)\s+(%s)' % _KY_WEEKDAYS_RE,
+     lambda m: "下%s" % _KY_WEEKDAYS[m.group(1)]),
+    (r'(?:өткөн|өткөндөгү)\s+(%s)' % _KY_WEEKDAYS_RE,
+     lambda m: "上%s" % _KY_WEEKDAYS[m.group(1)]),
+    (r'(?:ушул|бул)\s+(%s)' % _KY_WEEKDAYS_RE,
+     lambda m: "这%s" % _KY_WEEKDAYS[m.group(1)]),
+    (r'бүгүн\s+эртең\s+менен', '今天 08:00 am'),
+    (r'бүгүн\s+түштө', '今天 12:00 pm'),
+    (r'бүгүн\s+кечинде', '今天 20:00 pm'),
+    (r'бүгүн\s+түндө', '今天 22:00 pm'),
+    (r'эртең\s+эртең\s+менен', '明天 08:00 am'),
+    (r'кечээ\s+кечинде', '昨天 20:00 pm'),
+    (r'түн\s+ортосу', '12:00 am'),
     (r'Январь', '1月'),
     (r'Февраль', '2月'),
     (r'Март', '3月'),
@@ -47,4 +72,8 @@ SUB_TRANSLATE = [
     (r'кийинки\s+жыл', '明年'),
     (r'өткөн\s+жыл', '去年'),
 ]
+
+for _weekday in sorted(_KY_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _KY_WEEKDAYS[_weekday]))
+
 FUZZY_REGEX_LIST = []

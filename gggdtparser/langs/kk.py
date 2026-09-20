@@ -21,6 +21,18 @@ _KK_UNIT_RE = (
     r"апта(?:дан)?|ай(?:дан)?|жыл(?:дан)?"
 )
 
+_KK_WEEKDAYS = {
+    "дүйсенбі": "周一",
+    "сейсенбі": "周二",
+    "сәрсенбі": "周三",
+    "бейсенбі": "周四",
+    "жұма": "周五",
+    "сенбі": "周六",
+    "жексенбі": "周日",
+}
+
+_KK_WEEKDAYS_RE = "|".join(sorted(_KK_WEEKDAYS, key=len, reverse=True))
+
 
 def _kk_later(match):
     return "%s%s后" % (match.group(1), _KK_UNITS[match.group(2)])
@@ -31,6 +43,20 @@ def _kk_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"\b(?:келесі|алдағы|келер)\s+(%s)\b" % _KK_WEEKDAYS_RE,
+     lambda m: "下%s" % _KK_WEEKDAYS[m.group(1)]),
+    (r"\b(?:өткен|өткендегі|былтырғы)\s+(%s)\b" % _KK_WEEKDAYS_RE,
+     lambda m: "上%s" % _KK_WEEKDAYS[m.group(1)]),
+    (r"\bосы\s+(%s)\b" % _KK_WEEKDAYS_RE,
+     lambda m: "这%s" % _KK_WEEKDAYS[m.group(1)]),
+    (r"\bбүгін\s+таңертең\b", "今天 08:00 am"),
+    (r"\bбүгін\s+түсте\b", "今天 12:00 pm"),
+    (r"\bбүгін\s+кешке\b", "今天 20:00 pm"),
+    (r"\bбүгін\s+түнде\b", "今天 22:00 pm"),
+    (r"\bертең\s+таңертең\b", "明天 08:00 am"),
+    (r"\bкеше\s+кешке\b", "昨天 20:00 pm"),
+    (r"\bтүскі\s+үзіліс\b", "12:00 pm"),
+    (r"\bтүн\s+ортасы\b", "12:00 am"),
     (r"\bқаңтар\b", "1月"),
     (r"\bақпан\b", "2月"),
     (r"\bнаурыз\b", "3月"),
@@ -58,3 +84,6 @@ SUB_TRANSLATE = [
     (r"\bкелесі\s+жыл\b", "明年"),
     (r"\bөткен\s+жыл\b", "去年"),
 ]
+
+for _weekday in sorted(_KK_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"\b%s\b" % _weekday, _KK_WEEKDAYS[_weekday]))

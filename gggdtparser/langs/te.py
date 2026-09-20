@@ -25,6 +25,25 @@ _TE_MONTHS = {
 
 _TE_MONTHS_RE = "|".join(sorted(_TE_MONTHS, key=len, reverse=True))
 
+_TE_WEEKDAYS = {
+    "సోమవారం": "周一",
+    "సోమవారము": "周一",
+    "మంగళవారం": "周二",
+    "మంగళవారము": "周二",
+    "బుధవారం": "周三",
+    "బుధవారము": "周三",
+    "గురువారం": "周四",
+    "గురువారము": "周四",
+    "శుక్రవారం": "周五",
+    "శుక్రవారము": "周五",
+    "శనివారం": "周六",
+    "శనివారము": "周六",
+    "ఆదివారం": "周日",
+    "ఆదివారము": "周日",
+}
+
+_TE_WEEKDAYS_RE = "|".join(sorted(_TE_WEEKDAYS, key=len, reverse=True))
+
 
 def _to_ascii(value):
     return value.translate(_TE_DIGITS)
@@ -45,6 +64,19 @@ def _named_date(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:వచ్చే|రాబోయే|తర్వాతి)\s+(%s)" % _TE_WEEKDAYS_RE,
+     lambda m: "下%s" % _TE_WEEKDAYS[m.group(1)]),
+    (r"(?:గత|మునుపటి|వెళ్లిన)\s+(%s)" % _TE_WEEKDAYS_RE,
+     lambda m: "上%s" % _TE_WEEKDAYS[m.group(1)]),
+    (r"ఈ\s+(%s)" % _TE_WEEKDAYS_RE,
+     lambda m: "这%s" % _TE_WEEKDAYS[m.group(1)]),
+    (r"ఈ\s+ఉదయం", "今天 08:00 am"),
+    (r"ఈ\s+మధ్యాహ్నం", "今天 12:00 pm"),
+    (r"ఈ\s+సాయంత్రం", "今天 20:00 pm"),
+    (r"ఈ\s+రాత్రి", "今天 22:00 pm"),
+    (r"రేపు\s+ఉదయం", "明天 08:00 am"),
+    (r"నిన్న\s+రాత్రి", "昨天 22:00 pm"),
+    (r"అర్ధరాత్రి", "12:00 am"),
     (r"(?<!\d)(?P<Y>[౦-౯]{4})[\-\/\.]\s*(?P<m>[౦-౯]{1,2})[\-\/\.]\s*(?P<d>[౦-౯]{1,2})(?!\d)",
      _numeric_date),
     (r"(?P<d>[౦-౯]{1,2}|\d{1,2})\s*(?P<name>%s)\s*(?P<Y>[౦-౯]{4}|\d{4})"
@@ -81,6 +113,9 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_TE_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((_month, _TE_MONTHS[_month]))
+
+for _weekday in sorted(_TE_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _TE_WEEKDAYS[_weekday]))
 
 ACCURATE_REGEX_LIST = []
 FUZZY_REGEX_LIST = []

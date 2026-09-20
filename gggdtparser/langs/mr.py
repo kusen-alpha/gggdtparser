@@ -13,7 +13,38 @@ ACCURATE_REGEX_LIST = [
     r"(?P<bM>\d+)\s*मिनिटांपूर्व",
 ]
 
+_MR_WEEKDAYS = {
+    "सोमवार": "周一",
+    "सोमवारी": "周一",
+    "मंगळवार": "周二",
+    "मंगळवारी": "周二",
+    "बुधवार": "周三",
+    "बुधवारी": "周三",
+    "गुरुवार": "周四",
+    "गुरुवारी": "周四",
+    "शुक्रवार": "周五",
+    "शुक्रवारी": "周五",
+    "शनिवार": "周六",
+    "शनिवारी": "周六",
+    "रविवार": "周日",
+    "रविवारी": "周日",
+}
+_MR_WEEKDAYS_RE = "|".join(sorted(_MR_WEEKDAYS, key=len, reverse=True))
+
 SUB_TRANSLATE = [
+    (r"(?:पुढील|येणारा|येणाऱ्या)\s+(%s)" % _MR_WEEKDAYS_RE,
+     lambda m: "下%s" % _MR_WEEKDAYS[m.group(1)]),
+    (r"(?:मागील|गेल्या|गेले)\s+(%s)" % _MR_WEEKDAYS_RE,
+     lambda m: "上%s" % _MR_WEEKDAYS[m.group(1)]),
+    (r"(?:या|हा)\s+(%s)" % _MR_WEEKDAYS_RE,
+     lambda m: "这%s" % _MR_WEEKDAYS[m.group(1)]),
+    (r'आज\s+सकाळी', '今天 08:00 am'),
+    (r'आज\s+दुपारी', '今天 12:00 pm'),
+    (r'आज\s+संध्याकाळी', '今天 20:00 pm'),
+    (r'आज\s+रात्री', '今天 22:00 pm'),
+    (r'उद्या\s+सकाळी', '明天 08:00 am'),
+    (r'काल\s+रात्री', '昨天 22:00 pm'),
+    (r'मध्यरात्री', '12:00 am'),
     (r'एप्रिल', '4月'),
     (r'काल', '昨天'),
     (r'आज', '今天'),
@@ -39,4 +70,8 @@ SUB_TRANSLATE = [
     (r'पुढील\s+वर्ष', '明年'),
     (r'मागील\s+वर्ष', '去年'),
 ]
+
+for _weekday in sorted(_MR_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _MR_WEEKDAYS[_weekday]))
+
 FUZZY_REGEX_LIST = []
