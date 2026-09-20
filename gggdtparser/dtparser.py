@@ -516,6 +516,8 @@ class StringDateTimeRegexParser(object):
                     shift = 7 - base_weekday + target_weekday
                 elif weekday_dir in ("上", "上个"):
                     shift = -((base_weekday - target_weekday) % 7 or 7)
+                    if target_weekday < base_weekday:
+                        shift -= 7
                 else:
                     shift = target_weekday - base_weekday
                 change_day += -shift
