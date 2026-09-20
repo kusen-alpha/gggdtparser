@@ -23,6 +23,17 @@ _HT_MONTHS = {
 }
 _HT_MONTHS_RE = "|".join(sorted(_HT_MONTHS, key=len, reverse=True))
 
+_HT_WEEKDAYS = {
+    "lendi": "周一",
+    "madi": "周二",
+    "mèkredi": "周三",
+    "jedi": "周四",
+    "vandredi": "周五",
+    "samdi": "周六",
+    "dimanch": "周日",
+}
+_HT_WEEKDAYS_RE = "|".join(sorted(_HT_WEEKDAYS, key=len, reverse=True))
+
 
 def _ht_month_no(name):
     return _HT_MONTHS[name.lower()]
@@ -53,6 +64,20 @@ def _ht_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(%s)\s+pwochèn\b" % _HT_WEEKDAYS_RE,
+     lambda m: "下%s" % _HT_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+pase\b" % _HT_WEEKDAYS_RE,
+     lambda m: "上%s" % _HT_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+sa\s+a\b" % _HT_WEEKDAYS_RE,
+     lambda m: "这%s" % _HT_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bjodi\s+a\s+maten\b", "今天 08:00 am"),
+    (r"(?i)\bjodi\s+a\s+midi\b", "今天 12:00 pm"),
+    (r"(?i)\bjodi\s+a\s+apremidi\b", "今天 15:00 pm"),
+    (r"(?i)\bjodi\s+a\s+aswè\b", "今天 20:00 pm"),
+    (r"(?i)\bjodi\s+a\s+lannwit\b", "今天 22:00 pm"),
+    (r"(?i)\bdemen\s+maten\b", "明天 08:00 am"),
+    (r"(?i)\byè\s+swa\b", "昨天 22:00 pm"),
+    (r"(?i)\bminui\b", "12:00 am"),
     (r"(?i)(?P<d>\d{1,2})\s*(?:d'|de)?\s*(?P<name>%s)\s+(?P<Y>\d{4})"
      % _HT_MONTHS_RE, _ht_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -77,3 +102,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_HT_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\b" % _month, _HT_MONTHS[_month]))
+
+for _weekday in sorted(_HT_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _HT_WEEKDAYS[_weekday]))

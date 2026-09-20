@@ -7,10 +7,35 @@
 乌尔都语
 """
 
+_UR_WEEKDAYS = {
+    'پیر': '周一',
+    'منگل': '周二',
+    'بدھ': '周三',
+    'جمعرات': '周四',
+    'جمعہ': '周五',
+    'ہفتہ': '周六',
+    'اتوار': '周日',
+}
+_UR_WEEKDAYS_RE = "|".join(sorted(_UR_WEEKDAYS, key=len, reverse=True))
+
 ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r'(?:اگلے|آئندہ)\s+(%s)' % _UR_WEEKDAYS_RE,
+     lambda m: "下%s" % _UR_WEEKDAYS[m.group(1)]),
+    (r'پچھلے\s+(%s)' % _UR_WEEKDAYS_RE,
+     lambda m: "上%s" % _UR_WEEKDAYS[m.group(1)]),
+    (r'اس\s+(%s)' % _UR_WEEKDAYS_RE,
+     lambda m: "这%s" % _UR_WEEKDAYS[m.group(1)]),
+    (r'آج\s+صبح', '今天 08:00 am'),
+    (r'آج\s+دوپہر', '今天 12:00 pm'),
+    (r'آج\s+سہ\s+پہر', '今天 15:00 pm'),
+    (r'آج\s+شام', '今天 20:00 pm'),
+    (r'آج\s+رات', '今天 22:00 pm'),
+    (r'کل\s+صبح', '明天 08:00 am'),
+    (r'گزشتہ\s+رات', '昨天 22:00 pm'),
+    (r'آدھی\s+رات', '12:00 am'),
     (r'جنوری', '1月'),
     (r'فروری', '2月'),
     (r'مارچ', '3月'),
@@ -47,6 +72,9 @@ SUB_TRANSLATE = [
     (r'اگلے\s+سال', '明年'),
     (r'پچھلے\s+سال', '去年'),
 ]
+
+for _weekday in sorted(_UR_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _UR_WEEKDAYS[_weekday]))
 
 FUZZY_REGEX_LIST = [
     r"(?P<bM>\d+)\s*منٹ قبل"

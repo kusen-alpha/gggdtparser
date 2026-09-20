@@ -23,6 +23,17 @@ _MG_MONTHS = {
 }
 _MG_MONTHS_RE = "|".join(sorted(_MG_MONTHS, key=len, reverse=True))
 
+_MG_WEEKDAYS = {
+    "alatsinainy": "周一",
+    "talata": "周二",
+    "alarobia": "周三",
+    "alakamisy": "周四",
+    "zoma": "周五",
+    "asabotsy": "周六",
+    "alahady": "周日",
+}
+_MG_WEEKDAYS_RE = "|".join(sorted(_MG_WEEKDAYS, key=len, reverse=True))
+
 
 def _mg_month_no(name):
     return _MG_MONTHS[name.lower()]
@@ -53,6 +64,20 @@ def _mg_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(%s)\s+manaraka\b" % _MG_WEEKDAYS_RE,
+     lambda m: "下%s" % _MG_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+lasa\b" % _MG_WEEKDAYS_RE,
+     lambda m: "上%s" % _MG_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bity\s+(%s)\b" % _MG_WEEKDAYS_RE,
+     lambda m: "这%s" % _MG_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\banio\s+maraina\b", "今天 08:00 am"),
+    (r"(?i)\banio\s+antoandro\b", "今天 12:00 pm"),
+    (r"(?i)\banio\s+tolakandro\b", "今天 15:00 pm"),
+    (r"(?i)\banio\s+hariva\b", "今天 20:00 pm"),
+    (r"(?i)\banio\s+alina\b", "今天 22:00 pm"),
+    (r"(?i)\brahampitso\s+maraina\b", "明天 08:00 am"),
+    (r"(?i)\bomaly\s+hariva\b", "昨天 20:00 pm"),
+    (r"(?i)\bmisasakalina\b", "12:00 am"),
     (r"(?i)(?P<d>\d{1,2})\s*(?:ny\s+)?(?P<name>%s)\s+(?P<Y>\d{4})"
      % _MG_MONTHS_RE, _mg_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -77,3 +102,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_MG_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\.?\b" % _month, _MG_MONTHS[_month]))
+
+for _weekday in sorted(_MG_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _MG_WEEKDAYS[_weekday]))

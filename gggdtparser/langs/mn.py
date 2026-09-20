@@ -16,6 +16,17 @@ _MN_UNIT_RE = (
     r"секунд|минут|цаг|өдөр|долоо\s+хоног|хоног|сар|жил"
 )
 
+_MN_WEEKDAYS = {
+    "даваа": "周一", "Даваа": "周一",
+    "мягмар": "周二", "Мягмар": "周二",
+    "лхагва": "周三", "Лхагва": "周三",
+    "пүрэв": "周四", "Пүрэв": "周四",
+    "баасан": "周五", "Баасан": "周五",
+    "бямба": "周六", "Бямба": "周六",
+    "ням": "周日", "Ням": "周日",
+}
+_MN_WEEKDAYS_RE = "|".join(sorted(_MN_WEEKDAYS, key=len, reverse=True))
+
 _MN_MONTHS = {
     "нэгдүгээр сар": "1月",
     "хоёрдугаар сар": "2月",
@@ -41,6 +52,20 @@ def _mn_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:ирэх|дараагийн)\s+(%s)" % _MN_WEEKDAYS_RE,
+     lambda m: "下%s" % _MN_WEEKDAYS[m.group(1)]),
+    (r"өнгөрсөн\s+(%s)" % _MN_WEEKDAYS_RE,
+     lambda m: "上%s" % _MN_WEEKDAYS[m.group(1)]),
+    (r"энэ\s+(%s)" % _MN_WEEKDAYS_RE,
+     lambda m: "这%s" % _MN_WEEKDAYS[m.group(1)]),
+    (r"өнөөдөр\s+өглөө", "今天 08:00 am"),
+    (r"өнөөдөр\s+үд\s+дунд", "今天 12:00 pm"),
+    (r"өнөөдөр\s+үдээс\s+хойш", "今天 15:00 pm"),
+    (r"өнөөдөр\s+орой", "今天 20:00 pm"),
+    (r"өнөөдөр\s+шөнө", "今天 22:00 pm"),
+    (r"маргааш\s+өглөө", "明天 08:00 am"),
+    (r"өчигдөр\s+орой", "昨天 20:00 pm"),
+    (r"шөнө\s+дунд", "12:00 am"),
     (r"(?P<n>\d{1,2})\s*[-–]?\s*р?\s+сар", lambda m: "%s月" % m.group("n")),
 ]
 
@@ -64,3 +89,6 @@ SUB_TRANSLATE += [
     (r"ирэх\s+жил", "明年"),
     (r"өнгөрсөн\s+жил", "去年"),
 ]
+
+for _weekday in sorted(_MN_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _MN_WEEKDAYS[_weekday]))

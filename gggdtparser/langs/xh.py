@@ -23,6 +23,17 @@ _XH_MONTHS = {
 }
 _XH_MONTHS_RE = "|".join(sorted(_XH_MONTHS, key=len, reverse=True))
 
+_XH_WEEKDAYS = {
+    "mvulo": "周一",
+    "lwesibini": "周二", "ulwesibini": "周二",
+    "lwesithathu": "周三", "ulwesithathu": "周三",
+    "lwesine": "周四", "ulwesine": "周四",
+    "lwesihlanu": "周五", "ulwesihlanu": "周五",
+    "umgqibelo": "周六",
+    "icawa": "周日",
+}
+_XH_WEEKDAYS_RE = "|".join(sorted(_XH_WEEKDAYS, key=len, reverse=True))
+
 
 def _xh_month_no(name):
     return _XH_MONTHS[name.lower()]
@@ -53,6 +64,20 @@ def _xh_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(%s)\s+olandela(?:yo)?\b" % _XH_WEEKDAYS_RE,
+     lambda m: "下%s" % _XH_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+odlulileyo\b" % _XH_WEEKDAYS_RE,
+     lambda m: "上%s" % _XH_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:kulo|lo)\s+(%s)\b" % _XH_WEEKDAYS_RE,
+     lambda m: "这%s" % _XH_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bnamhlanje\s+kusasa\b", "今天 08:00 am"),
+    (r"(?i)\bnamhlanje\s+emini\b", "今天 12:00 pm"),
+    (r"(?i)\bnamhlanje\s+emvakwemini\b", "今天 15:00 pm"),
+    (r"(?i)\bnamhlanje\s+ngokuhlwa\b", "今天 20:00 pm"),
+    (r"(?i)\bnamhlanje\s+ebusuku\b", "今天 22:00 pm"),
+    (r"(?i)\bngomso\s+kusasa\b", "明天 08:00 am"),
+    (r"(?i)\bizolo\s+ngokuhlwa\b", "昨天 20:00 pm"),
+    (r"(?i)\bezinzulwini\s+zobusuku\b", "12:00 am"),
     (r"(?i)(?P<d>\d{1,2})\s*(?:ngomhla\s+)?(?P<name>%s)\s+(?P<Y>\d{4})"
      % _XH_MONTHS_RE, _xh_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -76,3 +101,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_XH_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\b" % _month, _XH_MONTHS[_month]))
+
+for _weekday in sorted(_XH_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _XH_WEEKDAYS[_weekday]))

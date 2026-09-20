@@ -24,6 +24,17 @@ _JV_MONTHS = {
 }
 _JV_MONTHS_RE = "|".join(sorted(_JV_MONTHS, key=len, reverse=True))
 
+_JV_WEEKDAYS = {
+    "senin": "周一",
+    "selasa": "周二",
+    "rebo": "周三",
+    "kemis": "周四",
+    "jumat": "周五",
+    "setu": "周六",
+    "minggu": "周日",
+}
+_JV_WEEKDAYS_RE = "|".join(sorted(_JV_WEEKDAYS, key=len, reverse=True))
+
 
 def _jv_month_no(name):
     return _JV_MONTHS[name.lower()]
@@ -54,6 +65,25 @@ def _jv_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(senin|selasa|rebo|kemis|jumat|setu)\s+ngarep\b",
+     lambda m: "下%s" % _JV_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(senin|selasa|rebo|kemis|jumat|setu)\s+(?:kepungkur|wingi)\b",
+     lambda m: "上%s" % _JV_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(senin|selasa|rebo|kemis|jumat|setu)\s+iki\b",
+     lambda m: "这%s" % _JV_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bsesuk\s+esuk\b", "明天 08:00 am"),
+    (r"(?i)\bwingi\s+bengi\b", "昨天 22:00 pm"),
+    (r"(?i)\besuk\s+iki\b", "今天 08:00 am"),
+    (r"(?i)\besuk\b", "今天 08:00 am"),
+    (r"(?i)\bawan\s+iki\b", "今天 12:00 pm"),
+    (r"(?i)\bawan\b", "今天 12:00 pm"),
+    (r"(?i)\bsore\s+iki\b", "今天 15:00 pm"),
+    (r"(?i)\bsore\b", "今天 15:00 pm"),
+    (r"(?i)\bsonten\s+iki\b", "今天 20:00 pm"),
+    (r"(?i)\bsonten\b", "今天 20:00 pm"),
+    (r"(?i)\bbengi\s+iki\b", "今天 22:00 pm"),
+    (r"(?i)\bbengi\b", "今天 22:00 pm"),
+    (r"(?i)\btengah\s+wengi\b", "12:00 am"),
     (r"(?i)(?P<d>\d{1,2})\s*(?:tanggal\s+)?(?P<name>%s)\s+(?P<Y>\d{4})"
      % _JV_MONTHS_RE, _jv_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -81,3 +111,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_JV_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\.?\b" % _month, _JV_MONTHS[_month]))
+
+for _weekday in sorted(_JV_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _JV_WEEKDAYS[_weekday]))

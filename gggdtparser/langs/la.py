@@ -35,6 +35,17 @@ _LA_MONTHS = {
 }
 _LA_MONTHS_RE = "|".join(sorted(_LA_MONTHS, key=len, reverse=True))
 
+_LA_WEEKDAYS = {
+    "feria secunda": "周一",
+    "feria tertia": "周二",
+    "feria quarta": "周三",
+    "feria quinta": "周四",
+    "feria sexta": "周五",
+    "sabbatum": "周六",
+    "dominica": "周日",
+}
+_LA_WEEKDAYS_RE = "|".join(sorted(_LA_WEEKDAYS, key=len, reverse=True))
+
 
 def _la_month_no(name):
     return _LA_MONTHS[name.lower()]
@@ -65,6 +76,20 @@ def _la_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(%s)\s+proxima\b" % _LA_WEEKDAYS_RE,
+     lambda m: "下%s" % _LA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+praeterita\b" % _LA_WEEKDAYS_RE,
+     lambda m: "上%s" % _LA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bhac\s+(%s)\b" % _LA_WEEKDAYS_RE,
+     lambda m: "这%s" % _LA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bhodie\s+mane\b", "今天 08:00 am"),
+    (r"(?i)\bhodie\s+meridie\b", "今天 12:00 pm"),
+    (r"(?i)\bhodie\s+post\s+meridiem\b", "今天 15:00 pm"),
+    (r"(?i)\bhodie\s+vespere\b", "今天 20:00 pm"),
+    (r"(?i)\bhodie\s+nocte\b", "今天 22:00 pm"),
+    (r"(?i)\bcras\s+mane\b", "明天 08:00 am"),
+    (r"(?i)\bheri\s+vespere\b", "昨天 20:00 pm"),
+    (r"(?i)\bmedia\s+nocte\b", "12:00 am"),
     (r"(?i)(?P<d>\d{1,2})\s*(?:mensis\s+)?(?P<name>%s)\s+(?P<Y>\d{4})"
      % _LA_MONTHS_RE, _la_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -88,3 +113,8 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_LA_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\b" % _month, _LA_MONTHS[_month]))
+
+for _weekday in sorted(_LA_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((
+        r"(?i)\b%s\b" % _weekday.replace(" ", r"\s+"),
+        _LA_WEEKDAYS[_weekday]))

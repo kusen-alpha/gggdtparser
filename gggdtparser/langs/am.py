@@ -24,6 +24,17 @@ _AM_MONTHS = {
 }
 _AM_MONTHS_RE = "|".join(sorted(_AM_MONTHS, key=len, reverse=True))
 
+_AM_WEEKDAYS = {
+    "ሰኞ": "周一",
+    "ማክሰኞ": "周二",
+    "ረቡዕ": "周三",
+    "ሐሙስ": "周四",
+    "ዓርብ": "周五",
+    "ቅዳሜ": "周六",
+    "እሑድ": "周日",
+}
+_AM_WEEKDAYS_RE = "|".join(sorted(_AM_WEEKDAYS, key=len, reverse=True))
+
 
 def _am_named_date(match):
     return "%s %s %s" % (
@@ -50,6 +61,20 @@ def _am_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:በሚቀጥለው|የሚቀጥለው)\s+(%s)" % _AM_WEEKDAYS_RE,
+     lambda m: "下%s" % _AM_WEEKDAYS[m.group(1)]),
+    (r"ባለፈው\s+(%s)" % _AM_WEEKDAYS_RE,
+     lambda m: "上%s" % _AM_WEEKDAYS[m.group(1)]),
+    (r"(?:በዚህ|ይህን)\s+(%s)" % _AM_WEEKDAYS_RE,
+     lambda m: "这%s" % _AM_WEEKDAYS[m.group(1)]),
+    (r"ዛሬ\s+ጠዋት", "今天 08:00 am"),
+    (r"ዛሬ\s+እኩለ\s+ቀን", "今天 12:00 pm"),
+    (r"ዛሬ\s+ከሰዓት", "今天 15:00 pm"),
+    (r"ዛሬ\s+ማታ", "今天 20:00 pm"),
+    (r"ዛሬ\s+ሌሊት", "今天 22:00 pm"),
+    (r"ነገ\s+ጠዋት", "明天 08:00 am"),
+    (r"ትናንት\s+ማታ", "昨天 20:00 pm"),
+    (r"እኩለ\s+ሌሊት", "12:00 am"),
     (r"(?P<d>\d{1,2})\s*(?P<name>%s)\s*(?:ቀን\s*)?(?P<Y>\d{4})"
      % _AM_MONTHS_RE, _am_named_date),
     (r"(?P<name>%s)\s+(?P<d>\d{1,2})[,\s]+\s*(?P<Y>\d{4})"
@@ -73,3 +98,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_AM_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((_month, _AM_MONTHS[_month]))
+
+for _weekday in sorted(_AM_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _AM_WEEKDAYS[_weekday]))

@@ -7,10 +7,35 @@
 塔吉克语
 """
 
+_TG_WEEKDAYS = {
+    'душанбе': '周一',
+    'сешанбе': '周二',
+    'чоршанбе': '周三',
+    'панҷшанбе': '周四',
+    'ҷумъа': '周五',
+    'шанбе': '周六',
+    'якшанбе': '周日',
+}
+_TG_WEEKDAYS_RE = "|".join(sorted(_TG_WEEKDAYS, key=len, reverse=True))
+
 ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r'(%s)(?:и)?\s+оянда' % _TG_WEEKDAYS_RE,
+     lambda m: "下%s" % _TG_WEEKDAYS[m.group(1)]),
+    (r'(%s)(?:и)?\s+гузашта' % _TG_WEEKDAYS_RE,
+     lambda m: "上%s" % _TG_WEEKDAYS[m.group(1)]),
+    (r'ин\s+(%s)' % _TG_WEEKDAYS_RE,
+     lambda m: "这%s" % _TG_WEEKDAYS[m.group(1)]),
+    (r'имрӯз\s+субҳ', '今天 08:00 am'),
+    (r'имрӯз\s+нисфирӯзӣ', '今天 12:00 pm'),
+    (r'имрӯз\s+баъд\s+аз\s+нисфирӯзӣ', '今天 15:00 pm'),
+    (r'имрӯз\s+бегоҳ', '今天 20:00 pm'),
+    (r'имрӯз\s+шаб', '今天 22:00 pm'),
+    (r'фардо\s+субҳ', '明天 08:00 am'),
+    (r'дирӯз\s+бегоҳ', '昨天 20:00 pm'),
+    (r'ними\s+шаб', '12:00 am'),
     (r'январ', '1月'),
     (r'феврал', '2月'),
     (r'март', '3月'),
@@ -45,6 +70,9 @@ SUB_TRANSLATE = [
     (r'соли\s+оянда', '明年'),
     (r'соли\s+гузашта', '去年'),
 ]
+
+for _weekday in sorted(_TG_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _TG_WEEKDAYS[_weekday]))
 
 FUZZY_REGEX_LIST = [
     r"(?P<bM>\d+)\s*дақиқалар\s*аввал",

@@ -34,6 +34,17 @@ _KN_UNIT_BASE_RE = (
     r"ಸೆಕೆಂಡು|ನಿಮಿಷ|ಗಂಟೆ|ದಿನ|ವಾರ|ತಿಂಗಳು|ವರ್ಷ"
 )
 
+_KN_WEEKDAYS = {
+    "ಸೋಮವಾರ": "周一",
+    "ಮಂಗಳವಾರ": "周二",
+    "ಬುಧವಾರ": "周三",
+    "ಗುರುವಾರ": "周四",
+    "ಶುಕ್ರವಾರ": "周五",
+    "ಶನಿವಾರ": "周六",
+    "ಭಾನುವಾರ": "周日",
+}
+_KN_WEEKDAYS_RE = "|".join(sorted(_KN_WEEKDAYS, key=len, reverse=True))
+
 
 def _kn_ascii(value):
     return value.translate(_KN_DIGITS)
@@ -56,6 +67,20 @@ def _kn_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:ಮುಂದಿನ|ಮುಂಬರುವ)\s+(%s)" % _KN_WEEKDAYS_RE,
+     lambda m: "下%s" % _KN_WEEKDAYS[m.group(1)]),
+    (r"(?:ಕಳೆದ|ಹಿಂದಿನ)\s+(%s)" % _KN_WEEKDAYS_RE,
+     lambda m: "上%s" % _KN_WEEKDAYS[m.group(1)]),
+    (r"ಈ\s+(%s)" % _KN_WEEKDAYS_RE,
+     lambda m: "这%s" % _KN_WEEKDAYS[m.group(1)]),
+    (r"ಇಂದು\s+ಬೆಳಿಗ್ಗೆ", "今天 08:00 am"),
+    (r"ಇಂದು\s+ಮಧ್ಯಾಹ್ನ", "今天 12:00 pm"),
+    (r"ಇಂದು\s+ಅಪರಾಹ್ನ", "今天 15:00 pm"),
+    (r"ಇಂದು\s+ಸಂಜೆ", "今天 20:00 pm"),
+    (r"ಇಂದು\s+ರಾತ್ರಿ", "今天 22:00 pm"),
+    (r"ನಾಳೆ\s+ಬೆಳಿಗ್ಗೆ", "明天 08:00 am"),
+    (r"ನಿನ್ನೆ\s+ರಾತ್ರಿ", "昨天 22:00 pm"),
+    (r"ಮಧ್ಯರಾತ್ರಿ", "12:00 am"),
     (r"[೦-೯]+", lambda m: m.group(0).translate(_KN_DIGITS)),
     (r"(?P<d>\d{1,2})\s*(?P<name>%s)\s*(?P<Y>\d{4})" % _KN_MONTHS_RE,
      _kn_named_date),
@@ -83,3 +108,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_KN_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((_month, _KN_MONTHS[_month]))
+
+for _weekday in sorted(_KN_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _KN_WEEKDAYS[_weekday]))

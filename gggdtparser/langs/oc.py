@@ -27,6 +27,17 @@ _OC_MONTHS = {
 }
 _OC_MONTHS_RE = "|".join(sorted(_OC_MONTHS, key=len, reverse=True))
 
+_OC_WEEKDAYS = {
+    "diluns": "周一",
+    "dimars": "周二",
+    "dimècres": "周三",
+    "dijòus": "周四",
+    "divendres": "周五",
+    "dissabte": "周六",
+    "dimenge": "周日",
+}
+_OC_WEEKDAYS_RE = "|".join(sorted(_OC_WEEKDAYS, key=len, reverse=True))
+
 
 def _oc_month_no(name):
     return _OC_MONTHS[name.lower()]
@@ -57,6 +68,20 @@ def _oc_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(%s)\s+que\s+ven\b" % _OC_WEEKDAYS_RE,
+     lambda m: "下%s" % _OC_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+passat\b" % _OC_WEEKDAYS_RE,
+     lambda m: "上%s" % _OC_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\baqueste\s+(%s)\b" % _OC_WEEKDAYS_RE,
+     lambda m: "这%s" % _OC_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\buèi\s+(?:al\s+matin|a\s+la\s+matinada)\b", "今天 08:00 am"),
+    (r"(?i)\buèi\s+a\s+miègjorn\b", "今天 12:00 pm"),
+    (r"(?i)\buèi\s+après\s+miègjorn\b", "今天 15:00 pm"),
+    (r"(?i)\buèi\s+al\s+ser\b", "今天 20:00 pm"),
+    (r"(?i)\buèi\s+a\s+nuèch\b", "今天 22:00 pm"),
+    (r"(?i)\bdeman\s+al\s+matin\b", "明天 08:00 am"),
+    (r"(?i)\bièr\s+al\s+ser\b", "昨天 20:00 pm"),
+    (r"(?i)\bmièjanuèch\b", "12:00 am"),
     (r"(?i)(?P<d>\d{1,2})\s*(?:de\s+)?(?P<name>%s)\s+(?P<Y>\d{4})"
      % _OC_MONTHS_RE, _oc_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -80,3 +105,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_OC_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\b" % _month, _OC_MONTHS[_month]))
+
+for _weekday in sorted(_OC_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _OC_WEEKDAYS[_weekday]))

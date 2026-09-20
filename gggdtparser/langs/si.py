@@ -7,10 +7,35 @@
 僧伽罗语
 """
 
+_SI_WEEKDAYS = {
+    "සඳුදා": "周一",
+    "අඟහරුවාදා": "周二",
+    "බදාදා": "周三",
+    "බ්‍රහස්පතින්දා": "周四",
+    "සිකුරාදා": "周五",
+    "සෙනසුරාදා": "周六",
+    "ඉරිදා": "周日",
+}
+_SI_WEEKDAYS_RE = "|".join(sorted(_SI_WEEKDAYS, key=len, reverse=True))
+
 ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r'ලබන\s+(%s)' % _SI_WEEKDAYS_RE,
+     lambda m: "下%s" % _SI_WEEKDAYS[m.group(1)]),
+    (r'පසුගිය\s+(%s)' % _SI_WEEKDAYS_RE,
+     lambda m: "上%s" % _SI_WEEKDAYS[m.group(1)]),
+    (r'මේ\s+(%s)' % _SI_WEEKDAYS_RE,
+     lambda m: "这%s" % _SI_WEEKDAYS[m.group(1)]),
+    (r'අද\s+උදෑසන', '今天 08:00 am'),
+    (r'අද\s+දවල්', '今天 12:00 pm'),
+    (r'අද\s+පස්වරුවේ', '今天 15:00 pm'),
+    (r'අද\s+සවස', '今天 20:00 pm'),
+    (r'අද\s+රෑ', '今天 22:00 pm'),
+    (r'හෙට\s+උදෑසන', '明天 08:00 am'),
+    (r'ඊයේ\s+රෑ', '昨天 22:00 pm'),
+    (r'මැදියම්\s+රෑ', '12:00 am'),
     (r'අප්‍රේල්', '4月'),
     (r'ජනවාරි', '1月'),
     (r'පෙබරවාරි', '2月'),
@@ -60,6 +85,9 @@ SUB_TRANSLATE = [
     (r'ලබන\s+වසර', '明年'),
     (r'පසුගිය\s+වසර', '去年'),
 ]
+
+for _weekday in sorted(_SI_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _SI_WEEKDAYS[_weekday]))
 
 FUZZY_REGEX_LIST = [
 ]

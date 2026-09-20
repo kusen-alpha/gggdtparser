@@ -23,6 +23,17 @@ _CEB_MONTHS = {
 }
 _CEB_MONTHS_RE = "|".join(sorted(_CEB_MONTHS, key=len, reverse=True))
 
+_CEB_WEEKDAYS = {
+    "lunes": "周一",
+    "martes": "周二",
+    "miyerkules": "周三",
+    "huwebes": "周四",
+    "biyernes": "周五",
+    "sabado": "周六",
+    "domingo": "周日",
+}
+_CEB_WEEKDAYS_RE = "|".join(sorted(_CEB_WEEKDAYS, key=len, reverse=True))
+
 
 def _ceb_month_no(name):
     return _CEB_MONTHS[name.lower()]
@@ -53,6 +64,20 @@ def _ceb_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(%s)\s+nga\s+sunod\b" % _CEB_WEEKDAYS_RE,
+     lambda m: "下%s" % _CEB_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bmiaging\s+(%s)\b" % _CEB_WEEKDAYS_RE,
+     lambda m: "上%s" % _CEB_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bkarong\s+(%s)\b" % _CEB_WEEKDAYS_RE,
+     lambda m: "这%s" % _CEB_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bkaron\s+sa\s+buntag\b", "今天 08:00 am"),
+    (r"(?i)\bkaron\s+sa\s+udto\b", "今天 12:00 pm"),
+    (r"(?i)\bkaron\s+sa\s+hapon\b", "今天 15:00 pm"),
+    (r"(?i)\bkaron\s+sa\s+gabii\b", "今天 20:00 pm"),
+    (r"(?i)\bkaron\s+sa\s+kagabhion\b", "今天 22:00 pm"),
+    (r"(?i)\bugma\s+sa\s+buntag\b", "明天 08:00 am"),
+    (r"(?i)\bgahapon\s+sa\s+gabii\b", "昨天 22:00 pm"),
+    (r"(?i)\btungang\s+gabii\b", "12:00 am"),
     (r"(?i)(?P<d>\d{1,2})\s*(?:ika-?\d*\s+sa\s+|ng\s+)?(?P<name>%s)\s+(?P<Y>\d{4})"
      % _CEB_MONTHS_RE, _ceb_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -78,3 +103,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_CEB_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\.?\b" % _month, _CEB_MONTHS[_month]))
+
+for _weekday in sorted(_CEB_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _CEB_WEEKDAYS[_weekday]))

@@ -8,11 +8,51 @@
 索马里语
 """
 
+_SO_WEEKDAYS = {
+    'Isniin': '周一',
+    'Talaado': '周二',
+    'Arbaco': '周三',
+    'Khamiis': '周四',
+    'Jimce': '周五',
+    'Sabti': '周六',
+    'Axad': '周日',
+}
+_SO_WEEKDAYS_RE = "|".join(sorted(_SO_WEEKDAYS, key=len, reverse=True))
+
+_SO_WEEKDAYS_NEXT = {
+    'Isniinta': '周一', 'Talaadada': '周二', 'Arbacada': '周三',
+    'Khamiista': '周四', 'Jimcaha': '周五', 'Sabtida': '周六',
+    'Axadda': '周日',
+}
+_SO_WEEKDAYS_NEXT_RE = "|".join(
+    sorted(_SO_WEEKDAYS_NEXT, key=len, reverse=True))
+
+_SO_WEEKDAYS_PAST = {
+    'Isniintii': '周一', 'Talaadadii': '周二', 'Arbacidii': '周三',
+    'Khamiistii': '周四', 'Jimcihii': '周五', 'Sabtidii': '周六',
+    'Axaddii': '周日',
+}
+_SO_WEEKDAYS_PAST_RE = "|".join(
+    sorted(_SO_WEEKDAYS_PAST, key=len, reverse=True))
+
 ACCURATE_REGEX_LIST = [
     r"(?P<bH>\d+)\s*Saacadood?\s*",
 ]
 
 SUB_TRANSLATE = [
+    (r'(%s)\s+soo\s+socota' % _SO_WEEKDAYS_NEXT_RE,
+     lambda m: "下%s" % _SO_WEEKDAYS_NEXT[m.group(1)]),
+    (r'(%s)\s+hore' % _SO_WEEKDAYS_PAST_RE,
+     lambda m: "上%s" % _SO_WEEKDAYS_PAST[m.group(1)]),
+    (r'Isniintan', '这周一'),
+    (r'maanta\s+subax', '今天 08:00 am'),
+    (r'maanta\s+duhurka', '今天 12:00 pm'),
+    (r'maanta\s+galab', '今天 15:00 pm'),
+    (r'maanta\s+fiid', '今天 20:00 pm'),
+    (r'maanta\s+habeen', '今天 22:00 pm'),
+    (r'berri\s+subax', '明天 08:00 am'),
+    (r'shalay\s+habeen', '昨天 22:00 pm'),
+    (r'saqda\s+dhexe', '12:00 am'),
     (r'Janaayo', '1月'),
     (r'Febraayo', '2月'),
     (r'Maarso', '3月'),
@@ -49,4 +89,8 @@ SUB_TRANSLATE = [
     (r'sanadka\s+soo\s+socda', '明年'),
     (r'sanadkii\s+hore', '去年'),
 ]
+
+for _weekday in sorted(_SO_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _SO_WEEKDAYS[_weekday]))
+
 FUZZY_REGEX_LIST = []

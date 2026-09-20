@@ -27,6 +27,17 @@ _IA_MONTHS = {
 }
 _IA_MONTHS_RE = "|".join(sorted(_IA_MONTHS, key=len, reverse=True))
 
+_IA_WEEKDAYS = {
+    "lunedi": "周一",
+    "martedi": "周二",
+    "mercuridi": "周三",
+    "jovedi": "周四",
+    "venerdi": "周五",
+    "sabbato": "周六",
+    "dominica": "周日",
+}
+_IA_WEEKDAYS_RE = "|".join(sorted(_IA_WEEKDAYS, key=len, reverse=True))
+
 
 def _ia_month_no(name):
     return _IA_MONTHS[name.lower()]
@@ -57,6 +68,20 @@ def _ia_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\bproxime\s+(%s)\b" % _IA_WEEKDAYS_RE,
+     lambda m: "下%s" % _IA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bpassate\s+(%s)\b" % _IA_WEEKDAYS_RE,
+     lambda m: "上%s" % _IA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\biste\s+(%s)\b" % _IA_WEEKDAYS_RE,
+     lambda m: "这%s" % _IA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bhodie\s+matino\b", "今天 08:00 am"),
+    (r"(?i)\bhodie\s+meridie\b", "今天 12:00 pm"),
+    (r"(?i)\bhodie\s+postmeridie\b", "今天 15:00 pm"),
+    (r"(?i)\bhodie\s+vespere\b", "今天 20:00 pm"),
+    (r"(?i)\bhodie\s+nocte\b", "今天 22:00 pm"),
+    (r"(?i)\bdeman\s+matino\b", "明天 08:00 am"),
+    (r"(?i)\bheri\s+vespere\b", "昨天 20:00 pm"),
+    (r"(?i)\bmedianocte\b", "12:00 am"),
     (r"(?i)(?P<d>\d{1,2})\s*(?:de\s+)?(?P<name>%s)\s+(?P<Y>\d{4})"
      % _IA_MONTHS_RE, _ia_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -81,3 +106,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_IA_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\b" % _month, _IA_MONTHS[_month]))
+
+for _weekday in sorted(_IA_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _IA_WEEKDAYS[_weekday]))

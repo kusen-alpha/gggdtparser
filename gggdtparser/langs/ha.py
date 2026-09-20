@@ -30,6 +30,17 @@ _HA_MONTHS = {
 }
 _HA_MONTHS_RE = "|".join(sorted(_HA_MONTHS, key=len, reverse=True))
 
+_HA_WEEKDAYS = {
+    "litinin": "周一",
+    "talata": "周二",
+    "laraba": "周三",
+    "alhamis": "周四",
+    "juma'a": "周五",
+    "asabar": "周六",
+    "lahadi": "周日",
+}
+_HA_WEEKDAYS_RE = "|".join(sorted(_HA_WEEKDAYS, key=len, reverse=True))
+
 
 def _ha_month_no(name):
     return _HA_MONTHS[name.lower()]
@@ -62,6 +73,19 @@ def _ha_ago(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(%s)\s+mai\s+zuwa\b" % _HA_WEEKDAYS_RE,
+     lambda m: "下%s" % _HA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(%s)\s+da\s+(?:ta\s+)?gabata\b" % _HA_WEEKDAYS_RE,
+     lambda m: "上%s" % _HA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bwannan\s+(%s)\b" % _HA_WEEKDAYS_RE,
+     lambda m: "这%s" % _HA_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\byau\s+da\s+safe\b", "今天 08:00 am"),
+    (r"(?i)\byau\s+da\s+rana\b", "今天 12:00 pm"),
+    (r"(?i)\byau\s+da\s+yamma\b", "今天 20:00 pm"),
+    (r"(?i)\byau\s+da\s+dare\b", "今天 22:00 pm"),
+    (r"(?i)\bgobe\s+da\s+safe\b", "明天 08:00 am"),
+    (r"(?i)\bjiya\s+da\s+dare\b", "昨天 22:00 pm"),
+    (r"(?i)\btsakar\s+dare\b", "12:00 am"),
     (r"(?i)(?P<d>\d{1,2})\s*(?:na\s+)?(?P<name>%s)\s+(?P<Y>\d{4})"
      % _HA_MONTHS_RE, _ha_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
@@ -88,3 +112,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_HA_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\.?\b" % _month, _HA_MONTHS[_month]))
+
+for _weekday in sorted(_HA_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _HA_WEEKDAYS[_weekday]))

@@ -36,6 +36,17 @@ _ML_UNIT_BASE_RE = (
     r"ദിവസം|ആഴ്ച|മാസം|വർഷം"
 )
 
+_ML_WEEKDAYS = {
+    "തിങ്കളാഴ്ച": "周一",
+    "ചൊവ്വാഴ്ച": "周二",
+    "ബുധനാഴ്ച": "周三",
+    "വ്യാഴാഴ്ച": "周四",
+    "വെള്ളിയാഴ്ച": "周五",
+    "ശനിയാഴ്ച": "周六",
+    "ഞായറാഴ്ച": "周日",
+}
+_ML_WEEKDAYS_RE = "|".join(sorted(_ML_WEEKDAYS, key=len, reverse=True))
+
 
 def _ml_ascii(value):
     return value.translate(_ML_DIGITS)
@@ -58,6 +69,20 @@ def _ml_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:അടുത്ത|വരുന്ന)\s+(%s)" % _ML_WEEKDAYS_RE,
+     lambda m: "下%s" % _ML_WEEKDAYS[m.group(1)]),
+    (r"കഴിഞ്ഞ\s+(%s)" % _ML_WEEKDAYS_RE,
+     lambda m: "上%s" % _ML_WEEKDAYS[m.group(1)]),
+    (r"ഈ\s+(%s)" % _ML_WEEKDAYS_RE,
+     lambda m: "这%s" % _ML_WEEKDAYS[m.group(1)]),
+    (r"ഇന്ന്\s+രാവിലെ", "今天 08:00 am"),
+    (r"ഇന്ന്\s+ഉച്ചയ്ക്ക്", "今天 12:00 pm"),
+    (r"ഇന്ന്\s+ഉച്ചകഴിഞ്ഞ്", "今天 15:00 pm"),
+    (r"ഇന്ന്\s+വൈകുന്നേരം", "今天 20:00 pm"),
+    (r"ഇന്ന്\s+രാത്രി", "今天 22:00 pm"),
+    (r"നാളെ\s+രാവിലെ", "明天 08:00 am"),
+    (r"ഇന്നലെ\s+രാത്രി", "昨天 22:00 pm"),
+    (r"അർദ്ധരാത്രി", "12:00 am"),
     (r"[൦-൯]+", lambda m: m.group(0).translate(_ML_DIGITS)),
     (r"(?P<d>\d{1,2})\s*(?P<name>%s)\s*(?P<Y>\d{4})" % _ML_MONTHS_RE,
      _ml_named_date),
@@ -85,3 +110,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_ML_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((_month, _ML_MONTHS[_month]))
+
+for _weekday in sorted(_ML_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _ML_WEEKDAYS[_weekday]))

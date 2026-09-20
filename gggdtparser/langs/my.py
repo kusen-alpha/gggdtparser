@@ -33,6 +33,17 @@ _MY_UNIT_BASE_RE = (
     r"စက္ကန့်|မိနစ်|နာရီ|ရက်သတ္တပတ်|ရက်|လ|နှစ်"
 )
 
+_MY_WEEKDAYS = {
+    "တနင်္လာ": "周一",
+    "အင်္ဂါ": "周二",
+    "ဗုဒ္ဓဟူး": "周三",
+    "ကြာသပတေး": "周四",
+    "သောကြာ": "周五",
+    "စနေ": "周六",
+    "တနင်္ဂနွေ": "周日",
+}
+_MY_WEEKDAYS_RE = "|".join(sorted(_MY_WEEKDAYS, key=len, reverse=True))
+
 
 def _my_ascii(value):
     return value.translate(_MY_DIGITS)
@@ -55,6 +66,20 @@ def _my_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:လာမယ့်|နောက်)\s*(%s)" % _MY_WEEKDAYS_RE,
+     lambda m: "下%s" % _MY_WEEKDAYS[m.group(1)]),
+    (r"ပြီးခဲ့တဲ့\s*(%s)" % _MY_WEEKDAYS_RE,
+     lambda m: "上%s" % _MY_WEEKDAYS[m.group(1)]),
+    (r"ဒီ\s*(%s)" % _MY_WEEKDAYS_RE,
+     lambda m: "这%s" % _MY_WEEKDAYS[m.group(1)]),
+    (r"ဒီနေ့\s+မနက်", "今天 08:00 am"),
+    (r"ဒီနေ့\s+မွန်းတည့်", "今天 12:00 pm"),
+    (r"ဒီနေ့\s+မွန်းလွဲ", "今天 15:00 pm"),
+    (r"ဒီနေ့\s+ညနေ", "今天 20:00 pm"),
+    (r"ဒီနေ့\s+ည", "今天 22:00 pm"),
+    (r"မနက်ဖြန်\s+မနက်", "明天 08:00 am"),
+    (r"မနေ့က\s+ည", "昨天 22:00 pm"),
+    (r"သန်းခေါင်ယံ", "12:00 am"),
     (r"[၀-၉]+", lambda m: m.group(0).translate(_MY_DIGITS)),
     (r"(?P<d>\d{1,2})\s*(?P<name>%s)\s*(?P<Y>\d{4})" % _MY_MONTHS_RE,
      _my_named_date),
@@ -82,3 +107,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_MY_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((_month, _MY_MONTHS[_month]))
+
+for _weekday in sorted(_MY_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _MY_WEEKDAYS[_weekday]))

@@ -33,6 +33,18 @@ _AS_UNIT_BASE_RE = (
     r"চেকেণ্ড|মিনিট|ঘণ্টা|দিন|সপ্তাহ|মাহ|বছৰ"
 )
 
+_AS_WEEKDAYS = {
+    "সোমবাৰ": "周一",
+    "মঙ্গলবাৰ": "周二",
+    "বুধবাৰ": "周三",
+    "বৃহস্পতিবাৰ": "周四",
+    "শুক্ৰবাৰ": "周五",
+    "শনিবাৰ": "周六",
+    "দেওবাৰ": "周日",
+    "ৰবিবাৰ": "周日",
+}
+_AS_WEEKDAYS_RE = "|".join(sorted(_AS_WEEKDAYS, key=len, reverse=True))
+
 
 def _as_ascii(value):
     return value.translate(_AS_DIGITS)
@@ -55,6 +67,20 @@ def _as_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?:অহা|পৰৱৰ্তী)\s+(%s)" % _AS_WEEKDAYS_RE,
+     lambda m: "下%s" % _AS_WEEKDAYS[m.group(1)]),
+    (r"(?:যোৱা|গত)\s+(%s)" % _AS_WEEKDAYS_RE,
+     lambda m: "上%s" % _AS_WEEKDAYS[m.group(1)]),
+    (r"এই\s+(%s)" % _AS_WEEKDAYS_RE,
+     lambda m: "这%s" % _AS_WEEKDAYS[m.group(1)]),
+    (r"আজি\s+পুৱা", "今天 08:00 am"),
+    (r"আজি\s+দুপৰীয়া", "今天 12:00 pm"),
+    (r"আজি\s+আবেলি", "今天 15:00 pm"),
+    (r"আজি\s+গধূলি", "今天 20:00 pm"),
+    (r"আজি\s+ৰাতি", "今天 22:00 pm"),
+    (r"কাইলৈ\s+পুৱা", "明天 08:00 am"),
+    (r"যোৱাকালি\s+ৰাতি", "昨天 22:00 pm"),
+    (r"মাজনিশা", "12:00 am"),
     (r"[০-৯]+", lambda m: m.group(0).translate(_AS_DIGITS)),
     (r"(?P<d>\d{1,2})\s*(?P<name>%s)\s*(?P<Y>\d{4})" % _AS_MONTHS_RE,
      _as_named_date),
@@ -82,3 +108,6 @@ SUB_TRANSLATE = [
 
 for _month in sorted(_AS_MONTHS, key=len, reverse=True):
     SUB_TRANSLATE.append((_month, _AS_MONTHS[_month]))
+
+for _weekday in sorted(_AS_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _AS_WEEKDAYS[_weekday]))
