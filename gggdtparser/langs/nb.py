@@ -22,6 +22,11 @@ SUB_TRANSLATE = [
          "mandag": "周一", "tirsdag": "周二", "onsdag": "周三",
          "torsdag": "周四", "fredag": "周五", "lørdag": "周六",
          "søndag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(mandag|tirsdag|onsdag|torsdag|fredag|lørdag|søndag)\b",
+     lambda m: "周%s" % {
+         "mandag": "一", "tirsdag": "二", "onsdag": "三",
+         "torsdag": "四", "fredag": "五", "lørdag": "六",
+         "søndag": "日"}[m.group(1).lower()]),
     (r"januar|jan\.?", "1月"),
     (r"februar|feb\.?", "2月"),
     (r"mars\.?|mars", "3月"),

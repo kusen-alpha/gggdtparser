@@ -33,6 +33,17 @@ _LO_UNIT_BASE_RE = (
     r"ວິນາທີ|ນາທີ|ຊົ່ວໂມງ|ມື້|ອາທິດ|ເດືອນ|ປີ"
 )
 
+_LO_WEEKDAYS = {
+    "ວັນຈັນ": "周一",
+    "ວັນອັງຄານ": "周二",
+    "ວັນພຸດ": "周三",
+    "ວັນພະຫັດ": "周四",
+    "ວັນສຸກ": "周五",
+    "ວັນເສົາ": "周六",
+    "ວັນອາທິດ": "周日",
+}
+_LO_WEEKDAYS_RE = "|".join(sorted(_LO_WEEKDAYS, key=len, reverse=True))
+
 
 def _lo_ascii(value):
     return value.translate(_LO_DIGITS)
@@ -73,6 +84,26 @@ def _lo_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(%s)\s*ໜ້າ" % _LO_WEEKDAYS_RE,
+     lambda m: "下%s" % _LO_WEEKDAYS[m.group(1)]),
+    (r"(%s)\s*ກ່ອນ" % _LO_WEEKDAYS_RE,
+     lambda m: "上%s" % _LO_WEEKDAYS[m.group(1)]),
+    (r"(%s)\s*ນີ້" % _LO_WEEKDAYS_RE,
+     lambda m: "这%s" % _LO_WEEKDAYS[m.group(1)]),
+    (r"(%s)\b" % _LO_WEEKDAYS_RE,
+     lambda m: "周%s" % {
+         "ວັນຈັນ": "一", "ວັນອັງຄານ": "二", "ວັນພຸດ": "三",
+         "ວັນພະຫັດ": "四", "ວັນສຸກ": "五", "ວັນເສົາ": "六",
+         "ວັນອາທິດ": "日"}[m.group(1)]),
+    (r"ຕອນເຊົ້າມື້ນີ້|ມື້ນີ້ຕອນເຊົ້າ", "今天 08:00 am"),
+    (r"ຕອນທ່ຽງ", "12:00 pm"),
+    (r"ຕອນບ່າຍມື້ນີ້|ມື້ນີ້ຕອນບ່າຍ", "今天 15:00 pm"),
+    (r"ຕອນແລງມື້ນີ້|ມື້ນີ້ຕອນແລງ", "今天 20:00 pm"),
+    (r"ກາງຄືນນີ້|ຄືນນີ້", "今天 22:00 pm"),
+    (r"ມື້ອື່ນຕອນເຊົ້າ", "明天 08:00 am"),
+    (r"ມື້ອື່ນຕອນແລງ", "明天 20:00 pm"),
+    (r"ມື້ວານຕອນແລງ", "昨天 20:00 pm"),
+    (r"ເວລາທ່ຽງຄືນ|ທ່ຽງຄືນ", "12:00 am"),
     (r"(?<![໐-໙])([໐-໙]{4})(?![໐-໙])",
      lambda m: _lo_gregorian_year(m.group(1))),
     (r"[໐-໙]+", lambda m: m.group(0).translate(_LO_DIGITS)),

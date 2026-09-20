@@ -50,6 +50,13 @@ SUB_TRANSLATE = [
      lambda m: "上%s" % _ET_WEEKDAYS[m.group(1).lower()]),
     (r"(?i)\b(?:see|sel(?:le)?)\s+(esmaspäev|esmaspäeval|teisipäev|teisipäeval|kolmapäev|kolmapäeval|neljapäev|neljapäeval|reede|reedel|laupäev|laupäeval|pühapäev|pühapäeval)\b",
      lambda m: "这%s" % _ET_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(esmaspäev(?:al)?|teisipäev(?:al)?|kolmapäev(?:al)?|neljapäev(?:al)?|reede(?:l)?|laupäev(?:al)?|pühapäev(?:al)?)\b",
+     lambda m: "周%s" % {
+         "esmaspäev": "一", "esmaspäeval": "一", "teisipäev": "二",
+         "teisipäeval": "二", "kolmapäev": "三", "kolmapäeval": "三",
+         "neljapäev": "四", "neljapäeval": "四", "reede": "五",
+         "reedel": "五", "laupäev": "六", "laupäeval": "六",
+         "pühapäev": "日", "pühapäeval": "日"}[m.group(1).lower()]),
     (r"\bjaanuar\b", "1月"),
     (r"\bveebruar\b", "2月"),
     (r"\bmärts\b", "3月"),

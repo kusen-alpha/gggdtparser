@@ -50,6 +50,14 @@ SUB_TRANSLATE = [
      lambda m: "上%s" % _LT_WEEKDAYS[m.group(1).lower()]),
     (r"(?i)\b(?:šį|šis)\s+(pirmadienis|pirmadienį|antradienis|antradienį|trečiadienis|trečiadienį|ketvirtadienis|ketvirtadienį|penktadienis|penktadienį|šeštadienis|šeštadienį|sekmadienis|sekmadienį)\b",
      lambda m: "这%s" % _LT_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(pirmadien(?:is|į)|antradien(?:is|į)|trečiadien(?:is|į)|ketvirtadien(?:is|į)|penktadien(?:is|į)|šeštadien(?:is|į)|sekmadien(?:is|į))\b",
+     lambda m: "周%s" % {
+         "pirmadienis": "一", "pirmadienį": "一", "antradienis": "二",
+         "antradienį": "二", "trečiadienis": "三", "trečiadienį": "三",
+         "ketvirtadienis": "四", "ketvirtadienį": "四",
+         "penktadienis": "五", "penktadienį": "五", "šeštadienis": "六",
+         "šeštadienį": "六", "sekmadienis": "日", "sekmadienį": "日"}[
+            m.group(1).lower()]),
     (r"\bsausis\b", "1月"),
     (r"\bvasaris\b", "2月"),
     (r"\bkovas\b", "3月"),

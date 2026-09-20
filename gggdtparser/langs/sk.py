@@ -46,6 +46,11 @@ SUB_TRANSLATE = [
          "pondelok": "周一", "utorok": "周二", "streda": "周三",
          "štvrtok": "周四", "piatok": "周五", "sobota": "周六",
          "nedeľa": "周日"}[m.group(1)]),
+    (r"\b(pondelok|utorok|streda|štvrtok|piatok|sobota|nedeľa)\b",
+     lambda m: "周%s" % {
+         "pondelok": "一", "utorok": "二", "streda": "三",
+         "štvrtok": "四", "piatok": "五", "sobota": "六",
+         "nedeľa": "日"}[m.group(1)]),
     (r"\bjanuár\b", "1月"),
     (r"\bfebruár\b", "2月"),
     (r"\bmarec\b", "3月"),

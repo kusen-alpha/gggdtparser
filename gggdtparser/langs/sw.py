@@ -27,6 +27,11 @@ SUB_TRANSLATE = [
      lambda m: "上%s" % _SW_WEEKDAYS[m.group(1).lower()]),
     (r"(?i)\b(jumatatu|jumanne|jumatano|alhamisi|ijumaa|jumamosi|jumapili)\s+hii\b",
      lambda m: "这%s" % _SW_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(jumatatu|jumanne|jumatano|alhamisi|ijumaa|jumamosi|jumapili)\b",
+     lambda m: "周%s" % {
+         "jumatatu": "一", "jumanne": "二", "jumatano": "三",
+         "alhamisi": "四", "ijumaa": "五", "jumamosi": "六",
+         "jumapili": "日"}[m.group(1).lower()]),
     (r'Januari', '1月'),
     (r'Februari', '2月'),
     (r'Machi', '3月'),

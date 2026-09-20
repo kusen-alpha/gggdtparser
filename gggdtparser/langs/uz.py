@@ -47,6 +47,11 @@ SUB_TRANSLATE = [
      lambda m: "上%s" % _UZ_WEEKDAYS[m.group(1).lower()]),
     (r"(?i)\bshu\s+(dushanba|seshanba|chorshanba|payshanba|juma|shanba|yakshanba)\b",
      lambda m: "这%s" % _UZ_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(dushanba|seshanba|chorshanba|payshanba|juma|shanba|yakshanba)\b",
+     lambda m: "周%s" % {
+         "dushanba": "一", "seshanba": "二", "chorshanba": "三",
+         "payshanba": "四", "juma": "五", "shanba": "六",
+         "yakshanba": "日"}[m.group(1).lower()]),
     (r"\byanvar\b", "1月"),
     (r"\bfevral\b", "2月"),
     (r"\bmart\b", "3月"),

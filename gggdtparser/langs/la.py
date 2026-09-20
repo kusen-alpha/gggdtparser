@@ -43,6 +43,22 @@ _LA_WEEKDAYS = {
     "feria sexta": "周五",
     "sabbatum": "周六",
     "dominica": "周日",
+    "dies lunae": "周一",
+    "lunae dies": "周一",
+    "dies martis": "周二",
+    "martis dies": "周二",
+    "dies mercurii": "周三",
+    "mercurii dies": "周三",
+    "dies iovis": "周四",
+    "dies jovis": "周四",
+    "iovis dies": "周四",
+    "jovis dies": "周四",
+    "dies veneris": "周五",
+    "veneris dies": "周五",
+    "dies saturni": "周六",
+    "saturni dies": "周六",
+    "dies solis": "周日",
+    "solis dies": "周日",
 }
 _LA_WEEKDAYS_RE = "|".join(sorted(_LA_WEEKDAYS, key=len, reverse=True))
 

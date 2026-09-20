@@ -32,6 +32,11 @@ SUB_TRANSLATE = [
          "lundi": "周一", "mardi": "周二", "mercredi": "周三",
          "jeudi": "周四", "vendredi": "周五", "samedi": "周六",
          "dimanche": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b",
+     lambda m: "周%s" % {
+         "lundi": "一", "mardi": "二", "mercredi": "三",
+         "jeudi": "四", "vendredi": "五", "samedi": "六",
+         "dimanche": "日"}[m.group(1).lower()]),
     (r"(?i)\bce\s+matin\b", "今天 08:00 am"),
     (r"(?i)\bce\s+midi\b", "今天 12:00 pm"),
     (r"(?i)\bcet\s+après-midi\b|\bcet\s+apres-midi\b", "今天 15:00 pm"),

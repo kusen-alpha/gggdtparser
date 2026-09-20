@@ -19,6 +19,7 @@ _FIL_WEEKDAYS = {
     "huwebes": "周四",
     "biyernes": "周五",
     "sabado": "周六",
+    "linggo": "周日",
 }
 
 SUB_TRANSLATE = [
@@ -29,6 +30,13 @@ SUB_TRANSLATE = [
      lambda m: "上%s" % _FIL_WEEKDAYS[m.group(1).lower()]),
     (r"(?i)\bngayong\s+(lunes|martes|miyerkules|huwebes|biyernes|sabado)\b",
      lambda m: "这%s" % _FIL_WEEKDAYS[m.group(1).lower()]),
+    (r"\bsusunod\s+na\s+linggo\b", "下周"),
+    (r"\bnakaraang\s+linggo\b", "上周"),
+    (r"(?i)\b(lunes|martes|miyerkules|huwebes|biyernes|sabado|linggo)\b",
+     lambda m: "周%s" % {
+         "lunes": "一", "martes": "二", "miyerkules": "三",
+         "huwebes": "四", "biyernes": "五", "sabado": "六",
+         "linggo": "日"}[m.group(1).lower()]),
     (r"\bEnero\b", "1月"),
     (r"\bPebrero\b", "2月"),
     (r"\bMarso\b", "3月"),
@@ -63,8 +71,6 @@ SUB_TRANSLATE = [
      lambda m: "%s%s前" % (
          m.group("num"), _FIL_UNITS[m.group("unit")])),
     (r"\bng\s+", ""),
-    (r"\bsusunod\s+na\s+linggo\b", "下周"),
-    (r"\bnakaraang\s+linggo\b", "上周"),
     (r"\bsusunod\s+na\s+buwan\b", "下个月"),
     (r"\bnakaraang\s+buwan\b", "上个月"),
     (r"\bsusunod\s+na\s+taon\b", "明年"),

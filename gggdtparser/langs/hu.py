@@ -28,6 +28,13 @@ SUB_TRANSLATE = [
          "csütörtök": "周四", "csütörtökön": "周四", "péntek": "周五",
          "pénteken": "周五", "szombat": "周六", "szombaton": "周六",
          "vasárnap": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(hétfő(?:n)?|kedd(?:en)?|szerda(?:n)?|csütörtök(?:ön)?|péntek(?:en)?|szombat(?:on)?|vasárnap)\b",
+     lambda m: "周%s" % {
+         "hétfő": "一", "hétfőn": "一", "kedd": "二", "kedden": "二",
+         "szerda": "三", "szerdán": "三", "csütörtök": "四",
+         "csütörtökön": "四", "péntek": "五", "pénteken": "五",
+         "szombat": "六", "szombaton": "六", "vasárnap": "日"}[
+            m.group(1).lower()]),
     (r"január\.?", "1月"),
     (r"február\.?", "2月"),
     (r"március\.?", "3月"),

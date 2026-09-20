@@ -41,6 +41,11 @@ SUB_TRANSLATE = [
          "montag": "周一", "dienstag": "周二", "mittwoch": "周三",
          "donnerstag": "周四", "freitag": "周五", "samstag": "周六",
          "sonntag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)\b",
+     lambda m: "周%s" % {
+         "montag": "一", "dienstag": "二", "mittwoch": "三",
+         "donnerstag": "四", "freitag": "五", "samstag": "六",
+         "sonntag": "日"}[m.group(1).lower()]),
     (r"(?i)\bheute\s+Morgen\b", "今天 08:00 am"),
     (r"(?i)\bheute\s+Abend\b", "今天 20:00 pm"),
     (r"(?i)\bheute\s+Mittag\b", "今天 12:00 pm"),

@@ -51,7 +51,13 @@ SUB_TRANSLATE = [
          "miercuri": "周三", "miercurea": "周三", "joi": "周四", "joia": "周四",
          "vineri": "周五", "vinerea": "周五", "sâmbătă": "周六",
          "sâmbăta": "周六", "duminică": "周日", "duminica": "周日"}[
-            m.group(1).lower()]),
+           m.group(1).lower()]),
+    (r"(?i)\b(luni|lunea|marți|marțea|miercuri|miercurea|joi|joia|vineri|vinerea|sâmbătă|sâmbăta|duminică|duminica)\b",
+     lambda m: "周%s" % {
+         "luni": "一", "lunea": "一", "marți": "二", "marțea": "二",
+         "miercuri": "三", "miercurea": "三", "joi": "四", "joia": "四",
+         "vineri": "五", "vinerea": "五", "sâmbătă": "六", "sâmbăta": "六",
+         "duminică": "日", "duminica": "日"}[m.group(1).lower()]),
     (r"\b(?:ianuarie|ian\.)\b", "1月"),
     (r"\b(?:februarie|feb\.)\b", "2月"),
     (r"\bmartie\b|\bmart\.\b", "3月"),

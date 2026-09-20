@@ -22,6 +22,13 @@ SUB_TRANSLATE = [
          "maanantaina": "周一", "tiistaina": "周二", "keskiviikkona": "周三",
          "torstaina": "周四", "perjantaina": "周五", "lauantaina": "周六",
          "sunnuntaina": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(maanantai(?:na)?|tiistai(?:na)?|keskiviikko(?:na)?|torstai(?:na)?|perjantai(?:na)?|lauantai(?:na)?|sunnuntai(?:na)?)\b",
+     lambda m: "周%s" % {
+         "maanantai": "一", "maanantaina": "一", "tiistai": "二",
+         "tiistaina": "二", "keskiviikko": "三", "keskiviikkona": "三",
+         "torstai": "四", "torstaina": "四", "perjantai": "五",
+         "perjantaina": "五", "lauantai": "六", "lauantaina": "六",
+         "sunnuntai": "日", "sunnuntaina": "日"}[m.group(1).lower()]),
     (r"maanantai", "周一"),
     (r"tiistai", "周二"),
     (r"keskiviikko", "周三"),

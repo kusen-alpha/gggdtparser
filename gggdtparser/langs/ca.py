@@ -93,3 +93,6 @@ SUB_TRANSLATE = [
     (r"(?P<d>\d{1,2})\s+de\s+(?P<m>\d{1,2})月\s+de\s+(?P<Y>\d{4})",
      lambda m: "%s年%s月%s日" % (m.group("Y"), m.group("m"), m.group("d"))),
 ]
+
+for _weekday in sorted(_CA_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _CA_WEEKDAYS[_weekday]))

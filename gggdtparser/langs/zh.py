@@ -12,6 +12,10 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r'星期([一二三四五六日天])', lambda m: "周%s" % m.group(1)),
+    (r'周([一二三四五六日天])', lambda m: "周%s" % m.group(1)),
+    (r'禮拜([一二三四五六日天])', lambda m: "周%s" % m.group(1)),
+    (r'礼拜([一二三四五六日天])', lambda m: "周%s" % m.group(1)),
     (r"今晚|今天晚上", "今天 22:00 pm"),
     (r"今天早上|今早", "今天 08:00 am"),
     (r"今天中午", "今天 12:00 pm"),

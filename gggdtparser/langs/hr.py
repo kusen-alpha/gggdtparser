@@ -48,6 +48,11 @@ SUB_TRANSLATE = [
      lambda m: "上%s" % _HR_WEEKDAYS[m.group(1).lower()]),
     (r"(?i)\b(?:ovaj|ova)\s+(ponedjeljak|utorak|srijeda|četvrtak|petak|subota|nedjelja)\b",
      lambda m: "这%s" % _HR_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(ponedjeljak|utorak|srijeda|četvrtak|petak|subota|nedjelja)\b",
+     lambda m: "周%s" % {
+         "ponedjeljak": "一", "utorak": "二", "srijeda": "三",
+         "četvrtak": "四", "petak": "五", "subota": "六",
+         "nedjelja": "日"}[m.group(1).lower()]),
     (r"\bsiječanj\b", "1月"),
     (r"\bveljača\b", "2月"),
     (r"\božujak\b", "3月"),

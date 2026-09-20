@@ -25,6 +25,11 @@ SUB_TRANSLATE = [
          "středu": "周三", "čtvrtek": "周四", "pátek": "周五",
          "sobota": "周六", "sobotu": "周六", "neděle": "周日",
          "neděli": "周日"}[m.group(1).lower()]),
+    (r"\b(pondělí|úterý|středa|středu|čtvrtek|pátek|sobota|sobotu|neděle|neděli)\b",
+     lambda m: "周%s" % {
+         "pondělí": "一", "úterý": "二", "středa": "三", "středu": "三",
+         "čtvrtek": "四", "pátek": "五", "sobota": "六", "sobotu": "六",
+         "neděle": "日", "neděli": "日"}[m.group(1).lower()]),
     (r"pondělí", "周一"),
     (r"úterý", "周二"),
     (r"středa", "周三"),

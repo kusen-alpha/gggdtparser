@@ -69,6 +69,11 @@ SUB_TRANSLATE = [
      lambda m: "上%s" % _TK_WEEKDAYS[m.group(1).lower()]),
     (r"(?i)\bşu\s+(duşenbe|sişenbe|çarşenbe|penşenbe|anna|şenbe|ýekşenbe)\b",
      lambda m: "这%s" % _TK_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(duşenbe|sişenbe|çarşenbe|penşenbe|anna|şenbe|ýekşenbe)\b",
+     lambda m: "周%s" % {
+         "duşenbe": "一", "sişenbe": "二", "çarşenbe": "三",
+         "penşenbe": "四", "anna": "五", "şenbe": "六",
+         "ýekşenbe": "日"}[m.group(1).lower()]),
     (r"(?i)(?P<d>\d{1,2})\s*(?:nji|njy)?\s*(?P<name>%s)\s+(?P<Y>\d{4})"
      % _TK_MONTHS_RE, _tk_named_date),
     (r"(?i)(?P<name>%s)\s+(?P<d>\d{1,2}),\s+(?P<Y>\d{4})"
