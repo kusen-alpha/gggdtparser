@@ -31,6 +31,27 @@ def _ro_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(luni|lunea|marți|marțea|miercuri|miercurea|joi|joia|vineri|vinerea|sâmbătă|sâmbăta|duminică|duminica)\s+viitoare\b",
+     lambda m: "下%s" % {
+         "luni": "周一", "lunea": "周一", "marți": "周二", "marțea": "周二",
+         "miercuri": "周三", "miercurea": "周三", "joi": "周四", "joia": "周四",
+         "vineri": "周五", "vinerea": "周五", "sâmbătă": "周六",
+         "sâmbăta": "周六", "duminică": "周日", "duminica": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\b(luni|lunea|marți|marțea|miercuri|miercurea|joi|joia|vineri|vinerea|sâmbătă|sâmbăta|duminică|duminica)\s+(?:trecută|trecute)\b",
+     lambda m: "上%s" % {
+         "luni": "周一", "lunea": "周一", "marți": "周二", "marțea": "周二",
+         "miercuri": "周三", "miercurea": "周三", "joi": "周四", "joia": "周四",
+         "vineri": "周五", "vinerea": "周五", "sâmbătă": "周六",
+         "sâmbăta": "周六", "duminică": "周日", "duminica": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\b(luni|lunea|marți|marțea|miercuri|miercurea|joi|joia|vineri|vinerea|sâmbătă|sâmbăta|duminică|duminica)\s+(?:aceasta|asta)\b",
+     lambda m: "这%s" % {
+         "luni": "周一", "lunea": "周一", "marți": "周二", "marțea": "周二",
+         "miercuri": "周三", "miercurea": "周三", "joi": "周四", "joia": "周四",
+         "vineri": "周五", "vinerea": "周五", "sâmbătă": "周六",
+         "sâmbăta": "周六", "duminică": "周日", "duminica": "周日"}[
+            m.group(1).lower()]),
     (r"\b(?:ianuarie|ian\.)\b", "1月"),
     (r"\b(?:februarie|feb\.)\b", "2月"),
     (r"\bmartie\b|\bmart\.\b", "3月"),
@@ -43,6 +64,13 @@ SUB_TRANSLATE = [
     (r"\b(?:octombrie|oct\.)\b", "10月"),
     (r"\b(?:noiembrie|nov\.)\b", "11月"),
     (r"\b(?:decembrie|dec\.)\b", "12月"),
+    (r"(?i)\bdis\s+dimineață\b|\bîn\s+această\s+dimineață\b", "今天 08:00 am"),
+    (r"(?i)\bla\s+prânz\b|\bprânz\b", "12:00 pm"),
+    (r"(?i)\bdiseară\b|\bîn\s+această\s+seară\b", "今天 20:00 pm"),
+    (r"(?i)\bmâine\s+dimineață\b", "明天 08:00 am"),
+    (r"(?i)\bmâine\s+seară\b", "明天 20:00 pm"),
+    (r"(?i)\bieri\s+seară\b", "昨天 20:00 pm"),
+    (r"(?i)\bla\s+miezul\s+nopții\b", "12:00 am"),
     (r"\balaltăieri\b|\balaltaieri\b", "前天"),
     (r"\bpoimâine\b|\bpoimaine\b", "后天"),
     (r"\bastăzi\b|\bazi\b", "今天"),

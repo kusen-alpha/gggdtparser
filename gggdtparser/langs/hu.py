@@ -7,6 +7,27 @@
 ACCURATE_REGEX_LIST = []
 
 SUB_TRANSLATE = [
+    (r"(?i)(?:jövő|a\s+következő)\s+(hétfőn|kedden|szerdán|csütörtökön|pénteken|szombaton|vasárnap|hétfő|kedd|szerda|csütörtök|péntek|szombat|vasárnap)\b",
+     lambda m: "下%s" % {
+         "hétfő": "周一", "hétfőn": "周一", "kedd": "周二",
+         "kedden": "周二", "szerda": "周三", "szerdán": "周三",
+         "csütörtök": "周四", "csütörtökön": "周四", "péntek": "周五",
+         "pénteken": "周五", "szombat": "周六", "szombaton": "周六",
+         "vasárnap": "周日"}[m.group(1).lower()]),
+    (r"(?i)múlt\s+(hétfőn|kedden|szerdán|csütörtökön|pénteken|szombaton|vasárnap|hétfő|kedd|szerda|csütörtök|péntek|szombat|vasárnap)\b",
+     lambda m: "上%s" % {
+         "hétfő": "周一", "hétfőn": "周一", "kedd": "周二",
+         "kedden": "周二", "szerda": "周三", "szerdán": "周三",
+         "csütörtök": "周四", "csütörtökön": "周四", "péntek": "周五",
+         "pénteken": "周五", "szombat": "周六", "szombaton": "周六",
+         "vasárnap": "周日"}[m.group(1).lower()]),
+    (r"(?i)(?:ez\s+(?:a|az)\s+|ezen\s+(?:a|az)\s+)(hétfőn|kedden|szerdán|csütörtökön|pénteken|szombaton|vasárnap|hétfő|kedd|szerda|csütörtök|péntek|szombat|vasárnap)\b",
+     lambda m: "这%s" % {
+         "hétfő": "周一", "hétfőn": "周一", "kedd": "周二",
+         "kedden": "周二", "szerda": "周三", "szerdán": "周三",
+         "csütörtök": "周四", "csütörtökön": "周四", "péntek": "周五",
+         "pénteken": "周五", "szombat": "周六", "szombaton": "周六",
+         "vasárnap": "周日"}[m.group(1).lower()]),
     (r"január\.?", "1月"),
     (r"február\.?", "2月"),
     (r"március\.?", "3月"),
@@ -26,6 +47,13 @@ SUB_TRANSLATE = [
     (r"péntek", ""),
     (r"szombat", ""),
     (r"vasárnap", ""),
+    (r"ma\s+reggel", "今天 08:00 am"),
+    (r"délben", "12:00 pm"),
+    (r"ma\s+este", "今天 20:00 pm"),
+    (r"holnap\s+reggel", "明天 08:00 am"),
+    (r"holnap\s+este", "明天 20:00 pm"),
+    (r"tegnap\s+este", "昨天 20:00 pm"),
+    (r"éjfélkor", "12:00 am"),
     (r"(?P<num>\d+)\s*órája", lambda m: "%s小时前" % int(m.group("num"))),
     (r"(?P<num>\d+)\s*perce", lambda m: "%s分钟前" % int(m.group("num"))),
     (r"(?P<num>\d+)\s*napja", lambda m: "%s天前" % int(m.group("num"))),

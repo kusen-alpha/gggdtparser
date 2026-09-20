@@ -7,6 +7,21 @@
 ACCURATE_REGEX_LIST = []
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:neste|kommende)\s+(mandag|tirsdag|onsdag|torsdag|fredag|lørdag|søndag)\b",
+     lambda m: "下%s" % {
+         "mandag": "周一", "tirsdag": "周二", "onsdag": "周三",
+         "torsdag": "周四", "fredag": "周五", "lørdag": "周六",
+         "søndag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bforrige\s+(mandag|tirsdag|onsdag|torsdag|fredag|lørdag|søndag)\b",
+     lambda m: "上%s" % {
+         "mandag": "周一", "tirsdag": "周二", "onsdag": "周三",
+         "torsdag": "周四", "fredag": "周五", "lørdag": "周六",
+         "søndag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bdenne\s+(mandag|tirsdag|onsdag|torsdag|fredag|lørdag|søndag)\b",
+     lambda m: "这%s" % {
+         "mandag": "周一", "tirsdag": "周二", "onsdag": "周三",
+         "torsdag": "周四", "fredag": "周五", "lørdag": "周六",
+         "søndag": "周日"}[m.group(1).lower()]),
     (r"januar|jan\.?", "1月"),
     (r"februar|feb\.?", "2月"),
     (r"mars\.?|mars", "3月"),
@@ -26,6 +41,15 @@ SUB_TRANSLATE = [
     (r"fredag", ""),
     (r"lørdag", ""),
     (r"søndag", ""),
+    (r"(?i)\bi\s+morges\b", "今天 08:00 am"),
+    (r"(?i)\bi\s+ettermiddag\b", "今天 15:00 pm"),
+    (r"(?i)\bi\s+kveld\b", "今天 20:00 pm"),
+    (r"(?i)\bi\s+natt\b", "今天 22:00 pm"),
+    (r"(?i)\bi\s+morgen\s+tidlig\b", "明天 08:00 am"),
+    (r"(?i)\bi\s+morgen\s+kveld\b", "明天 20:00 pm"),
+    (r"(?i)\bi\s+går\s+kveld\b", "昨天 20:00 pm"),
+    (r"(?i)\b(?:ved\s+)?middag(?:s)?tid\b", "12:00 pm"),
+    (r"(?i)\bmidnatt\b", "12:00 am"),
     (r"(?P<num>\d+)\s*timer?\s+siden", lambda m: "%s小时前" % int(m.group("num"))),
     (r"(?P<num>\d+)\s*minutter?\s+siden", lambda m: "%s分钟前" % int(m.group("num"))),
     (r"(?P<num>\d+)\s*dager?\s+siden", lambda m: "%s天前" % int(m.group("num"))),

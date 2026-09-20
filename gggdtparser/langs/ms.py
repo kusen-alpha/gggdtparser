@@ -13,6 +13,37 @@ _MS_UNITS = {
 }
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:pada\s+)?(isnin|selasa|rabu|khamis|jumaat|sabtu|ahad)\s+depan\b",
+     lambda m: "下%s" % {
+         "isnin": "周一", "selasa": "周二", "rabu": "周三",
+         "khamis": "周四", "jumaat": "周五", "sabtu": "周六",
+         "ahad": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:pada\s+)?(isnin|selasa|rabu|khamis|jumaat|sabtu|ahad)\s+(?:lepas|yang\s+lalu)\b",
+     lambda m: "上%s" % {
+         "isnin": "周一", "selasa": "周二", "rabu": "周三",
+         "khamis": "周四", "jumaat": "周五", "sabtu": "周六",
+         "ahad": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:pada\s+)?(isnin|selasa|rabu|khamis|jumaat|sabtu|ahad)\s+ini\b",
+     lambda m: "这%s" % {
+         "isnin": "周一", "selasa": "周二", "rabu": "周三",
+         "khamis": "周四", "jumaat": "周五", "sabtu": "周六",
+         "ahad": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bisnin\b", "周一"),
+    (r"(?i)\bselasa\b", "周二"),
+    (r"(?i)\brabu\b", "周三"),
+    (r"(?i)\bkhamis\b", "周四"),
+    (r"(?i)\bjumaat\b", "周五"),
+    (r"(?i)\bsabtu\b", "周六"),
+    (r"(?i)\bahad\b", "周日"),
+    (r"(?i)\bpagi\s+ini\b", "今天 08:00 am"),
+    (r"(?i)\btengah\s+hari\b", "12:00 pm"),
+    (r"(?i)\bpetang\s+ini\b", "今天 15:00 pm"),
+    (r"(?i)\bmalam\s+ini\b", "今天 20:00 pm"),
+    (r"(?i)\besok\s+pagi\b", "明天 08:00 am"),
+    (r"(?i)\besok\s+petang\b", "明天 15:00 pm"),
+    (r"(?i)\besok\s+malam\b", "明天 20:00 pm"),
+    (r"(?i)\bmalam\s+semalam\b|\bsemalam\s+malam\b", "昨天 20:00 pm"),
+    (r"(?i)\btengah\s+malam\b", "12:00 am"),
     (r"\bJanuari\b", "1月"),
     (r"\bFebruari\b", "2月"),
     (r"\bMac\b", "3月"),
