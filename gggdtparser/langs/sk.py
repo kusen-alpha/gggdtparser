@@ -31,6 +31,21 @@ def _sk_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"\b(?:budúci|budúca|budúce|ďalší|ďalšia)\s+(pondelok|utorok|streda|štvrtok|piatok|sobota|nedeľa)\b",
+     lambda m: "下%s" % {
+         "pondelok": "周一", "utorok": "周二", "streda": "周三",
+         "štvrtok": "周四", "piatok": "周五", "sobota": "周六",
+         "nedeľa": "周日"}[m.group(1)]),
+    (r"\b(?:minulý|minulá|minulé|predchádzajúci|predchádzajúca)\s+(pondelok|utorok|streda|štvrtok|piatok|sobota|nedeľa)\b",
+     lambda m: "上%s" % {
+         "pondelok": "周一", "utorok": "周二", "streda": "周三",
+         "štvrtok": "周四", "piatok": "周五", "sobota": "周六",
+         "nedeľa": "周日"}[m.group(1)]),
+    (r"\b(?:tento|táto|toto)\s+(pondelok|utorok|streda|štvrtok|piatok|sobota|nedeľa)\b",
+     lambda m: "这%s" % {
+         "pondelok": "周一", "utorok": "周二", "streda": "周三",
+         "štvrtok": "周四", "piatok": "周五", "sobota": "周六",
+         "nedeľa": "周日"}[m.group(1)]),
     (r"\bjanuár\b", "1月"),
     (r"\bfebruár\b", "2月"),
     (r"\bmarec\b", "3月"),
@@ -43,6 +58,13 @@ SUB_TRANSLATE = [
     (r"\boktóber\b", "10月"),
     (r"\bnovember\b", "11月"),
     (r"\bdecember\b", "12月"),
+    (r"\bdnes\s+ráno\b", "今天 08:00 am"),
+    (r"\bdnes\s+večer\b", "今天 20:00 pm"),
+    (r"\bzajtra\s+ráno\b", "明天 08:00 am"),
+    (r"\bzajtra\s+večer\b", "明天 20:00 pm"),
+    (r"\bvčera\s+večer\b", "昨天 20:00 pm"),
+    (r"\bnapoludnie\b", "12:00 pm"),
+    (r"\bo\s+polnoci\b", "12:00 am"),
     (r"\bpredvčerom\b", "前天"),
     (r"\bpozajtra\b", "后天"),
     (r"\bdnes\b", "今天"),

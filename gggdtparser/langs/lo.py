@@ -38,11 +38,29 @@ def _lo_ascii(value):
     return value.translate(_LO_DIGITS)
 
 
+def _lo_gregorian_year(value):
+    digits = _lo_ascii(value)
+    if not digits.isdigit():
+        return value
+    year = int(digits)
+    # 老挝佛历纪年通常落在 2500-2699 区间，超出范围视为公历。
+    if year < 2500 or year > 2699:
+        return value
+    return str(year - 543)
+
+
 def _lo_named_date(match):
     return "%s %s %s" % (
         _lo_ascii(match.group("d")),
         _LO_MONTHS[match.group("name")],
-        _lo_ascii(match.group("Y")),
+        _lo_gregorian_year(match.group("Y")),
+    )
+
+
+def _lo_month_year(match):
+    return "%s %s" % (
+        _LO_MONTHS[match.group("name")],
+        _lo_gregorian_year(match.group("Y")),
     )
 
 
@@ -55,13 +73,15 @@ def _lo_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?<![໐-໙])([໐-໙]{4})(?![໐-໙])",
+     lambda m: _lo_gregorian_year(m.group(1))),
     (r"[໐-໙]+", lambda m: m.group(0).translate(_LO_DIGITS)),
     (r"(?P<d>\d{1,2})\s*(?P<name>%s)\s*(?P<Y>\d{4})" % _LO_MONTHS_RE,
      _lo_named_date),
     (r"(?P<name>%s)\s*(?P<d>\d{1,2})[,\s]+\s*(?P<Y>\d{4})" % _LO_MONTHS_RE,
      _lo_named_date),
     (r"(?P<name>%s)\s*(?P<Y>\d{4})" % _LO_MONTHS_RE,
-     lambda m: "%s %s" % (_LO_MONTHS[m.group("name")], m.group("Y"))),
+     _lo_month_year),
     (r"ມື້ກ່ອນມື້ວານ", "前天"),
     (r"ມື້ອື່ນໆ", "后天"),
     (r"ມື້ວານ", "昨天"),

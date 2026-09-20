@@ -38,11 +38,29 @@ def _km_ascii(value):
     return value.translate(_KM_DIGITS)
 
 
+def _km_gregorian_year(value):
+    digits = _km_ascii(value)
+    if not digits.isdigit():
+        return value
+    year = int(digits)
+    # 高棉佛历纪年通常落在 2500-2699 区间，超出范围视为公历。
+    if year < 2500 or year > 2699:
+        return value
+    return str(year - 543)
+
+
 def _km_named_date(match):
     return "%s %s %s" % (
         _km_ascii(match.group("d")),
         _KM_MONTHS[match.group("name")],
-        _km_ascii(match.group("Y")),
+        _km_gregorian_year(match.group("Y")),
+    )
+
+
+def _km_month_year(match):
+    return "%s %s" % (
+        _KM_MONTHS[match.group("name")],
+        _km_gregorian_year(match.group("Y")),
     )
 
 
@@ -55,13 +73,15 @@ def _km_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?<![០-៩])([០-៩]{4})(?![០-៩])",
+     lambda m: _km_gregorian_year(m.group(1))),
     (r"[០-៩]+", lambda m: m.group(0).translate(_KM_DIGITS)),
     (r"(?P<d>\d{1,2})\s*(?P<name>%s)\s*(?P<Y>\d{4})" % _KM_MONTHS_RE,
      _km_named_date),
     (r"(?P<name>%s)\s*(?P<d>\d{1,2})[,\s]+\s*(?P<Y>\d{4})" % _KM_MONTHS_RE,
      _km_named_date),
     (r"(?P<name>%s)\s*(?P<Y>\d{4})" % _KM_MONTHS_RE,
-     lambda m: "%s %s" % (_KM_MONTHS[m.group("name")], m.group("Y"))),
+     _km_month_year),
     (r"ម្សិលមិញទៀត", "前天"),
     (r"ខានស្អែក", "后天"),
     (r"ថ្ងៃម្សិលមិញ", "昨天"),

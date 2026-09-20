@@ -32,7 +32,24 @@ def _lt_earlier(match):
     return "%s%s前" % (match.group(1), _LT_UNITS[match.group(2)])
 
 
+_LT_WEEKDAYS = {
+    "pirmadienis": "周一", "pirmadienį": "周一",
+    "antradienis": "周二", "antradienį": "周二",
+    "trečiadienis": "周三", "trečiadienį": "周三",
+    "ketvirtadienis": "周四", "ketvirtadienį": "周四",
+    "penktadienis": "周五", "penktadienį": "周五",
+    "šeštadienis": "周六", "šeštadienį": "周六",
+    "sekmadienis": "周日", "sekmadienį": "周日",
+}
+
+
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:kitą|ateinantį|artėjantį)\s+(pirmadienis|pirmadienį|antradienis|antradienį|trečiadienis|trečiadienį|ketvirtadienis|ketvirtadienį|penktadienis|penktadienį|šeštadienis|šeštadienį|sekmadienis|sekmadienį)\b",
+     lambda m: "下%s" % _LT_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:praėjusį|praeitą)\s+(pirmadienis|pirmadienį|antradienis|antradienį|trečiadienis|trečiadienį|ketvirtadienis|ketvirtadienį|penktadienis|penktadienį|šeštadienis|šeštadienį|sekmadienis|sekmadienį)\b",
+     lambda m: "上%s" % _LT_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:šį|šis)\s+(pirmadienis|pirmadienį|antradienis|antradienį|trečiadienis|trečiadienį|ketvirtadienis|ketvirtadienį|penktadienis|penktadienį|šeštadienis|šeštadienį|sekmadienis|sekmadienį)\b",
+     lambda m: "这%s" % _LT_WEEKDAYS[m.group(1).lower()]),
     (r"\bsausis\b", "1月"),
     (r"\bvasaris\b", "2月"),
     (r"\bkovas\b", "3月"),
@@ -47,6 +64,13 @@ SUB_TRANSLATE = [
     (r"\bgruodis\b", "12月"),
     (r"\bužvakar\b", "前天"),
     (r"\bporyt\b", "后天"),
+    (r"(?i)\b(?:šį\s+rytą|šiandien\s+ryt(?:ą|e))\b", "今天 08:00 am"),
+    (r"(?i)\b(?:šį\s+vakarą|šiandien\s+vakar(?:ą|e))\b", "今天 20:00 pm"),
+    (r"(?i)\b(?:rytoj\s+ryt(?:ą|e)|rytą\s+rytoj)\b", "明天 08:00 am"),
+    (r"(?i)\b(?:rytoj\s+vakar(?:ą|e))\b", "明天 20:00 pm"),
+    (r"(?i)\b(?:vakar\s+vakar(?:ą|e))\b", "昨天 20:00 pm"),
+    (r"(?i)\b(?:vidurdienį|per\s+pietus)\b", "12:00 pm"),
+    (r"(?i)\bvidurnaktį\b", "12:00 am"),
     (r"\bšiandien\b", "今天"),
     (r"\bvakar\b", "昨天"),
     (r"\brytoj\b", "明天"),
