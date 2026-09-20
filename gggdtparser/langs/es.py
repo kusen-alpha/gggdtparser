@@ -11,7 +11,25 @@
 ACCURATE_REGEX_LIST = [
 ]
 
+_ES_MONTH_ABBRS = {
+    "ene": 1, "feb": 2, "mar": 3, "abr": 4, "may": 5, "jun": 6,
+    "jul": 7, "ago": 8, "sep": 9, "set": 9, "oct": 10, "nov": 11,
+    "dic": 12,
+}
+_ES_WEEKDAY_ABBRS = {
+    "lun": "一", "mié": "三", "mie": "三", "jue": "四",
+    "vie": "五", "sáb": "六", "sab": "六", "dom": "日",
+}
+
+
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:lun|mar|mi[ée]|jue|vie|s[áa]b|dom)\.?\s+"
+     r"(?P<d>\d{1,2})\s+(?:de\s+)?"
+     r"(?P<mo>ene|feb|mar|abr|may|jun|jul|ago|sep|set|oct|nov|dic)\.?\s+"
+     r"(?:de\s+)?(?P<Y>\d{4})",
+     lambda m: "%s年%s月%s日" % (
+         m.group("Y"), _ES_MONTH_ABBRS[m.group("mo").lower().rstrip(".")],
+         m.group("d"))),
     (r"(?i)\b(?:el\s+)?(?:pr[óo]ximo|pr[óo]xima)\s+(?:(lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo))\b",
      lambda m: "下%s" % {
          "lunes": "周一", "martes": "周二", "miércoles": "周三",
@@ -48,6 +66,9 @@ SUB_TRANSLATE = [
          "miercoles": "三", "jueves": "四", "viernes": "五",
          "sábado": "六", "sabado": "六", "domingo": "日"}[
             m.group(1).lower()]),
+    (r"(?i)\b(?:lun|mi[ée]|jue|vie|s[áa]b|dom)\.?(?!\w)",
+     lambda m: "周%s" % _ES_WEEKDAY_ABBRS[
+         m.group(0).lower().rstrip(".")]),
     (r"(?i)\best[ae]\s+mañana\b", "今天 08:00 am"),
     (r"(?i)\best[ae]\s+tarde\b", "今天 15:00 pm"),
     (r"(?i)\best[ae]\s+noche\b", "今天 22:00 pm"),
@@ -57,18 +78,21 @@ SUB_TRANSLATE = [
     (r"(?i)\bmañana\s+por\s+la\s+noche\b", "明天 20:00 pm"),
     (r"(?i)\ba\s+mediodía\b|\ba\s+mediodia\b", "12:00 pm"),
     (r"(?i)\ba\s+medianoche\b", "12:00 am"),
-    (r"(de)?\s*enero\s*(de)?", "1月"),
-    (r"(de)?\s*febrero\s*(de)?", "2月"),
-    (r"(de)?\s*marzo\s*(de)?", "3月"),
-    (r"(de)?\s*abril\s*(de)?", "4月"),
-    (r"(de)?\s*mayo\s*(de)?", "5月"),
-    (r"(de)?\s*junio\s*(de)?", "6月"),
-    (r"(de)?\s*julio\s*(de)?", "7月"),
-    (r"(de)?\s*agosto\s*(de)?", "8月"),
-    (r"(de)?\s*septiembre\s*(de)?", "9月"),
-    (r"(de)?\s*octubre\s*(de)?", "10月"),
-    (r"(de)?\s*noviembre\s*(de)?", "11月"),
-    (r"(de)?\s*diciembre\s*(de)?", "12月"),
+    (r"(?i)(de)?\s*enero\s*(de)?", "1月"),
+    (r"(?i)(de)?\s*febrero\s*(de)?", "2月"),
+    (r"(?i)(de)?\s*marzo\s*(de)?", "3月"),
+    (r"(?i)(de)?\s*abril\s*(de)?", "4月"),
+    (r"(?i)(de)?\s*mayo\s*(de)?", "5月"),
+    (r"(?i)(de)?\s*junio\s*(de)?", "6月"),
+    (r"(?i)(de)?\s*julio\s*(de)?", "7月"),
+    (r"(?i)(de)?\s*agosto\s*(de)?", "8月"),
+    (r"(?i)(de)?\s*septiembre\s*(de)?", "9月"),
+    (r"(?i)(de)?\s*octubre\s*(de)?", "10月"),
+    (r"(?i)(de)?\s*noviembre\s*(de)?", "11月"),
+    (r"(?i)(de)?\s*diciembre\s*(de)?", "12月"),
+    (r"(?i)\b(?:ene|feb|mar|abr|may|jun|jul|ago|sep|set|oct|nov|dic)\.?(?!\w)",
+     lambda m: "%s月" % _ES_MONTH_ABBRS[
+         m.group(0).lower().rstrip(".")]),
     (r"(?i)\banteayer\b|\bantier\b", "前天"),
     (r"(?i)\bpasado\s+mañana\b", "后天"),
     (r"(?i)\bayer\b", "昨天"),

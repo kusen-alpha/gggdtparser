@@ -28,6 +28,14 @@ _PT_WEEKDAYS = {
     "sábado": "周六",
     "domingo": "周日",
 }
+_PT_MONTH_ABBRS = {
+    "jan": 1, "fev": 2, "mar": 3, "abr": 4, "mai": 5, "jun": 6,
+    "jul": 7, "ago": 8, "set": 9, "out": 10, "nov": 11, "dez": 12,
+}
+_PT_WEEKDAYS_ABBRS = {
+    "seg": "一", "ter": "二", "qua": "三", "qui": "四",
+    "sex": "五", "sab": "六", "sáb": "六", "dom": "日",
+}
 
 
 def _pt_weekday(value):
@@ -50,6 +58,9 @@ SUB_TRANSLATE = [
     (r"(?i)\bsexta(?:-feira)?\b", "周五"),
     (r"(?i)\bs[áa]bado\b", "周六"),
     (r"(?i)\bdomingo\b", "周日"),
+    (r"(?i)\b(?:seg|ter|qua|qui|sex|s[áa]b|dom)\.?(?!\w)",
+     lambda m: "周%s" % _PT_WEEKDAYS_ABBRS[
+         m.group(0).lower().rstrip(".")]),
     (r"(?i)\best[ae]\s+manhã\b", "今天 08:00 am"),
     (r"(?i)\best[ae]\s+tarde\b", "今天 15:00 pm"),
     (r"(?i)\best[ae]\s+noite\b", "今天 20:00 pm"),
@@ -60,19 +71,22 @@ SUB_TRANSLATE = [
     (r"(?i)\bontem\s+(?:à|de)\s+noite\b", "昨天 20:00 pm"),
     (r"(?i)\bao\s+meio\s*[- ]?dia\b", "12:00 pm"),
     (r"(?i)\bà\s+meia\s*[- ]?noite\b", "12:00 am"),
-    (r"(de)?\s*janeiro\s*(de)?", "1月"),
-    (r"Fev\.?", "2月"),
-    (r"(de)?\s*fevereiro\s*(de)?", "2月"),
-    (r"(de)?\s*março\s*(de)?", "3月"),
-    (r"(de)?\s*abril\s*(de)?", "4月"),
-    (r"(de)?\s*maio\s*(de)?", "5月"),
-    (r"(de)?\s*junho\s*(de)?", "6月"),
-    (r"(de)?\s*julho\s*(de)?", "7月"),
-    (r"(de)?\s*agosto\s*(de)?", "8月"),
-    (r"(de)?\s*setembro\s*(de)?", "9月"),
-    (r"(de)?\s*outubro\s*(de)?", "10月"),
-    (r"(de)?\s*novembro\s*(de)?", "11月"),
-    (r"(de)?\s*dezembro\s*(de)?", "12月"),
+    (r"(?i)(de)?\s*janeiro\s*(de)?", "1月"),
+    (r"(?i)\bFev\.?(?!\w)", "2月"),
+    (r"(?i)(de)?\s*fevereiro\s*(de)?", "2月"),
+    (r"(?i)(de)?\s*março\s*(de)?", "3月"),
+    (r"(?i)(de)?\s*abril\s*(de)?", "4月"),
+    (r"(?i)(de)?\s*maio\s*(de)?", "5月"),
+    (r"(?i)(de)?\s*junho\s*(de)?", "6月"),
+    (r"(?i)(de)?\s*julho\s*(de)?", "7月"),
+    (r"(?i)(de)?\s*agosto\s*(de)?", "8月"),
+    (r"(?i)(de)?\s*setembro\s*(de)?", "9月"),
+    (r"(?i)(de)?\s*outubro\s*(de)?", "10月"),
+    (r"(?i)(de)?\s*novembro\s*(de)?", "11月"),
+    (r"(?i)(de)?\s*dezembro\s*(de)?", "12月"),
+    (r"(?i)\b(?:jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\.?(?!\w)",
+     lambda m: "%s月" % _PT_MONTH_ABBRS[
+         m.group(0).lower().rstrip(".")]),
     (r"anteontem", "前天"),
     (r"depois\s+de\s+amanhã", "后天"),
     (r"ontem", "昨天"),

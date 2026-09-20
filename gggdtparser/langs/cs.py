@@ -7,6 +7,9 @@
 ACCURATE_REGEX_LIST = []
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:po|út|st|čt|pá|so|ne)\.?\s+"
+     r"(?P<d>\d{1,2})\.\s*(?P<m>\d{1,2})\.\s*(?P<Y>\d{4})",
+     lambda m: "%s年%s月%s日" % (m.group("Y"), m.group("m"), m.group("d"))),
     (r"příští\s+(pondělí|úterý|středa|středu|čtvrtek|pátek|sobota|sobotu|neděle|neděli)\b",
      lambda m: "下%s" % {
          "pondělí": "周一", "úterý": "周二", "středa": "周三",
@@ -30,6 +33,10 @@ SUB_TRANSLATE = [
          "pondělí": "一", "úterý": "二", "středa": "三", "středu": "三",
          "čtvrtek": "四", "pátek": "五", "sobota": "六", "sobotu": "六",
          "neděle": "日", "neděli": "日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:po|út|st|čt|pá|so|ne)\.?(?!\w)",
+     lambda m: "周%s" % {
+         "po": "一", "út": "二", "st": "三", "čt": "四",
+         "pá": "五", "so": "六", "ne": "日"}[m.group(0).lower().rstrip(".")]),
     (r"pondělí", "周一"),
     (r"úterý", "周二"),
     (r"středa", "周三"),
