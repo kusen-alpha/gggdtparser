@@ -11,6 +11,36 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:gelecek|önümüzdeki)\s+(pazartesi|salı|çarşamba|perşembe|cuma|cumartesi|pazar)\b",
+     lambda m: "下%s" % {
+         "pazartesi": "周一", "salı": "周二", "çarşamba": "周三",
+         "perşembe": "周四", "cuma": "周五", "cumartesi": "周六",
+         "pazar": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bgeçen\s+(pazartesi|salı|çarşamba|perşembe|cuma|cumartesi|pazar)\b",
+     lambda m: "上%s" % {
+         "pazartesi": "周一", "salı": "周二", "çarşamba": "周三",
+         "perşembe": "周四", "cuma": "周五", "cumartesi": "周六",
+         "pazar": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bbu\s+(pazartesi|salı|çarşamba|perşembe|cuma|cumartesi|pazar)\b",
+     lambda m: "这%s" % {
+         "pazartesi": "周一", "salı": "周二", "çarşamba": "周三",
+         "perşembe": "周四", "cuma": "周五", "cumartesi": "周六",
+         "pazar": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bpazartesi\b", "周一"),
+    (r"(?i)\bsalı\b", "周二"),
+    (r"(?i)\bçarşamba\b", "周三"),
+    (r"(?i)\bperşembe\b", "周四"),
+    (r"(?i)\bcuma\b", "周五"),
+    (r"(?i)\bcumartesi\b", "周六"),
+    (r"(?i)\bpazar\b", "周日"),
+    (r"(?i)\bbu\s+sabah\b", "今天 08:00 am"),
+    (r"(?i)\bbu\s+akşam\b", "今天 20:00 pm"),
+    (r"(?i)\bbu\s+gece\b", "今天 23:00 pm"),
+    (r"(?i)\byarın\s+sabah\b", "明天 08:00 am"),
+    (r"(?i)\byarın\s+akşam\b", "明天 20:00 pm"),
+    (r"(?i)\bdün\s+akşam\b", "昨天 20:00 pm"),
+    (r"(?i)\böğlen\b|\böğle\s+vakti\b", "12:00 pm"),
+    (r"(?i)\bgece\s+yarısı\b", "12:00 am"),
     (r"Ocak", "1月"),
     (r"\bŞubat\b|Şub\.?", "2月"),
     (r"Mart", "3月"),

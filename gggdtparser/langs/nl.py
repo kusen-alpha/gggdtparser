@@ -7,6 +7,47 @@
 ACCURATE_REGEX_LIST = []
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:volgende|komende)\s+(?:(maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag))\b",
+     lambda m: "下%s" % {
+         "maandag": "周一", "dinsdag": "周二", "woensdag": "周三",
+         "donderdag": "周四", "vrijdag": "周五", "zaterdag": "周六",
+         "zondag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:(maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag))\s+(?:volgende|komende)\b",
+     lambda m: "下%s" % {
+         "maandag": "周一", "dinsdag": "周二", "woensdag": "周三",
+         "donderdag": "周四", "vrijdag": "周五", "zaterdag": "周六",
+         "zondag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:vorige|afgelopen)\s+(?:(maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag))\b",
+     lambda m: "上%s" % {
+         "maandag": "周一", "dinsdag": "周二", "woensdag": "周三",
+         "donderdag": "周四", "vrijdag": "周五", "zaterdag": "周六",
+         "zondag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:(maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag))\s+(?:vorige|afgelopen)\b",
+     lambda m: "上%s" % {
+         "maandag": "周一", "dinsdag": "周二", "woensdag": "周三",
+         "donderdag": "周四", "vrijdag": "周五", "zaterdag": "周六",
+         "zondag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bdeze\s+(?:(maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag))\b",
+     lambda m: "这%s" % {
+         "maandag": "周一", "dinsdag": "周二", "woensdag": "周三",
+         "donderdag": "周四", "vrijdag": "周五", "zaterdag": "周六",
+         "zondag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bmaandag\b", "周一"),
+    (r"(?i)\bdinsdag\b", "周二"),
+    (r"(?i)\bwoensdag\b", "周三"),
+    (r"(?i)\bdonderdag\b", "周四"),
+    (r"(?i)\bvrijdag\b", "周五"),
+    (r"(?i)\bzaterdag\b", "周六"),
+    (r"(?i)\bzondag\b", "周日"),
+    (r"(?i)\bvanmorgen\b|\bvanochtend\b", "今天 08:00 am"),
+    (r"(?i)\bvanmiddag\b", "今天 15:00 pm"),
+    (r"(?i)\bvanavond\b", "今天 20:00 pm"),
+    (r"(?i)\bgisteravond\b|\bgisteren\s+avond\b", "昨天 20:00 pm"),
+    (r"(?i)\bgisterochtend\b|\bgisteren\s+ochtend\b", "昨天 08:00 am"),
+    (r"(?i)\bmorgenochtend\b|\bmorgen\s+ochtend\b", "明天 08:00 am"),
+    (r"(?i)\bmorgenavond\b|\bmorgen\s+avond\b", "明天 20:00 pm"),
+    (r"(?i)\bs\s+middags\b|\bsmiddags\b", "12:00 pm"),
+    (r"(?i)\bs\s+nachts\b|\bsnachts\b", "12:00 am"),
     (r"januari|jan\.?", "1月"),
     (r"februari|feb\.?", "2月"),
     (r"maart|mrt\.?", "3月"),

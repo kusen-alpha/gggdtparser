@@ -7,6 +7,36 @@
 ACCURATE_REGEX_LIST = []
 
 SUB_TRANSLATE = [
+    (r"ensi\s+(maanantai|tiistai|keskiviikko|torstai|perjantai|lauantai|sunnuntai)\b",
+     lambda m: "下%s" % {
+         "maanantai": "周一", "tiistai": "周二", "keskiviikko": "周三",
+         "torstai": "周四", "perjantai": "周五", "lauantai": "周六",
+         "sunnuntai": "周日"}[m.group(1).lower()]),
+    (r"viime\s+(maanantai|tiistai|keskiviikko|torstai|perjantai|lauantai|sunnuntai)\b",
+     lambda m: "上%s" % {
+         "maanantai": "周一", "tiistai": "周二", "keskiviikko": "周三",
+         "torstai": "周四", "perjantai": "周五", "lauantai": "周六",
+         "sunnuntai": "周日"}[m.group(1).lower()]),
+    (r"tänä\s+(maanantaina|tiistaina|keskiviikkona|torstaina|perjantaina|lauantaina|sunnuntaina)\b",
+     lambda m: "这%s" % {
+         "maanantaina": "周一", "tiistaina": "周二", "keskiviikkona": "周三",
+         "torstaina": "周四", "perjantaina": "周五", "lauantaina": "周六",
+         "sunnuntaina": "周日"}[m.group(1).lower()]),
+    (r"maanantai", "周一"),
+    (r"tiistai", "周二"),
+    (r"keskiviikko", "周三"),
+    (r"torstai", "周四"),
+    (r"perjantai", "周五"),
+    (r"lauantai", "周六"),
+    (r"sunnuntai", "周日"),
+    (r"tänä\s+aamuna", "今天 08:00 am"),
+    (r"tänä\s+iltapäivänä", "今天 15:00 pm"),
+    (r"tänä\s+iltana", "今天 20:00 pm"),
+    (r"huomisaamuna|huomenna\s+aamulla", "明天 08:00 am"),
+    (r"huomenna\s+illalla", "明天 20:00 pm"),
+    (r"eilen\s+illalla", "昨天 20:00 pm"),
+    (r"keskellä\s+päivää", "12:00 pm"),
+    (r"keskiyöllä", "12:00 am"),
     (r"tammikuuta|tammikuu", "1月"),
     (r"helmikuuta|helmikuu", "2月"),
     (r"maaliskuuta|maaliskuu", "3月"),

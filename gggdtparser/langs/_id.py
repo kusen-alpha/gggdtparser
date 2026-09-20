@@ -13,6 +13,40 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(senin|selasa|rabu|kamis|jumat|sabtu)\s+depan\b",
+     lambda m: "下%s" % {
+         "senin": "周一", "selasa": "周二", "rabu": "周三",
+         "kamis": "周四", "jumat": "周五", "sabtu": "周六"}[
+            m.group(1).lower()]),
+    (r"(?i)\bhari\s+minggu\s+depan\b", "下周日"),
+    (r"(?i)\b(senin|selasa|rabu|kamis|jumat|sabtu)\s+(?:lalu|yang\s+lalu)\b",
+     lambda m: "上%s" % {
+         "senin": "周一", "selasa": "周二", "rabu": "周三",
+         "kamis": "周四", "jumat": "周五", "sabtu": "周六"}[
+            m.group(1).lower()]),
+    (r"(?i)\bhari\s+minggu\s+(?:lalu|yang\s+lalu)\b", "上周日"),
+    (r"(?i)\b(senin|selasa|rabu|kamis|jumat|sabtu)\s+ini\b",
+     lambda m: "这%s" % {
+         "senin": "周一", "selasa": "周二", "rabu": "周三",
+         "kamis": "周四", "jumat": "周五", "sabtu": "周六"}[
+            m.group(1).lower()]),
+    (r"(?i)\bhari\s+minggu\s+ini\b", "这周日"),
+    (r"(?i)\bsenin\b", "周一"),
+    (r"(?i)\bselasa\b", "周二"),
+    (r"(?i)\brabu\b", "周三"),
+    (r"(?i)\bkamis\b", "周四"),
+    (r"(?i)\bjumat\b", "周五"),
+    (r"(?i)\bsabtu\b", "周六"),
+    (r"(?i)\bpagi\s+ini\b", "今天 08:00 am"),
+    (r"(?i)\bsiang\s+ini\b", "今天 12:00 pm"),
+    (r"(?i)\bsore\s+ini\b", "今天 15:00 pm"),
+    (r"(?i)\bmalam\s+ini\b", "今天 20:00 pm"),
+    (r"(?i)\bbesok\s+pagi\b", "明天 08:00 am"),
+    (r"(?i)\bbesok\s+sore\b", "明天 15:00 pm"),
+    (r"(?i)\bbesok\s+malam\b", "明天 20:00 pm"),
+    (r"(?i)\bkemarin\s+malam\b|\btadi\s+malam\b", "昨天 20:00 pm"),
+    (r"(?i)\btengah\s+hari\b", "12:00 pm"),
+    (r"(?i)\btengah\s+malam\b", "12:00 am"),
     (r"\bJanuari\b", "1月"),
     (r"\bFebruari\b", "2月"),
     (r"Maret", "3月"),
