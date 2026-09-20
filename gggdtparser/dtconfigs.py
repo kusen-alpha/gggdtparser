@@ -233,6 +233,44 @@ LANG_MAPPING = {
     # 老挝语
     "lo": "lo",
     "lao": "lo",
+    # 阿姆哈拉语
+    "am": "am",
+    "amh": "am",
+    # 宿务语
+    "ceb": "ceb",
+    # 世界语
+    "eo": "eo",
+    "epo": "eo",
+    # 豪萨语
+    "ha": "ha",
+    "hau": "ha",
+    # 海地克里奥尔语
+    "ht": "ht",
+    "hat": "ht",
+    # 国际语
+    "ia": "ia",
+    "ina": "ia",
+    # 爪哇语
+    "jv": "jv",
+    "jav": "jv",
+    # 拉丁语
+    "la": "la",
+    "lat": "la",
+    # 马达加斯加语
+    "mg": "mg",
+    "mlg": "mg",
+    # 奥克语
+    "oc": "oc",
+    "oci": "oc",
+    # 土库曼语
+    "tk": "tk",
+    "tuk": "tk",
+    # 科萨语
+    "xh": "xh",
+    "xho": "xh",
+    # 祖鲁语
+    "zu": "zu",
+    "zul": "zu",
 }
 
 TRANSLATE_LANGS = []
@@ -248,7 +286,9 @@ _LANG_LIST_SORT = ['default', 'en', 'zh', 'zht', 'de', 'fra', 'swe',
                    'mk', 'sq', 'hy', 'ka', 'kk', 'uz', 'ne',
                    'be', 'bs', 'mn', 'kn', 'ml', 'or', 'as',
                    'cy', 'ga', 'eu', 'gl', 'mt', 'lb',
-                   'my', 'km', 'lo'
+                   'my', 'km', 'lo',
+                   'am', 'ceb', 'eo', 'ha', 'ht', 'ia',
+                   'jv', 'la', 'mg', 'oc', 'tk', 'xh', 'zu'
                    ]
 
 
