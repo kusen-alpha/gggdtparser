@@ -17,6 +17,33 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche))\s+(?:prochain|prochaine)\b",
+     lambda m: "下%s" % {
+         "lundi": "周一", "mardi": "周二", "mercredi": "周三",
+         "jeudi": "周四", "vendredi": "周五", "samedi": "周六",
+         "dimanche": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche))\s+(?:dernier|dernière|derniere)\b",
+     lambda m: "上%s" % {
+         "lundi": "周一", "mardi": "周二", "mercredi": "周三",
+         "jeudi": "周四", "vendredi": "周五", "samedi": "周六",
+         "dimanche": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bcet?\s+(?:(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche))\b",
+     lambda m: "这%s" % {
+         "lundi": "周一", "mardi": "周二", "mercredi": "周三",
+         "jeudi": "周四", "vendredi": "周五", "samedi": "周六",
+         "dimanche": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bce\s+matin\b", "今天 08:00 am"),
+    (r"(?i)\bce\s+midi\b", "今天 12:00 pm"),
+    (r"(?i)\bcet\s+après-midi\b|\bcet\s+apres-midi\b", "今天 15:00 pm"),
+    (r"(?i)\bce\s+soir\b", "今天 22:00 pm"),
+    (r"(?i)\bcette\s+nuit\b", "今天 23:00 pm"),
+    (r"(?i)\bhier\s+matin\b", "昨天 08:00 am"),
+    (r"(?i)\bhier\s+soir\b", "昨天 20:00 pm"),
+    (r"(?i)\bdemain\s+matin\b", "明天 08:00 am"),
+    (r"(?i)\bdemain\s+midi\b", "明天 12:00 pm"),
+    (r"(?i)\bdemain\s+soir\b", "明天 20:00 pm"),
+    (r"(?i)\bà\s+midi\b", "12:00 pm"),
+    (r"(?i)\bà\s+minuit\b", "12:00 am"),
     (r"\bjanvier\b|\bjanv\.\b", "1月"),
     (r"\bf[ée]vrier\b|\bf[ée]vr\.\b|\bfevr\.\b", "2月"),
     (r"\bmars\.?\b", "3月"),

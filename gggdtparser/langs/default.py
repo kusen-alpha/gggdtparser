@@ -8,6 +8,29 @@
 默认
 """
 
+from ..calendars import (
+    iso_week_to_gregorian,
+    ordinal_day_to_month_day,
+)
+
+
+def _iso_week(match):
+    date_value = iso_week_to_gregorian(
+        match.group('isoY'), match.group('isoW'), match.group('isoD'))
+    if date_value is None:
+        return match.group(0)
+    return "%d/%d/%d" % (date_value.year, date_value.month, date_value.day)
+
+
+def _ordinal_day(match):
+    month_day = ordinal_day_to_month_day(
+        match.group('ordY'), match.group('ordD'))
+    if month_day is None:
+        return match.group(0)
+    return "%s/%s/%s" % (
+        match.group('ordY'), month_day[0], month_day[1])
+
+
 ACCURATE_REGEX_LIST = [
 # 精准策略
     r"(?P<Y>\d{4})\s*[\-\|/\.年]\s*(?P<m>\d{1,2})\s*[\-\|/\.月]\s*(?P<d>\d{1,2})(?!\d)\s*[日]?\s*(?=[T，,，\s]|$)[T，,]?\s*(?P<apm>am|pm)?\s*(?P<H>\d{1,2})\s*[:时h.]\s*(?P<M>\d{1,2})\s*[:分]\s*(?P<S>\d{1,2})\s*[秒]?",
@@ -126,6 +149,12 @@ FUZZY_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    # ISO 8601 week dates: 2025-W15-3 -> 2025/04/09
+    (r"(?P<isoY>\d{4})\s*-\s*W\s*(?P<isoW>\d{1,2})\s*-\s*(?P<isoD>[1-7])\b",
+     _iso_week),
+    # Ordinal day of year: 2025-060 -> 2025/03/01
+    (r"(?P<ordY>\d{4})\s*-\s*(?P<ordD>\d{3})\b",
+     _ordinal_day),
     (r"\bFeb\b", "2月"),
     (r'at', ''),
     (r'今日', '今天'),

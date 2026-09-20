@@ -513,7 +513,7 @@ class StringDateTimeRegexParser(object):
             if target_weekday:
                 base_weekday = now.weekday() + 1
                 if weekday_dir in ("下", "下个"):
-                    shift = (target_weekday - base_weekday) % 7 or 7
+                    shift = 7 - base_weekday + target_weekday
                 elif weekday_dir in ("上", "上个"):
                     shift = -((base_weekday - target_weekday) % 7 or 7)
                 else:

@@ -16,6 +16,43 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag))\s+(?:nächste[nrs]?|kommende[nrs]?)\b",
+     lambda m: "下%s" % {
+         "montag": "周一", "dienstag": "周二", "mittwoch": "周三",
+         "donnerstag": "周四", "freitag": "周五", "samstag": "周六",
+         "sonntag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:(?:nächste[nrs]?|kommende[nrs]?))\s+(?:(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag))\b",
+     lambda m: "下%s" % {
+         "montag": "周一", "dienstag": "周二", "mittwoch": "周三",
+         "donnerstag": "周四", "freitag": "周五", "samstag": "周六",
+         "sonntag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag))\s+(?:letzte[nrs]?|vergangene[nrs]?)\b",
+     lambda m: "上%s" % {
+         "montag": "周一", "dienstag": "周二", "mittwoch": "周三",
+         "donnerstag": "周四", "freitag": "周五", "samstag": "周六",
+         "sonntag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:(?:letzte[nrs]?|vergangene[nrs]?))\s+(?:(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag))\b",
+     lambda m: "上%s" % {
+         "montag": "周一", "dienstag": "周二", "mittwoch": "周三",
+         "donnerstag": "周四", "freitag": "周五", "samstag": "周六",
+         "sonntag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bdies(?:en|e|em|er)?\s+(?:(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag))\b",
+     lambda m: "这%s" % {
+         "montag": "周一", "dienstag": "周二", "mittwoch": "周三",
+         "donnerstag": "周四", "freitag": "周五", "samstag": "周六",
+         "sonntag": "周日"}[m.group(1).lower()]),
+    (r"(?i)\bheute\s+Morgen\b", "今天 08:00 am"),
+    (r"(?i)\bheute\s+Abend\b", "今天 20:00 pm"),
+    (r"(?i)\bheute\s+Mittag\b", "今天 12:00 pm"),
+    (r"(?i)\bheute\s+Nacht\b", "今天 23:00 pm"),
+    (r"(?i)\bgestern\s+Abend\b", "昨天 20:00 pm"),
+    (r"(?i)\bgestern\s+Morgen\b", "昨天 08:00 am"),
+    (r"(?i)\bmorgen\s+früh\b", "明天 08:00 am"),
+    (r"(?i)\bmorgen\s+Mittag\b", "明天 12:00 pm"),
+    (r"(?i)\bmorgen\s+Abend\b", "明天 20:00 pm"),
+    (r"(?i)\bübermorgen\s+Morgen\b", "后天 08:00 am"),
+    (r"(?i)\bzu\s+Mittag\b", "12:00 pm"),
+    (r"(?i)\bum\s+Mitternacht\b", "12:00 am"),
     (r"Januar|Jan", "1月"),
     (r"Februar|Feb\.", "2月"),
     (r"März|Mär", "3月"),

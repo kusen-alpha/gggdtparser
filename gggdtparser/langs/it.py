@@ -7,6 +7,42 @@
 ACCURATE_REGEX_LIST = []
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:(luned[ìi]|marted[ìi]|mercoled[ìi]|gioved[ìi]|venerd[ìi]|sabato|domenica))\s+prossim[oa]\b",
+     lambda m: "下%s" % {
+         "lunedì": "周一", "lunedi": "周一", "martedì": "周二",
+         "martedi": "周二", "mercoledì": "周三", "mercoledi": "周三",
+         "giovedì": "周四", "giovedi": "周四", "venerdì": "周五",
+         "venerdi": "周五", "sabato": "周六", "domenica": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\bprossim[oa]\s+(?:(luned[ìi]|marted[ìi]|mercoled[ìi]|gioved[ìi]|venerd[ìi]|sabato|domenica))\b",
+     lambda m: "下%s" % {
+         "lunedì": "周一", "lunedi": "周一", "martedì": "周二",
+         "martedi": "周二", "mercoledì": "周三", "mercoledi": "周三",
+         "giovedì": "周四", "giovedi": "周四", "venerdì": "周五",
+         "venerdi": "周五", "sabato": "周六", "domenica": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\b(?:(luned[ìi]|marted[ìi]|mercoled[ìi]|gioved[ìi]|venerd[ìi]|sabato|domenica))\s+(?:scors[oa]|precedente)\b",
+     lambda m: "上%s" % {
+         "lunedì": "周一", "lunedi": "周一", "martedì": "周二",
+         "martedi": "周二", "mercoledì": "周三", "mercoledi": "周三",
+         "giovedì": "周四", "giovedi": "周四", "venerdì": "周五",
+         "venerdi": "周五", "sabato": "周六", "domenica": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\bquest[oa]\s+(?:(luned[ìi]|marted[ìi]|mercoled[ìi]|gioved[ìi]|venerd[ìi]|sabato|domenica))\b",
+     lambda m: "这%s" % {
+         "lunedì": "周一", "lunedi": "周一", "martedì": "周二",
+         "martedi": "周二", "mercoledì": "周三", "mercoledi": "周三",
+         "giovedì": "周四", "giovedi": "周四", "venerdì": "周五",
+         "venerdi": "周五", "sabato": "周六", "domenica": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\bstamattina\b|\bstamani\b", "今天 08:00 am"),
+    (r"(?i)\b(?:quest[oa]\s+sera|stasera)\b", "今天 20:00 pm"),
+    (r"(?i)\b(?:quest[oa]\s+notte|stanotte)\b", "今天 23:00 pm"),
+    (r"(?i)\bieri\s+sera\b", "昨天 20:00 pm"),
+    (r"(?i)\bdomani\s+mattina\b", "明天 08:00 am"),
+    (r"(?i)\bdomani\s+sera\b", "明天 20:00 pm"),
+    (r"(?i)\ba\s+mezzogiorno\b", "12:00 pm"),
+    (r"(?i)\ba\s+mezzanotte\b", "12:00 am"),
     (r"\bgennaio\b|\bgen\.\b", "1月"),
     (r"\bfebbraio\b|\bfeb\.\b", "2月"),
     (r"\bmarzo\b|\bmar\.\b", "3月"),

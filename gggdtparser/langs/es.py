@@ -12,6 +12,45 @@ ACCURATE_REGEX_LIST = [
 ]
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:el\s+)?(?:pr[óo]ximo|pr[óo]xima)\s+(?:(lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo))\b",
+     lambda m: "下%s" % {
+         "lunes": "周一", "martes": "周二", "miércoles": "周三",
+         "miercoles": "周三", "jueves": "周四", "viernes": "周五",
+         "sábado": "周六", "sabado": "周六", "domingo": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\b(?:(lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo))\s+(?:pr[óo]ximo|pr[óo]xima)\b",
+     lambda m: "下%s" % {
+         "lunes": "周一", "martes": "周二", "miércoles": "周三",
+         "miercoles": "周三", "jueves": "周四", "viernes": "周五",
+         "sábado": "周六", "sabado": "周六", "domingo": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\b(?:(lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo))\s+(?:pasado|pasada|anterior)\b",
+     lambda m: "上%s" % {
+         "lunes": "周一", "martes": "周二", "miércoles": "周三",
+         "miercoles": "周三", "jueves": "周四", "viernes": "周五",
+         "sábado": "周六", "sabado": "周六", "domingo": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\b(?:el\s+)?(?:(lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo))\s+(?:que\s+viene)\b",
+     lambda m: "下%s" % {
+         "lunes": "周一", "martes": "周二", "miércoles": "周三",
+         "miercoles": "周三", "jueves": "周四", "viernes": "周五",
+         "sábado": "周六", "sabado": "周六", "domingo": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\beste\s+(?:(lunes|martes|mi[ée]rcoles|jueves|viernes|s[áa]bado|domingo))\b",
+     lambda m: "这%s" % {
+         "lunes": "周一", "martes": "周二", "miércoles": "周三",
+         "miercoles": "周三", "jueves": "周四", "viernes": "周五",
+         "sábado": "周六", "sabado": "周六", "domingo": "周日"}[
+            m.group(1).lower()]),
+    (r"(?i)\best[ae]\s+mañana\b", "今天 08:00 am"),
+    (r"(?i)\best[ae]\s+tarde\b", "今天 15:00 pm"),
+    (r"(?i)\best[ae]\s+noche\b", "今天 22:00 pm"),
+    (r"(?i)\banoche\b", "昨天 22:00 pm"),
+    (r"(?i)\bmañana\s+por\s+la\s+mañana\b", "明天 08:00 am"),
+    (r"(?i)\bmañana\s+por\s+la\s+tarde\b", "明天 15:00 pm"),
+    (r"(?i)\bmañana\s+por\s+la\s+noche\b", "明天 20:00 pm"),
+    (r"(?i)\ba\s+mediodía\b|\ba\s+mediodia\b", "12:00 pm"),
+    (r"(?i)\ba\s+medianoche\b", "12:00 am"),
     (r"(de)?\s*enero\s*(de)?", "1月"),
     (r"(de)?\s*febrero\s*(de)?", "2月"),
     (r"(de)?\s*marzo\s*(de)?", "3月"),
