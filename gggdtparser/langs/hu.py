@@ -35,6 +35,11 @@ SUB_TRANSLATE = [
          "csütörtökön": "四", "péntek": "五", "pénteken": "五",
          "szombat": "六", "szombaton": "六", "vasárnap": "日"}[
             m.group(1).lower()]),
+    (r"(?iu)\b(?:h|k|sze|cs|p|szo|v)\.?(?!\w)",
+     lambda m: "周%s" % {
+         "h": "一", "k": "二", "sze": "三", "cs": "四",
+         "p": "五", "szo": "六", "v": "日"}[
+             m.group(0).lower().rstrip(".")]),
     (r"(?iu)\b(?:jan\.?|január)(?!\w)", "1月"),
     (r"(?iu)\b(?:febr?\.?|február)(?!\w)", "2月"),
     (r"(?iu)\b(?:márc\.?|március)(?!\w)", "3月"),

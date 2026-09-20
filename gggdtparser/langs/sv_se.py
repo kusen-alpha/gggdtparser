@@ -27,6 +27,11 @@ SUB_TRANSLATE = [
          "måndag": "一", "tisdag": "二", "onsdag": "三",
          "torsdag": "四", "fredag": "五", "lördag": "六",
          "söndag": "日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:mån|tis|ons|tors|fre|lör|sön)\.?(?!\w)",
+     lambda m: "周%s" % {
+         "mån": "一", "tis": "二", "ons": "三", "tors": "四",
+         "fre": "五", "lör": "六", "sön": "日"}[
+            m.group(0).lower().rstrip(".")]),
     (r"januari|jan\.?", "1月"),
     (r"februari|feb\.?", "2月"),
     (r"mars", "3月"),
@@ -35,7 +40,7 @@ SUB_TRANSLATE = [
     (r"juni|jun\.?", "6月"),
     (r"juli|jul\.?", "7月"),
     (r"augusti|aug\.?", "8月"),
-    (r"september|sept\.?", "9月"),
+    (r"september|sept\.?|sep\.?", "9月"),
     (r"oktober|okt\.?", "10月"),
     (r"november|nov\.?", "11月"),
     (r"december|dec\.?", "12月"),

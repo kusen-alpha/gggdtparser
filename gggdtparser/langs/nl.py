@@ -39,6 +39,10 @@ SUB_TRANSLATE = [
     (r"(?i)\bvrijdag\b", "周五"),
     (r"(?i)\bzaterdag\b", "周六"),
     (r"(?i)\bzondag\b", "周日"),
+    (r"(?i)\b(?:ma|di|wo|do|vr|za|zo)\.?(?!\w)",
+     lambda m: "周%s" % {
+         "ma": "一", "di": "二", "wo": "三", "do": "四",
+         "vr": "五", "za": "六", "zo": "日"}[m.group(0).lower().rstrip(".")]),
     (r"(?i)\bvanmorgen\b|\bvanochtend\b", "今天 08:00 am"),
     (r"(?i)\bvanmiddag\b", "今天 15:00 pm"),
     (r"(?i)\bvanavond\b", "今天 20:00 pm"),

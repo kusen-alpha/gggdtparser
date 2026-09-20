@@ -30,7 +30,29 @@ def _ro_earlier(match):
     return "%s%s前" % (match.group(1), _RO_UNITS[match.group(2)])
 
 
+_RO_MONTH_ABBRS = {
+    "ian": 1, "feb": 2, "mar": 3, "mart": 3, "apr": 4, "mai": 5,
+    "iun": 6, "iul": 7, "aug": 8, "sept": 9, "oct": 10, "nov": 11,
+    "dec": 12,
+}
+
+
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:lun|mar|mie|joi|vin|s[âa]m|dum)\.?\s+"
+     r"(?P<d>\d{1,2})\s+"
+     r"(?P<mo>ian|feb|mar|mart|apr|mai|iun|iul|aug|sept|oct|nov|dec)\.?\s+"
+     r"(?P<Y>\d{4})",
+     lambda m: "%s年%s月%s日" % (
+         m.group("Y"),
+         _RO_MONTH_ABBRS[m.group("mo").lower().rstrip(".")],
+         m.group("d"))),
+    (r"(?i)\b(?P<d>\d{1,2})\s+"
+     r"(?P<mo>ian|feb|mar|mart|apr|mai|iun|iul|aug|sept|oct|nov|dec)\.?\s+"
+     r"(?P<Y>\d{4})",
+     lambda m: "%s年%s月%s日" % (
+         m.group("Y"),
+         _RO_MONTH_ABBRS[m.group("mo").lower().rstrip(".")],
+         m.group("d"))),
     (r"(?i)\b(luni|lunea|marți|marțea|miercuri|miercurea|joi|joia|vineri|vinerea|sâmbătă|sâmbăta|duminică|duminica)\s+viitoare\b",
      lambda m: "下%s" % {
          "luni": "周一", "lunea": "周一", "marți": "周二", "marțea": "周二",
@@ -58,6 +80,11 @@ SUB_TRANSLATE = [
          "miercuri": "三", "miercurea": "三", "joi": "四", "joia": "四",
          "vineri": "五", "vinerea": "五", "sâmbătă": "六", "sâmbăta": "六",
          "duminică": "日", "duminica": "日"}[m.group(1).lower()]),
+    (r"(?i)\b(?:lun|mar|mie|joi|vin|s[âa]m|dum)\.?(?!\w)",
+     lambda m: "周%s" % {
+         "lun": "一", "mar": "二", "mie": "三", "joi": "四",
+         "vin": "五", "sâm": "六", "sam": "六", "dum": "日"}[
+             m.group(0).lower().rstrip(".")]),
     (r"(?i)\b(?:ianuarie|ian\.?(?!\w))", "1月"),
     (r"(?i)\b(?:februarie|feb\.?(?!\w))", "2月"),
     (r"(?i)\b(?:martie|mart\.?(?!\w))", "3月"),

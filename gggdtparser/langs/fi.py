@@ -29,6 +29,11 @@ SUB_TRANSLATE = [
          "torstai": "四", "torstaina": "四", "perjantai": "五",
          "perjantaina": "五", "lauantai": "六", "lauantaina": "六",
          "sunnuntai": "日", "sunnuntaina": "日"}[m.group(1).lower()]),
+    (r"(?iu)\b(?:ma|ti|ke|to|pe|la|su)\.?(?!\w)",
+     lambda m: "周%s" % {
+         "ma": "一", "ti": "二", "ke": "三", "to": "四",
+         "pe": "五", "la": "六", "su": "日"}[
+            m.group(0).lower().rstrip(".")]),
     (r"maanantai", "周一"),
     (r"tiistai", "周二"),
     (r"keskiviikko", "周三"),

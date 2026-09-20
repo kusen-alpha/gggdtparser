@@ -32,6 +32,11 @@ SUB_TRANSLATE = [
     (r"(?i)\bpiątek\b", "周五"),
     (r"(?i)\bsobota\b", "周六"),
     (r"(?i)\bniedziela\b", "周日"),
+    (r"(?i)\b(?:pon\.?|wt\.?|śr\.?|czw\.?|pt\.?|sob\.?|niedz\.?)(?!\w)",
+     lambda m: "周%s" % {
+         "pon": "一", "wt": "二", "śr": "三", "czw": "四",
+         "pt": "五", "sob": "六", "niedz": "日"}[
+            m.group(0).lower().rstrip(".")]),
     (r"dzisiaj\s+rano|dziś\s+rano", "今天 08:00 am"),
     (r"dzisiaj\s+po\s+południu|dziś\s+po\s+południu", "今天 15:00 pm"),
     (r"dzisiaj\s+wieczorem|dziś\s+wieczorem", "今天 20:00 pm"),
