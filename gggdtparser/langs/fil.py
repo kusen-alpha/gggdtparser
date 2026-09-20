@@ -12,8 +12,23 @@ _FIL_UNITS = {
     "araw": "天", "linggo": "周", "buwan": "月", "taon": "年",
 }
 
+_FIL_WEEKDAYS = {
+    "lunes": "周一",
+    "martes": "周二",
+    "miyerkules": "周三",
+    "huwebes": "周四",
+    "biyernes": "周五",
+    "sabado": "周六",
+}
+
 SUB_TRANSLATE = [
     (r"\bika-(\d+)\b", lambda m: m.group(1)),
+    (r"(?i)\b(?:sa\s+)?(?:susunod\s+na|darating\s+na)\s+(lunes|martes|miyerkules|huwebes|biyernes|sabado)\b",
+     lambda m: "下%s" % _FIL_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:noong\s+)?(?:nakaraang|naunang|huling)\s+(lunes|martes|miyerkules|huwebes|biyernes|sabado)\b",
+     lambda m: "上%s" % _FIL_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bngayong\s+(lunes|martes|miyerkules|huwebes|biyernes|sabado)\b",
+     lambda m: "这%s" % _FIL_WEEKDAYS[m.group(1).lower()]),
     (r"\bEnero\b", "1月"),
     (r"\bPebrero\b", "2月"),
     (r"\bMarso\b", "3月"),
@@ -28,6 +43,15 @@ SUB_TRANSLATE = [
     (r"\bDisyembre\b", "12月"),
     (r"\bnoong\s+isang\s+araw\b", "前天"),
     (r"\bsa\s+makalawa\b", "后天"),
+    (r"(?i)\b(?:ngayong\s+umaga|kaninang\s+umaga)\b", "今天 08:00 am"),
+    (r"(?i)\bngayong\s+hapon\b", "今天 15:00 pm"),
+    (r"(?i)\bngayong\s+gabi\b", "今天 20:00 pm"),
+    (r"(?i)\bmamayang\s+gabi\b", "今天 22:00 pm"),
+    (r"(?i)\bbukas\s+(?:ng\s+)?umaga\b", "明天 08:00 am"),
+    (r"(?i)\bbukas\s+(?:ng\s+)?gabi\b", "明天 20:00 pm"),
+    (r"(?i)\bkagabi\b", "昨天 22:00 pm"),
+    (r"(?i)\btanghali\b", "12:00 pm"),
+    (r"(?i)\bhatinggabi\b", "12:00 am"),
     (r"\b(?:ngayon\s+din|sa\s+ngayon)\b", "刚刚"),
     (r"\bngayon\b", "今天"),
     (r"\bkahapon\b", "昨天"),

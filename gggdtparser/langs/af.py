@@ -14,7 +14,23 @@ _AF_UNITS = {
     "jaar": "年",
 }
 
+_AF_WEEKDAYS = {
+    "maandag": "周一",
+    "dinsdag": "周二",
+    "woensdag": "周三",
+    "donderdag": "周四",
+    "vrydag": "周五",
+    "saterdag": "周六",
+    "sondag": "周日",
+}
+
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:volgende|aankomende|komende)\s+(maandag|dinsdag|woensdag|donderdag|vrydag|saterdag|sondag)\b",
+     lambda m: "下%s" % _AF_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:verlede|afgelope)\s+(maandag|dinsdag|woensdag|donderdag|vrydag|saterdag|sondag)\b",
+     lambda m: "上%s" % _AF_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:hierdie|dié)\s+(maandag|dinsdag|woensdag|donderdag|vrydag|saterdag|sondag)\b",
+     lambda m: "这%s" % _AF_WEEKDAYS[m.group(1).lower()]),
     (r"\bJanuarie\b", "1月"),
     (r"\bFebruarie\b", "2月"),
     (r"\bMaart\b", "3月"),
@@ -29,6 +45,16 @@ SUB_TRANSLATE = [
     (r"\bDesember\b", "12月"),
     (r"\beergister\b", "前天"),
     (r"\boormôre\b", "后天"),
+    (r"(?i)\bvanoggend\b", "今天 08:00 am"),
+    (r"(?i)\b(?:vandagmiddag|vanmiddag)\b", "今天 15:00 pm"),
+    (r"(?i)\b(?:vandagaand|vanaand)\b", "今天 20:00 pm"),
+    (r"(?i)\b(?:môreoggend|môre\s+oggend)\b", "明天 08:00 am"),
+    (r"(?i)\b(?:môremiddag|môre\s+middag)\b", "明天 15:00 pm"),
+    (r"(?i)\b(?:môreaand|môre\s+aand)\b", "明天 20:00 pm"),
+    (r"(?i)\b(?:gisteraand|gister\s+aand)\b", "昨天 20:00 pm"),
+    (r"(?i)\bgister\s+nag\b", "昨天 22:00 pm"),
+    (r"(?i)\b(?:middaguur|middag)\b", "12:00 pm"),
+    (r"(?i)\bmiddernag\b", "12:00 am"),
     (r"\bvandag\b", "今天"),
     (r"\bgister\b", "昨天"),
     (r"\bmôre\b", "明天"),

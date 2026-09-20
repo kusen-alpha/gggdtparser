@@ -21,6 +21,16 @@ _UZ_UNIT_RE = (
     r"hafta(?:dan)?|oy(?:dan)?|yil(?:dan)?"
 )
 
+_UZ_WEEKDAYS = {
+    "dushanba": "周一",
+    "seshanba": "周二",
+    "chorshanba": "周三",
+    "payshanba": "周四",
+    "juma": "周五",
+    "shanba": "周六",
+    "yakshanba": "周日",
+}
+
 
 def _uz_later(match):
     return "%s%s后" % (match.group(1), _UZ_UNITS[match.group(2)])
@@ -31,6 +41,12 @@ def _uz_earlier(match):
 
 
 SUB_TRANSLATE = [
+    (r"(?i)\b(?:kelasi|keyingi)\s+(dushanba|seshanba|chorshanba|payshanba|juma|shanba|yakshanba)\b",
+     lambda m: "下%s" % _UZ_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(?:o'tgan|o'tggan|otgan)\s+(dushanba|seshanba|chorshanba|payshanba|juma|shanba|yakshanba)\b",
+     lambda m: "上%s" % _UZ_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\bshu\s+(dushanba|seshanba|chorshanba|payshanba|juma|shanba|yakshanba)\b",
+     lambda m: "这%s" % _UZ_WEEKDAYS[m.group(1).lower()]),
     (r"\byanvar\b", "1月"),
     (r"\bfevral\b", "2月"),
     (r"\bmart\b", "3月"),
@@ -45,6 +61,16 @@ SUB_TRANSLATE = [
     (r"\bdekabr\b", "12月"),
     (r"\boldin\s+kecha\b", "前天"),
     (r"\bindin\b", "后天"),
+    (r"(?i)\bbugun\s+ertalab\b", "今天 08:00 am"),
+    (r"(?i)\bbugun\s+(?:tushda|tush\s+paytida)\b", "12:00 pm"),
+    (r"(?i)\bbugun\s+tushdan\s+keyin\b", "今天 15:00 pm"),
+    (r"(?i)\bbugun\s+kechqurun\b", "今天 20:00 pm"),
+    (r"(?i)\bbugun\s+kechasi\b", "今天 22:00 pm"),
+    (r"(?i)\bertaga\s+ertalab\b", "明天 08:00 am"),
+    (r"(?i)\bertaga\s+kechqurun\b", "明天 20:00 pm"),
+    (r"(?i)\bkecha\s+kechqurun\b", "昨天 20:00 pm"),
+    (r"(?i)\bkecha\s+tunda\b", "昨天 22:00 pm"),
+    (r"(?i)\b(?:yarim\s+tun|yarimtun)\b", "12:00 am"),
     (r"\bbugun\b", "今天"),
     (r"\bkecha\b", "昨天"),
     (r"\bertaga\b", "明天"),

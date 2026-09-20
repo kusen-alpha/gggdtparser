@@ -10,7 +10,23 @@
 ACCURATE_REGEX_LIST = [
 ]
 
+_SW_WEEKDAYS = {
+    "jumatatu": "周一",
+    "jumanne": "周二",
+    "jumatano": "周三",
+    "alhamisi": "周四",
+    "ijumaa": "周五",
+    "jumamosi": "周六",
+    "jumapili": "周日",
+}
+
 SUB_TRANSLATE = [
+    (r"(?i)\b(jumatatu|jumanne|jumatano|alhamisi|ijumaa|jumamosi|jumapili)\s+(?:ijayo|inayofuata)\b",
+     lambda m: "下%s" % _SW_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(jumatatu|jumanne|jumatano|alhamisi|ijumaa|jumamosi|jumapili)\s+iliyopita\b",
+     lambda m: "上%s" % _SW_WEEKDAYS[m.group(1).lower()]),
+    (r"(?i)\b(jumatatu|jumanne|jumatano|alhamisi|ijumaa|jumamosi|jumapili)\s+hii\b",
+     lambda m: "这%s" % _SW_WEEKDAYS[m.group(1).lower()]),
     (r'Januari', '1月'),
     (r'Februari', '2月'),
     (r'Machi', '3月'),
@@ -25,6 +41,17 @@ SUB_TRANSLATE = [
     (r'Desemba', '12月'),
     (r'juzi', '前天'),
     (r'kesho\s+kutwa', '后天'),
+    (r'(?i)\basubuhi\s+hii\b', '今天 08:00 am'),
+    (r'(?i)\bmchana\s+huu\b', '今天 15:00 pm'),
+    (r'(?i)\bjioni\s+hii\b', '今天 20:00 pm'),
+    (r'(?i)\busiku\s+huu\b', '今天 22:00 pm'),
+    (r'(?i)\bkesho\s+asubuhi\b', '明天 08:00 am'),
+    (r'(?i)\bkesho\s+jioni\b', '明天 20:00 pm'),
+    (r'(?i)\bkesho\s+usiku\b', '明天 22:00 pm'),
+    (r'(?i)\bjana\s+jioni\b', '昨天 20:00 pm'),
+    (r'(?i)\bjana\s+usiku\b', '昨天 22:00 pm'),
+    (r'(?i)\badhuhuri\b', '12:00 pm'),
+    (r'(?i)\busiku\s+wa\s+manane\b', '12:00 am'),
     (r'jana', '昨天'),
     (r'leo', '今天'),
     (r'kesho', '明天'),
