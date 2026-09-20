@@ -96,3 +96,6 @@ SUB_TRANSLATE = [
 for _weekday in sorted(_EU_WEEKDAYS, key=len, reverse=True):
     SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday,
                           _EU_WEEKDAYS[_weekday]))
+for _weekday in sorted(_EU_WEEKDAYS_BASE, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday,
+                          _EU_WEEKDAYS_BASE[_weekday]))

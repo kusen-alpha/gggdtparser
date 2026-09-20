@@ -72,3 +72,6 @@ SUB_TRANSLATE = [
     (r"\bvolgende\s+jaar\b", "明年"),
     (r"\bverlede\s+jaar\b", "去年"),
 ]
+
+for _weekday in sorted(_AF_WEEKDAYS, key=len, reverse=True):
+    SUB_TRANSLATE.append((r"(?i)\b%s\b" % _weekday, _AF_WEEKDAYS[_weekday]))

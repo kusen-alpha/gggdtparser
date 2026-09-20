@@ -90,7 +90,7 @@ SUB_TRANSLATE = [
      lambda m: "上%s" % _KM_WEEKDAYS[m.group(1)]),
     (r"(?:ថ្ងៃ)?(%s)\s*នេះ" % _KM_WEEKDAYS_RE,
      lambda m: "这%s" % _KM_WEEKDAYS[m.group(1)]),
-    (r"(?:ថ្ងៃ)?(%s)\b" % _KM_WEEKDAYS_RE,
+    (r"(?:ថ្ងៃ)?(%s)(?![\u1780-\u17FF])" % _KM_WEEKDAYS_RE,
      lambda m: "周%s" % {
          "ចន្ទ": "一", "ច័ន្ទ": "一", "អង្គារ": "二", "អង្គាក់": "二",
          "ពុធ": "三", "ព្រហស្បតិ៍": "四", "ព្រហស្បតិ៏": "四",

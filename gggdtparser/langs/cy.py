@@ -64,6 +64,7 @@ SUB_TRANSLATE = [
     (r"(?i)\bcanol\s+dydd\b", "12:00 pm"),
     (r"(?i)\bIonawr\b", "1月"),
     (r"(?i)\bChwefror\b", "2月"),
+    (r"(?i)\bdydd\s+mawrth\b", "周二"),
     (r"(?i)\bMawrth\b", "3月"),
     (r"(?i)\bEbrill\b", "4月"),
     (r"(?i)\bMai\b", "5月"),

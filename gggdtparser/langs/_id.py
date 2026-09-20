@@ -65,7 +65,6 @@ SUB_TRANSLATE = [
     (r"Kamis", ""),
     (r"Jumat", ""),
     (r"Sabtu", ""),
-    (r"Minggu", ""),
     (r"(?P<d>\d{1,2})\s+(?P<m>\d{1,2})\s*月\s+(?P<Y>\d{4})\s+(?P<H>\d{1,2})\.(?P<M>\d{2})",
      lambda m: "%s %s月 %s %s:%s" % (
          m.group("d"), m.group("m"), m.group("Y"),
@@ -100,6 +99,8 @@ SUB_TRANSLATE = [
     (r"bulan\s+lalu\b", "上个月"),
     (r"tahun\s+depan\b", "明年"),
     (r"tahun\s+lalu\b", "去年"),
+    (r"(?i)\bminggu\s+ini\b", "这周日"),
+    (r"(?i)\bminggu\b", "周日"),
 ]
 FUZZY_REGEX_LIST = [
     r"(?P<bH>\d+)\s*jam\s*yang\s*lalu",

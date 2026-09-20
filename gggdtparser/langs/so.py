@@ -95,5 +95,9 @@ SUB_TRANSLATE = [
 
 for _weekday in sorted(_SO_WEEKDAYS, key=len, reverse=True):
     SUB_TRANSLATE.append((_weekday, _SO_WEEKDAYS[_weekday]))
+for _weekday in sorted(_SO_WEEKDAYS_NEXT, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _SO_WEEKDAYS_NEXT[_weekday]))
+for _weekday in sorted(_SO_WEEKDAYS_PAST, key=len, reverse=True):
+    SUB_TRANSLATE.append((_weekday, _SO_WEEKDAYS_PAST[_weekday]))
 
 FUZZY_REGEX_LIST = []
