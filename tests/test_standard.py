@@ -10,10 +10,14 @@ from gggdtparser import parse
 dt = datetime.datetime
 
 
+def _local_timestamp_expected():
+    return dt.fromtimestamp(1643738522)
+
+
 VALID_CASES = [
     # 时间戳
-    ("1643738522", dt(2022, 2, 2, 2, 2, 2)),
-    ("1643738522000", dt(2022, 2, 2, 2, 2, 2)),
+    ("1643738522", _local_timestamp_expected()),
+    ("1643738522000", _local_timestamp_expected()),
     # ISO / 分隔符 / 中文
     ("2022-02-02T02:02:02+00:00", dt(2022, 2, 2, 2, 2, 2)),
     ("2022-02-02 02:02:02", dt(2022, 2, 2, 2, 2, 2)),

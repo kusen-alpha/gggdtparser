@@ -105,8 +105,9 @@ def test_translate_func_is_applied_before_parsing():
 
 
 def test_parse_by_regex_timestamp():
-    assert parse_by_regex("1643738522") == dt(2022, 2, 2, 2, 2, 2)
-    assert parse_by_regex("1643738522000") == dt(2022, 2, 2, 2, 2, 2)
+    expected = dt.fromtimestamp(1643738522)
+    assert parse_by_regex("1643738522") == expected
+    assert parse_by_regex("1643738522000") == expected
 
 
 def test_parse_by_regex_bad_lang_returns_none():
